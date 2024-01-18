@@ -36,17 +36,17 @@ const INPUT_FIELD_IDS = [
   HOSPITALIZATION_ENDTIME_INPUT_ID
 ];
 
+if (typeof window !== 'undefined') {
+  window.onload = function() {
+    load_common_data();
 
-window.onload = function() {
-  load_common_data();
+    init_fields();
 
-  init_fields();
+    init_coverage_indicator();
 
-  init_coverage_indicator();
-
-  add_event_listeners();
-  };
-
+    add_event_listeners();
+    };
+}
 // Initialize the input fields by populating lists, or setting initial values.
 function init_fields() {
   init_country_dropdowns();
@@ -250,8 +250,60 @@ function add_event_listeners() {
 // Onboarding task: 
   // Write a function that takes as input: a string containing epilog data corresponding to data for an example claim (which would otherwise be entered into the web form),
   // and outputs: true if the claim is covered by the policy, and false otherwise.
-
-
+const {definemorefacts,read,readdata,compfinds,definemorerules,debugfinds,maketimestamp} = require('../../src/epilog.js')
+if (typeof localStorage === 'undefined') {
+  global.localStorage = {
+      getItem: function(key) {
+          return this[key] || null;
+      },
+      setItem: function(key, value) {
+          this[key] = value.toString();
+      },
+      removeItem: function(key) {
+          delete this[key];
+      }
+  };
+}
+function match_with_regex_2_arity(regex,string){
+  let match = regex.exec(string);
+  return [match[1],match[2]]
+}
+function match_with_regex_2_arity_conditional(regex,string,id){
+  let match = regex.exec(string)
+  console.assert(match[1]==id,"id of the clause is incorrect")
+  return match[2]
+}
+function get_datetime_clause(date,time){
+  let splitDate = date.split("_");
+  let splitTime = time.split("_");
+  // maketimestamp is an epilog.js function
+  let timeStamp = maketimestamp(splitDate[0], splitDate[1], splitDate[2], splitTime[0], splitTime[1], splitTime[2]);
+  return "datetimetotimestamp(" + date + "," + time + "," + timeStamp + ") ";
+}
+function test_input_string(input_str){
+  load_common_data();
+  let common_dataset = definemorefacts([], readdata(localStorage["commonData"]));
+  let combined_dataset = definemorefacts(common_dataset, readdata(input_str));
+  let [claim_id,policy_id] = match_with_regex_2_arity(/claim\.policy\(([^,]+),\s*([^)]+)\)/g,input_str);
+  let hosp_id= match_with_regex_2_arity_conditional(/claim\.hospitalization\(([^,]+),\s*([^)]+)\)/g,input_str,claim_id);
+  let hosp_startdate=match_with_regex_2_arity_conditional(/hospitalization\.startdate\(([^,]+),\s*([^)]+)\)/g,input_str,hosp_id);
+  let hosp_starttime=match_with_regex_2_arity_conditional(/hospitalization\.starttime\(([^,]+),\s*([^)]+)\)/g,input_str,hosp_id);
+  let hosp_enddate=match_with_regex_2_arity_conditional(/hospitalization\.enddate\(([^,]+),\s*([^)]+)\)/g,input_str,hosp_id);
+  let hosp_endtime=match_with_regex_2_arity_conditional(/hospitalization\.endtime\(([^,]+),\s*([^)]+)\)/g,input_str,hosp_id);
+  let datetime_clauses=get_datetime_clause(hosp_startdate,hosp_starttime)
+  datetime_clauses+=get_datetime_clause(hosp_enddate,hosp_endtime)
+  combined_dataset = definemorefacts(combined_dataset,readdata(datetime_clauses))
+  let covers_query = "covers(" + policy_id + ", " + claim_id + ")";
+  let coverage = compfinds('covered', read(covers_query), combined_dataset, definemorerules([], readdata(policy_rules)));
+  if (coverage.length === 0) {
+    console.log('false')
+  } else {
+    console.log('true')
+  }
+}
+const {load_common_data} = require('../../src/load_common_data')
+const {load_example_claim} = require('../../src/load_example_claim')
+load_example_claim();
 let policy_rules = `
 covers(P, C) :-
   claim.policy(C, P) &
@@ -321,3 +373,4 @@ duration(Z,DURATION) :-
 
 geq(X, Y) :- evaluate(min(X,Y), Y)
 `;
+test_input_string(localStorage["example_claim"]);
