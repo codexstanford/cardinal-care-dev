@@ -1,14 +1,14 @@
 const POLICY_ID_INPUT_ID = "policy_id_input";
-const POLICY_SIGNED_INPUT_ID = "policy_signed_input";
-const WELLNESS_VISIT_CONFIRMATION_INPUT_ID = "wellness_visit_confirmation_input";
-const PREMIUM_PAID_AMOUNT_INPUT_ID = "premium_paid_amount_input";
-const POLICY_CANCELED_INPUT_ID = "policy_canceled_input";
+const POLICY_OPTED_OUT_INPUT_ID = "policy_opted_out_input";
 const CLAIM_ID_INPUT_ID = "claim_id_input";
 const CLAIMANT_ID_INPUT_ID = "claimant_id_input";
 const CLAIM_DATE_INPUT_ID = "claim_date_input";
 const PATIENT_AGE_INPUT_ID = "patient_age_input";
 const HOSPITALIZATION_ID_INPUT_ID = "hospitalization_id_input";
-const HOSPITALIZATION_REASON_INPUT_ID = "hospitalization_reason_input";
+const HOSPITALIZATION_TREATMENT_LOCATION_INPUT_ID = "hospitalization_treatment_location_input";
+const HOSPITALIZATION_HOSPITAL_INPUT_ID = "hospitalization_hospital_input";
+const HOSPITALIZATION_TYPE_OF_HEALTHCARE_INPUT_ID = "hospitalization_type_of_healthcare_input";
+const HOSPITALIZATION_NUM_PREV_VISITS_ID = "hospitalization_num_prev_visits_input";
 const HOSPITALIZATION_CAUSE_INPUT_ID = "hospitalization_cause_input";
 const HOSPITALIZATION_COUNTRY_INPUT_ID = "hospitalization_country_input";
 const HOSPITALIZATION_STARTDATE_INPUT_ID = "hospitalization_startdate_input";
@@ -18,16 +18,16 @@ const HOSPITALIZATION_ENDTIME_INPUT_ID = "hospitalization_endtime_input";
 
 const INPUT_FIELD_IDS = [
   POLICY_ID_INPUT_ID,
-  POLICY_SIGNED_INPUT_ID,
-  WELLNESS_VISIT_CONFIRMATION_INPUT_ID,
-  PREMIUM_PAID_AMOUNT_INPUT_ID,
-  POLICY_CANCELED_INPUT_ID,
+  POLICY_OPTED_OUT_INPUT_ID,
   CLAIM_ID_INPUT_ID,
   CLAIMANT_ID_INPUT_ID,
   CLAIM_DATE_INPUT_ID,
   PATIENT_AGE_INPUT_ID,
   HOSPITALIZATION_ID_INPUT_ID,
-  HOSPITALIZATION_REASON_INPUT_ID,
+  HOSPITALIZATION_TREATMENT_LOCATION_INPUT_ID,
+  HOSPITALIZATION_HOSPITAL_INPUT_ID,
+  HOSPITALIZATION_TYPE_OF_HEALTHCARE_INPUT_ID,
+  HOSPITALIZATION_NUM_PREV_VISITS_ID,
   HOSPITALIZATION_CAUSE_INPUT_ID,
   HOSPITALIZATION_COUNTRY_INPUT_ID,
   HOSPITALIZATION_STARTDATE_INPUT_ID,
@@ -91,36 +91,14 @@ function get_data_from_input_fields() {
   }
   
   let facts_to_add = "claim.policy(" + CLAIM_ID_VALUE + ", " + POLICY_ID_VALUE + ") claim.hospitalization(" + CLAIM_ID_VALUE + ", " + HOSPITALIZATION_ID_VALUE + ")";
-
+  facts_to_add += "policy.type(" + POLICY_ID_VALUE + ", stanford_cardinal) ";
   // Policy facts
-  const POLICY_SIGNED_VALUE = document.getElementById(POLICY_SIGNED_INPUT_ID).checked;
-  if (POLICY_SIGNED_VALUE === true) {
-    facts_to_add += "policy.signed(" + POLICY_ID_VALUE + ", yes) ";
+  const POLICY_OPTED_OUT_VALUE = document.getElementById(POLICY_OPTED_OUT_INPUT_ID).checked;
+  if (POLICY_OPTED_OUT_VALUE === true) {
+    facts_to_add += "policy.opted_out(" + POLICY_ID_VALUE + ", yes) ";
   } else {
-    facts_to_add += "policy.signed(" + POLICY_ID_VALUE + ", no) ";
+    facts_to_add += "policy.opted_out(" + POLICY_ID_VALUE + ", no) ";
   }
-
-  const WELLNESS_VISIT_CONFIRMATION_VALUE = document.getElementById(WELLNESS_VISIT_CONFIRMATION_INPUT_ID).checked;
-  if (WELLNESS_VISIT_CONFIRMATION_VALUE === true) {
-    facts_to_add += "policy.wellness_visit_confirmation_provided(" + POLICY_ID_VALUE + ", yes) ";
-  } else {
-    facts_to_add += "policy.wellness_visit_confirmation_provided(" + POLICY_ID_VALUE + ", no) ";
-  }
-
-  const PREMIUM_PAID_AMOUNT_VALUE = document.getElementById(PREMIUM_PAID_AMOUNT_INPUT_ID).value;
-  if (PREMIUM_PAID_AMOUNT_VALUE === '') {
-    facts_to_add += "policy.premium_amount_paid(" + POLICY_ID_VALUE + ", 0) ";
-  } else {
-    facts_to_add += "policy.premium_amount_paid(" + POLICY_ID_VALUE + ", "+ PREMIUM_PAID_AMOUNT_VALUE +") ";
-  }
-
-  const POLICY_CANCELED_VALUE = document.getElementById(POLICY_CANCELED_INPUT_ID).checked;
-  if (POLICY_CANCELED_VALUE === true) {
-    facts_to_add += "policy.canceled(" + POLICY_ID_VALUE + ", yes) ";
-  } else {
-    facts_to_add += "policy.canceled(" + POLICY_ID_VALUE + ", no) ";
-  }
-
 
   // Claim facts
   const CLAIMANT_ID_VALUE = document.getElementById(CLAIMANT_ID_INPUT_ID).value;
@@ -145,10 +123,27 @@ function get_data_from_input_fields() {
 
   // Hospitalization facts
 
-  const HOSPITALIZATION_REASON_VALUE = document.getElementById(HOSPITALIZATION_REASON_INPUT_ID).value;
-  if (HOSPITALIZATION_REASON_VALUE !== "") {
-    facts_to_add += "hospitalization.reason(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_REASON_VALUE + ") ";
-  } 
+  const HOSPITALIZATION_TREATMENT_LOCATION_VALUE = document.getElementById(HOSPITALIZATION_TREATMENT_LOCATION_INPUT_ID).value;
+  if (HOSPITALIZATION_TREATMENT_LOCATION_VALUE !== "") {
+    facts_to_add += "hospitalization.treatment_location(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_TREATMENT_LOCATION_VALUE + ") ";
+  }
+
+  const HOSPITALIZATION_HOSPITAL_VALUE = document.getElementById(HOSPITALIZATION_HOSPITAL_INPUT_ID).value;
+  if (HOSPITALIZATION_HOSPITAL_VALUE !== "") {
+    facts_to_add += "hospitalization.hospital(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_HOSPITAL_VALUE + ") ";
+  }
+
+  const HOSPITALIZATION_TYPE_OF_HEALTHCARE_VALUE = document.getElementById(HOSPITALIZATION_TYPE_OF_HEALTHCARE_INPUT_ID).value;
+  if (HOSPITALIZATION_TYPE_OF_HEALTHCARE_VALUE !== "") {
+    facts_to_add += "hospitalization.type_of_healthcare(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_TYPE_OF_HEALTHCARE_VALUE + ") ";
+  }
+
+  const HOSPITALIZATION_NUM_PREV_VISITS_VALUE = document.getElementById(HOSPITALIZATION_NUM_PREV_VISITS_ID).value;
+  if (HOSPITALIZATION_NUM_PREV_VISITS_VALUE === "") {
+    facts_to_add += "hospitalization.num_prev_visits(" + HOSPITALIZATION_ID_VALUE + ", -1) ";
+  } else {
+    facts_to_add += "hospitalization.num_prev_visits(" + HOSPITALIZATION_ID_VALUE + ", "+ HOSPITALIZATION_NUM_PREV_VISITS_VALUE +") ";
+  }
 
   const HOSPITALIZATION_CAUSE_VALUE = document.getElementById(HOSPITALIZATION_CAUSE_INPUT_ID).value;
   if (HOSPITALIZATION_CAUSE_VALUE !== "") {
@@ -200,6 +195,7 @@ function get_data_from_input_fields() {
     facts_to_add += "datetimetotimestamp(" + formattedDate + "," + formattedTime + "," + timeStamp + ") ";
   } 
 
+  console.log(facts_to_add);
   let output = definemorefacts([], readdata(facts_to_add));
 
   // Calling grindem on an epilog.js dataset or ruleset makes it palatable to read as a human
@@ -269,71 +265,84 @@ function check_chaim(claim_id, claim_data){
 }
 
 let policy_rules = `de
+
+benefit.guidelines(Product, Treatment, Guidelines) :-
+  evaluate(guideline_1,Guidelines)
+
+guidelines.compliant(Guidelines,Min_Age,Max_Age,Allowed_Visits) :-
+  evaluate(2,Allowed_Visits) &
+  evaluate(0,Min_Age) &
+  evaluate(21,Max_Age)
+
 covers(P, C) :-
   claim.policy(C, P) &
-  covered(C, N)
+  covered(C)
 
-covered(C, N) :- 
-    claim.policy(C, P) & 
-    policy.in_effect(P) & 
-    claim.hospitalization(C, H) & 
-    hospitalization_conditions_met(H) & 
-    benefit_calc(C, N) & 
-    ~geq(0, N) &
+covered(C) :- 
+    policy.type(Policy,stanford_cardinal) &
+    ~policy.opted_out(P, yes) &
+    eligible(C,Policy) &
     ~exclusion_applies(C)
 
-policy.in_effect(P) :- 
-    policy.signed(P, yes) & 
-    policy.paid_premium(P) & 
-    condition_met_1.3(P) & 
-    policy.canceled(P, no)
-
-condition_met_1.3(P) :- policy.wellness_visit_confirmation_provided(P, yes)
-
-policy.paid_premium(P) :- 
-    policy.premium_amount_paid(P, A) &
-    geq(A, 2000)
-
-hospitalization_conditions_met(H) :- hospitalization_valid_reason(H) & hospitalization.country(H, usa)
-
-hospitalization_valid_reason(H) :- hospitalization.reason(H, sickness)
-hospitalization_valid_reason(H) :- hospitalization.reason(H, accidental_injury)
-
-exclusion_applies(C) :- 
-    claim.hospitalization(C, H) & 
-    hospitalization.causal_event(H, skydiving)
-exclusion_applies(C) :- 
-    claim.hospitalization(C, H) & 
-    hospitalization.causal_event(H, military_service)
-exclusion_applies(C) :- 
-    claim.hospitalization(C, H) & 
-    hospitalization.causal_event(H, firefighting_service)
-exclusion_applies(C) :- 
-    claim.hospitalization(C, H) & 
-    hospitalization.causal_event(H, police_service)
-exclusion_applies(C) :- 
-    claim.hospitalization(C, H) & 
-    hospitalization.patient(H, X) &
-    person.age(X, A) & 
-    geq(A, 75)
-
-benefit_calc(C,N) :- 
-    claim.hospitalization(C, H) & 
-    duration_days(H, D) & 
-    evaluate(max(0,times(D, 500)), N)
-
-duration_days(H, D) :- 
-    duration(H, D_MS) & 
-    evaluate(floor(quotient(D_MS, 86400000)), D)
-
-duration(Z,DURATION) :-
-    hospitalization.startdate(Z,SD) &
-    hospitalization.starttime(Z,ST) &
-    hospitalization.enddate(Z,ED) &
-    hospitalization.endtime(Z,ET) &
-    datetimetotimestamp(SD,ST,SS) &
-    datetimetotimestamp(ED,ET,ES) &
-    evaluate(minus(ES,SS),DURATION)
-
-geq(X, Y) :- evaluate(min(X,Y), Y)
+    eligible(C,Policy) :-
+    policy.type(Policy, Product) &
+    claim.hospitalization(C,H) &
+    hospitalization.type_of_healthcare(H, Benefit) &
+    policy_includes(Product,Benefit) &
+    fits_benefit(Product,C,Benefit)
+  
+  policy_includes(stanford_cardinal,routine_physical_exams)
+  policy_includes(stanford_cardinal,preventive_care_immunizations)
+  
+  total_allowed_visits(Product, routine_physical_exams, AGE, Allowed_Visits) :-
+    leq(22,AGE) & evaluate(1,Allowed_Visits)
+  total_allowed_visits(Product, preventive_care_immunizations, AGE, Allowed_Visits) :-
+    leq(22,AGE) & evaluate(1,Allowed_Visits)
+    
+  total_allowed_visits(Product, Treatment, AGE, Allowed_Visits) :- 
+    benefit.guidelines(Product, Treatment, Guidelines) &
+    guidelines.compliant(Guidelines,Min_Age,Max_Age,Allowed_Visits) & 
+    leq(AGE,Max_Age) & leq(Min_Age, AGE)
+  
+  allowed_locations(stanford_cardinal,routine_physical_exams,physician_office)
+  fits_benefit(Product,C,routine_physical_exams) :-
+    claim.hospitalization(C,H) &
+    hospitalization.treatment_location(H,physician_office) &
+    hospitalization.patient(H,Person) & person.age(Person,AGE) & leq(0,AGE) & 
+    total_allowed_visits(Product,routine_physical_exams,AGE, Allowed_Visits) &
+    hospitalization.num_prev_visits(H,Prev_Visits) & leq(0,Prev_Visits) & 
+    evaluate(plus(Prev_Visits,1),Num_Visits) &
+    leq(Num_Visits,Allowed_Visits)
+  
+  allowed_locations(stanford_cardinal,preventive_care_immunizations,physician_office)
+  allowed_locations(stanford_cardinal,preventive_care_immunizations,facility)
+  fits_benefit(Product,C,preventive_care_immunizations) :-
+    claim.hospitalization(C,H) &
+    hospitalization.treatment_location(H,L) &
+    allowed_locations(Product,preventive_care_immunizations,L) &
+    hospitalization.patient(H,Person) & person.age(Person,AGE) & leq(0,AGE) &
+    total_allowed_visits(Product,preventive_care_immunizations,AGE, _)
+  
+  %% Armed forces
+  exclusion_applies(C):-
+      claim.hospitalization(C, H) & 
+      hospitalization.causal_event(H, military_service)
+  
+  %% Alternative Healthcare
+  exclusion_applies(C):-
+      claim.hospitalization(C, H) & 
+      ~ hospitalization.type_of_healthcare(H, preventive_care_immunizations) &
+      ~ hospitalization.type_of_healthcare(H, routine_physical_exams)
+  
+  %% Is tier 1
+  tier_1_hospital(C):-
+      claim.hospitalization(C, H) & 
+      hospitalization.hospital(H, Hos) &
+      hospital.tier(stanford_cardinal, Hos, 1)
+  
+  
+  definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(....)_(..)_(..)"))))
+  definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)_(..)"))))
+  definition(head(X!L),X)
+  definition(tail(X!L),L)
 `;
