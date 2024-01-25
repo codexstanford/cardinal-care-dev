@@ -393,3 +393,5 @@ country.continent(western_samoa,asia)
 country.continent(yemen,asia)
 country.continent(yugoslavia,europe)
 `;
+
+module.exports = {load_common_data};
