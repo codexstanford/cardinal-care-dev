@@ -8,7 +8,7 @@ const HOSPITALIZATION_ID_INPUT_ID = "hospitalization_id_input";
 const HOSPITALIZATION_TREATMENT_LOCATION_INPUT_ID = "hospitalization_treatment_location_input";
 const HOSPITALIZATION_HOSPITAL_INPUT_ID = "hospitalization_hospital_input";
 const HOSPITALIZATION_TYPE_OF_HEALTHCARE_INPUT_ID = "hospitalization_type_of_healthcare_input";
-const HOSPITALIZATION_NUM_PREV_VISITS_ID = "hospitalization_num_prev_visits_input";
+// const HOSPITALIZATION_NUM_PREV_VISITS_ID = "hospitalization_num_prev_visits_input";
 const HOSPITALIZATION_CAUSE_INPUT_ID = "hospitalization_cause_input";
 const HOSPITALIZATION_COUNTRY_INPUT_ID = "hospitalization_country_input";
 const HOSPITALIZATION_STARTDATE_INPUT_ID = "hospitalization_startdate_input";
@@ -27,7 +27,7 @@ const INPUT_FIELD_IDS = [
   HOSPITALIZATION_TREATMENT_LOCATION_INPUT_ID,
   HOSPITALIZATION_HOSPITAL_INPUT_ID,
   HOSPITALIZATION_TYPE_OF_HEALTHCARE_INPUT_ID,
-  HOSPITALIZATION_NUM_PREV_VISITS_ID,
+  // HOSPITALIZATION_NUM_PREV_VISITS_ID,
   HOSPITALIZATION_CAUSE_INPUT_ID,
   HOSPITALIZATION_COUNTRY_INPUT_ID,
   HOSPITALIZATION_STARTDATE_INPUT_ID,
@@ -138,12 +138,10 @@ function get_data_from_input_fields() {
     facts_to_add += "hospitalization.type_of_healthcare(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_TYPE_OF_HEALTHCARE_VALUE + ") ";
   }
 
-  const HOSPITALIZATION_NUM_PREV_VISITS_VALUE = document.getElementById(HOSPITALIZATION_NUM_PREV_VISITS_ID).value;
-  if (HOSPITALIZATION_NUM_PREV_VISITS_VALUE === "") {
-    facts_to_add += "hospitalization.num_prev_visits(" + HOSPITALIZATION_ID_VALUE + ", -1) ";
-  } else {
-    facts_to_add += "hospitalization.num_prev_visits(" + HOSPITALIZATION_ID_VALUE + ", "+ HOSPITALIZATION_NUM_PREV_VISITS_VALUE +") ";
-  }
+  // const HOSPITALIZATION_NUM_PREV_VISITS_VALUE = document.getElementById(HOSPITALIZATION_NUM_PREV_VISITS_ID).value;
+  // if (HOSPITALIZATION_NUM_PREV_VISITS_VALUE !== "") {
+  //   facts_to_add += "hospitalization.num_prev_visits(" + HOSPITALIZATION_ID_VALUE + ", "+ HOSPITALIZATION_NUM_PREV_VISITS_VALUE +") ";
+  // }
 
   const HOSPITALIZATION_CAUSE_VALUE = document.getElementById(HOSPITALIZATION_CAUSE_INPUT_ID).value;
   if (HOSPITALIZATION_CAUSE_VALUE !== "") {
@@ -278,18 +276,18 @@ covers(P, C) :-
   claim.policy(C, P) &
   covered(C)
 
-covered(C) :- 
+  covered(C) :- 
     policy.type(Policy,stanford_cardinal) &
     ~policy.opted_out(P, yes) &
     eligible(C,Policy) &
     ~exclusion_applies(C)
 
-    eligible(C,Policy) :-
+  eligible(C,Policy) :-
     policy.type(Policy, Product) &
     claim.hospitalization(C,H) &
     hospitalization.type_of_healthcare(H, Benefit) &
     policy_includes(Product,Benefit) &
-    fits_benefit(Product,C,Benefit)
+    fits_benefit(Policy,C,Benefit)
   
   policy_includes(stanford_cardinal,routine_physical_exams)
   policy_includes(stanford_cardinal,preventive_care_immunizations)
@@ -304,19 +302,23 @@ covered(C) :-
     guidelines.compliant(Guidelines,Min_Age,Max_Age,Allowed_Visits) & 
     leq(AGE,Max_Age) & leq(Min_Age, AGE)
   
+  num_visits(Policy, Treatment, Num_visits) :-
+    evaluate(countofall(C, claim.hospitalization(C,H) & hospitalization.type_of_healthcare(H,Treatment) & claim.policy(C,Policy)), Num_visits)
+
   allowed_locations(stanford_cardinal,routine_physical_exams,physician_office)
-  fits_benefit(Product,C,routine_physical_exams) :-
+  fits_benefit(Policy,C,routine_physical_exams) :-
+    policy.type(Policy, Product) &
     claim.hospitalization(C,H) &
     hospitalization.treatment_location(H,physician_office) &
     hospitalization.patient(H,Person) & person.age(Person,AGE) & leq(0,AGE) & 
     total_allowed_visits(Product,routine_physical_exams,AGE, Allowed_Visits) &
-    hospitalization.num_prev_visits(H,Prev_Visits) & leq(0,Prev_Visits) & 
-    evaluate(plus(Prev_Visits,1),Num_Visits) &
+    num_visits(Policy,routine_physical_exams,Num_Visits) & leq(1,Num_Visits) & 
     leq(Num_Visits,Allowed_Visits)
   
   allowed_locations(stanford_cardinal,preventive_care_immunizations,physician_office)
   allowed_locations(stanford_cardinal,preventive_care_immunizations,facility)
   fits_benefit(Product,C,preventive_care_immunizations) :-
+    policy.type(Policy, Product) &
     claim.hospitalization(C,H) &
     hospitalization.treatment_location(H,L) &
     allowed_locations(Product,preventive_care_immunizations,L) &
