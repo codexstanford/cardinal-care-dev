@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cardinal Care Dev - YOUR POLICY HERE</title>
+  <title>Cardinal Care Dev - Cardinal Care</title>
   <link rel="stylesheet" href="your_policy_here.css">
 </head>
 <body>
@@ -10,6 +10,93 @@
     <a href="../../index.html">List of Policies</a>
   </nav>
 
+  <table id="claims-processing-table">
+    <tr id ="coverage-indicator" class="covered-false">
+      <td colspan="2">Covered</td>
+    </tr>
+
+    <!-- Policy Information-->
+    <tr id="policy-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Policy Information</strong></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="1">Policy ID: <input type="text" id="policy_id_input" value="policy1"></td>
+      <td colspan="1">Insuree: <input type="text" id="policy_insuree_input"></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="1">Start Date: <input type="date" id="policy_start_date_input"></td>
+      <td colspan="1">End Date: <input type="date" id="policy_end_date_input"></td>
+    </tr>
+
+    <!-- Claim Information-->
+    <tr id="claim-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Claim Information</strong></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Claim ID: <input type="text" id="claim_id_input" value="claim1"></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Claimant: <input type="text" id="claimant_id_input" value="person1"></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Date: <input type="date" id="claim_date_input"></td>
+    </tr>
+
+    <!-- Patient Information-->
+    <tr id="patient-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Patient Information</strong></td>
+    </tr>
+    <tr class="info-row patient-info-row">
+      <td colspan="2">Patient Age: <input type="number" min="0" id="patient_age_input" value="0"></td>
+    </tr>
+    <tr class="info-row patient-info-row">
+      <td colspan="2">Occupation <select id="patient_occupation_input" class="option-dropdown">
+        <option value="none"></option>
+        <option value="armed_forces">Armed Forces</option>
+        <option value="other">Other</option>
+    </select></td>
+    
+    <!-- Hospital Visit Information-->
+    <tr id="hospital-visit-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Hospital Visit Information</strong></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Hospital Visit ID: <input type="text" id="hospitalization_id_input" value="hosp1"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="1">Reason for Hospital Visit: <select id="hospitalization_reason_input" class="option-dropdown" name="hospitalization_reason">
+        <option value="none"></option>
+        <option value="routine_physical">Routine Physical</option>
+        <option value="preventive_care">Preventive Immunization</option>
+        <option value="alternative">Alternative Health Care</option>
+        <option value="other">Other</option>
+    </select></td>
+    <td colspan="1">Vaccine Administered <input type="text" id="hospital_visit_vaccine_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="1">Hospital/Clinic: <select id="hospital_visit_hospital_input" class="option-dropdown" name="hospitalization_hospital">
+        <option value="none"></option>
+        <option value="stanford_medical_center">Stanford University Medical Center</option>
+        <option value="menlo_medical_clinic">Menlo Medical Clinic</option>
+        <option value="sutter_health">Sutter Health/Palo Alto Medical Foundation</option>
+        <option value="other">Other</option>
+    </select></td>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Start Date of Hospital Visit <input type="date" id="hospitalization_startdate_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Start Time of Hospital Visit: <input type="time" id="hospitalization_starttime_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">End Date of Hospital Visit: <input type="date" id="hospitalization_enddate_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">End Time of Hospital Visit: <input type="time" id="hospitalization_endtime_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+    <td colspan="2">Consequence of Occupation <input type="checkbox" id="hospitalization_coo_input"></td>
+    </tr>
+  </table>
 
   <script src="../../src/load_common_data.js"></script>
   <script src="../../src/epilog.js"></script>
