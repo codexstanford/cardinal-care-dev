@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cardinal Care Dev - Cardinal Care</title>
+  <link rel="stylesheet" href="cardinal_care.css">
+</head>
+<body>
+  <nav>
+    <a href="../../index.html">List of Policies</a>
+  </nav>
+
+  <table id="claims-processing-table">
+    <tr id ="coverage-indicator" class="covered-false">
+      <td colspan="2">Covered</td>
+    </tr>
+
+    <!-- Policy Information-->
+    <tr id="policy-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Policy Information</strong></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="2">Policy ID: <input type="text" id="policy_id_input" value="policy1"></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="1">Have opted out of policy: <input type="checkbox" id="policy_opted_out_input"></td>
+    </tr>
+
+    <!-- Claim Information-->
+    <tr id="claim-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Claim Information</strong></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Claim ID: <input type="text" id="claim_id_input" value="claim1"></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Claimant: <input type="text" id="claimant_id_input" value="person1"></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Date: <input type="date" id="claim_date_input"></td>
+    </tr>
+
+    <!-- Patient Information-->
+    <tr id="patient-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Patient Information</strong></td>
+    </tr>
+    <tr class="info-row patient-info-row">
+      <td colspan="2">Patient Age: <input type="number" min="0" id="patient_age_input" value="0"></td>
+    </tr>
+    
+    <!-- Hospitalization Information-->
+    <tr id="hospitalization-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Hospitalization Information</strong></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Hospitalization ID: <input type="text" id="hospitalization_id_input" value="hosp1"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Treatment Location: <select id="hospitalization_treatment_location_input" class="option-dropdown" name="hospitalization_treatment_location">
+        <option value="none"></option>
+        <option value="physician_office">Physician Office</option>
+        <option value="facility">Facility</option>
+        <option value="home">Home</option>
+        <option value="other">Other</option>
+    </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Hospital Name(if applicable): <input type="text" id="hospitalization_hospital_input" value="hospital1"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Type of Healthcare: <select id="hospitalization_type_of_healthcare_input" class="option-dropdown" name="hospitalization_type_of_healthcare">
+        <option value="none"></option>
+        <option value="preventive_care_immunizations">Preventive Care Immunizations</option>
+        <option value="routine_physical_exams">Routine Physical Exams</option>
+        <option value="ayurvedic">Ayurvedic</option>
+        <option value="other">Other</option>
+    </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Number of Previous Visits of same type <input type="number" min="0" id="hospitalization_num_prev_visits_input" value="0"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Cause of Hospitalization: <select id="hospitalization_cause_input" class="option-dropdown" name="claim_cause">
+        <option value="none"></option>
+        <option value="skydiving">Skydiving</option>
+        <option value="military_service">Military Service</option>
+        <option value="firefighting_service">Firefighting Service</option>
+        <option value="police_service">Police Service</option>
+        <option value="other">Other</option>
+    </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Country in which hospitalization occurred: <select id="hospitalization_country_input" class="option-dropdown country-dropdown" name="hospitalization_country">
+        <option value="none"></option>
+    </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Start Date of Hospitalization <input type="date" id="hospitalization_startdate_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Start Time of Hospitalization: <input type="time" id="hospitalization_starttime_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">End Date of Hospitalization <input type="date" id="hospitalization_enddate_input"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">End Time of Hospitalization: <input type="time" id="hospitalization_endtime_input"></td>
+    </tr>
+  </table>
+
+  <script src="../../src/load_common_data.js"></script>
+  <script src="../../src/epilog.js"></script>
+  <script src="cardinal_care.js"></script>
+</body>
+</html>
