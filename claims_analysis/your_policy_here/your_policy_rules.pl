@@ -55,9 +55,8 @@ eligible_service(C,P,routine_physical):-
   claim.claimant(C,Cl)
   person.age(Cl,Age) &
   physical_visit_limit(Age,Limit) &
-  evaluate(countofall(X,previous_physical_visit(C,X),Count)) &
-  evaluate(minus(Limit,1),LimitMinus) &
-  leq(Count,LimitMinus).
+  evaluate(countofall(X,previous_physical_visit(C,X)),Count) &
+  leq(Count,Limit).
 
 physical_visit_limit(Age,Limit):-
   physical_visit_limit(MinAge,MaxAge,Limit) &
@@ -76,7 +75,7 @@ previous_physical_visit(Claim1,Claim2):-
   get_timestamp_from_date(Policy_StartDate,Policy_Timestamp) &
   leq(Policy_Timestamp,Hosp2_Timestamp)
 
-
+policy_year_startdate(01_08_2023).
 
 eligible_service(C,P,preventive_care).
 valid_hospital(stanford_medical_center).
