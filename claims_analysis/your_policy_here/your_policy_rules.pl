@@ -52,11 +52,26 @@ exception(C,P):-
   claim.consequence_of_occupation(C,yes).
 
 eligible_service(C,P,routine_physical):-
-  claim.claimant(C,Cl)
-  person.age(Cl,Age) &
+  claim.claimant(C,Cl) &
+  claim.age(C,Age) &
   physical_visit_limit(Age,Limit) &
-  evaluate(countofall(X,previous_physical_visit(C,X)),Count) &
+  evaluate(countofall(X,physical_visit_current_year(C,X)),Count) &
   leq(Count,Limit).
+
+eligible_service(C,P,preventive_care):-
+  claim.claimant(C,Cl) &
+  claim.age(C,Age) &
+  claim.hospitalization(C,H) &
+  hospitalization.vaccine(H,V) &
+  preventive_care_limit(V,Age,Limit,MinAge,MaxAge) &
+  evaluate(countofall(X,preventive_care_visit(C,X)),Count) &
+  leq(Count,Limit).
+
+preventive_care_limit(Vaccine,Age,Limit,MinAge,MaxAge):-
+  preventive_care_limit(Vaccine,MinAge,MaxAge,Limit) &
+  evaluate(minus(MaxAge,1),MaxAgeMinus) &
+  leq(Age,MaxAgeMinus) &
+  leq(MinAge,Age).
 
 physical_visit_limit(Age,Limit):-
   physical_visit_limit(MinAge,MaxAge,Limit) &
@@ -64,26 +79,65 @@ physical_visit_limit(Age,Limit):-
   leq(Age,MaxAgeMinus) &
   leq(MinAge,Age).
 
-previous_physical_visit(Claim1,Claim2):-
+physical_visit_current_year(Claim1,Claim2):-
   claim.claimant(Claim1,Person) &
   claim.claimant(Claim2,Person) &
+  claim.policy(Claim1,Policy) &
+  claim.policy(Claim2,Policy) &
   claim.hospitalization(Claim2,Hosp2) &
+  claim.hospitalization(Claim1,Hosp1) &
+  hospitalization.start_time(Hosp1,Hosp1_StartDate,Hosp1_StartTime) &
   hospitalization.reason(Hosp2,routine_physical) &
   hospitalization.start_time(Hosp2,Hosp2_StartDate,Hosp2_StartTime) &
   policy_year_startdate(Policy_StartDate) &
   get_timestamp_from_datetime(Hosp2_StartDate,Hosp2_StartTime,Hosp2_Timestamp) &
   get_timestamp_from_date(Policy_StartDate,Policy_Timestamp) &
-  leq(Policy_Timestamp,Hosp2_Timestamp)
+  get_timestamp_from_datetime(Hosp1_StartDate,Hosp1_StartTime,Hosp1_Timestamp) &
+  leq(Policy_Timestamp,Hosp2_Timestamp) &
+  leq(Policy_Timestamp,Hosp1_Timestamp) &
+  claim.time(Claim1,C1_D,C1_T) &
+  claim.time(Claim2,C2_D,C2_T) &
+  get_timestamp_from_datetime(C1_D,C1_T,C1_TS) &
+  get_timestamp_from_datetime(C2_D,C2_T,C2_TS) &
+  leq(C2_TS,C1_TS).
+
+preventive_care_visit(Claim1,Claim2):-
+  claim.claimant(Claim1,Person) &
+  claim.claimant(Claim2,Person) &
+  claim.policy(Claim1,Policy) &
+  claim.policy(Claim2,Policy) &
+  claim.hospitalization(Claim2,Hosp2) &
+  claim.hospitalization(Claim1,Hosp1) &
+  hospitalization.reason(Hosp1,preventive_care) &
+  hospitalization.reason(Hosp2,preventive_care) &
+  hospitalization.vaccine(Hosp1,Vaccine) &
+  hospitalization.vaccine(Hosp2,Vaccine) &
+  claim.age(Claim1,Age1) &
+  preventive_care_limit(Vaccine,Age1,Limit,MinAge,MaxAge) &
+  claim.age(Claim2,Age2) &
+  evaluate(minus(MaxAge,1),MaxAgeMinus) &
+  leq(Age2,MaxAgeMinus) &
+  leq(MinAge,Age2) &
+  claim.time(Claim1,C1_D,C1_T) &
+  claim.time(Claim2,C2_D,C2_T) &
+  get_timestamp_from_datetime(C1_D,C1_T,C1_TS) &
+  get_timestamp_from_datetime(C2_D,C2_T,C2_TS) &
+  leq(C2_TS,C1_TS).
+  
 
 policy_year_startdate(01_08_2023).
 
-eligible_service(C,P,preventive_care).
 valid_hospital(stanford_medical_center).
 valid_hospital(menlo_medical_clinic).
 valid_hospital(sutter_health).
 physical_visit_limit(0,22,0).
 physical_visit_limit(22,200,1)
 
+preventive_care_limit(covid,0,200,3).
+preventive_care_limit(polio,0,5,5).
+preventive_care_limit(polio,5,100,0).
+preventive_care_limit(tb,0,24,1).
+preventive_care_limit(tb,24,200,0).
 
 
 
