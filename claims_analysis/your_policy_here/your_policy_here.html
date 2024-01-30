@@ -41,6 +41,9 @@
     <tr class="info-row claim-info-row">
       <td colspan="2">Date: <input type="date" id="claim_date_input"></td>
     </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Time: <input type="time" id="claim_time_input"></td>
+    </tr>
 
     <!-- Patient Information-->
     <tr id="patient-info-heading" class="claims-processing-section-heading">
@@ -71,7 +74,13 @@
         <option value="alternative">Alternative Health Care</option>
         <option value="other">Other</option>
     </select></td>
-    <td colspan="1">Vaccine Administered <input type="text" id="hospital_visit_vaccine_input"></td>
+    <td colspan="1">Vaccine Administered  <select id="hospital_visit_vaccine_input" class="option-dropdown" name="hospitalization_vaccine">
+      <option value="none"></option>
+      <option value="covid">Covid</option>
+      <option value="tb">TB</option>
+      <option value="polio">Polio</option>
+      <option value="other">Other</option>
+  </select></td>
     </tr>
     <tr class="info-row hospitalization-info-row">
       <td colspan="1">Hospital/Clinic: <select id="hospital_visit_hospital_input" class="option-dropdown" name="hospitalization_hospital">
