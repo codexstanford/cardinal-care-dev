@@ -1,0 +1,27 @@
+Schema
+
+Claim
+- Policy
+- Date
+- Claimant
+- Hospitalization
+
+
+Hospitalization
+- Startdate
+- Enddate
+- Hospital/Location
+- Reason
+- Vaccine
+- Consequence_of_occupation
+
+Person
+- DOB
+- Occupation
+
+Policy
+- Type
+- Insuree
+- Startdate
+- enddate
+

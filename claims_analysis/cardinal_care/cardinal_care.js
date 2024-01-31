@@ -92,7 +92,6 @@ function get_data_from_input_fields() {
   const CLAIM_ID_VALUE = document.getElementById(CLAIM_ID_INPUT_ID).value;
   const HOSPITALIZATION_ID_VALUE = document.getElementById(HOSPITALIZATION_ID_INPUT_ID).value;
   if (POLICY_ID_VALUE === '' || CLAIM_ID_VALUE === '' || HOSPITALIZATION_ID_VALUE === '') {
-    console.log('wtf--')
     return [];
   }
   
@@ -176,7 +175,7 @@ function get_data_from_input_fields() {
 
   }
   
-  const HOSPITALIZATION_COO_VALUE = document.getElementById(HOSPITALIZATION_HOSPITAL_ID).checked;
+  const HOSPITALIZATION_COO_VALUE = document.getElementById(HOSPITALIZATION_COO_ID).checked;
   if (HOSPITALIZATION_COO_VALUE === true) {
     facts_to_add += "hospitalization.consequence_of_occupation("  + HOSPITALIZATION_ID_VALUE + ", yes)";
   } else {
@@ -284,8 +283,10 @@ definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..
 definition(tail(X!L),L)
 
 exception(C,P):-
-  person.occupation(armed_forces) &
-  claim.consequence_of_occupation(C,yes).
+  claim.claimant(C,Cl) &
+  claim.hospitalization(C,H) &
+  person.occupation(Cl,armed_forces) &
+  hospitalization.consequence_of_occupation(H,yes).
 
 eligible_service(C,P,routine_physical):-
   claim.claimant(C,Cl) &
