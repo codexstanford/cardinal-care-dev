@@ -215,7 +215,7 @@ function update_coverage_indicator() {
 
   let covers_query = "covers(" + POLICY_ID_VALUE + ", " + CLAIM_ID_VALUE + ")";
 
-  let common_dataset = definemorefacts([], readdata(localStorage["commonData"]));
+  let common_dataset = definemorefacts([], readdata(localStorage["commonData"])); // use definemorefacts for indexing 
   let combined_dataset = definemorefacts(common_dataset, get_data_from_input_fields());
   
   let coverage_indicator = document.getElementById("coverage-indicator");
@@ -248,10 +248,26 @@ function add_event_listeners() {
 }
 
 // Onboarding task: 
-  // Write a function that takes as input: a string containing epilog data corresponding to data for an example claim (which would otherwise be entered into the web form),
+  // Write a function that takes as input: a string containing epilog data corresponding to data for an example claim 
+  // (which would otherwise be entered into the web form),
   // and outputs: true if the claim is covered by the policy, and false otherwise.
 
+  // Assuming I can manage the data how I want; otherwise would change it to match above HTML DOM tree branches
+  // But comment above makes it seem like I don't HAVE to do that, so I won't.
 
+function check_coverage(claim_data, policy_id) { // If no policy ID assumed, can getElementByID
+  let covers_query = "covers(" + policy_id + ", " + claim_data.claim_id + ")"; // From above 
+  let common_dataset = definemorefacts([], readdata(localStorage["commonData"]));  // From above
+  let read_data = definemorefacts([], readdata(claim_data));
+  let combined_dataset = definemorefacts(common_dataset, read_data) // Assumes claim_data matched inputs below.
+
+  let coverage = compfinds('covered', read(covers_query), combined_dataset, definemorerules([], readdata(policy_rules))) // Uses compfinds along the "covers"
+  // Query between the general dataset and this specific claim_data dataset.
+
+  return (coverage.length !== 0);
+}
+
+// 
 let policy_rules = `
 covers(P, C) :-
   claim.policy(C, P) &
