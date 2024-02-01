@@ -12,8 +12,7 @@
 
   <table id="claims-processing-table">
     <tr id="coverage-indicator" class="covered-false">
-      <!-- By default, this should automatically change to Cannot Waive -->
-      <td colspan="2">Can Waive</td>
+      <td colspan="2">Cannot Waive</td>
     </tr>
 
     <!-- International Student Information-->
@@ -23,24 +22,26 @@
     <tr class="info-row policy-info-row">
       <td colspan="2">Are you an international student? <input type="checkbox" id="international_input" ></td>
     </tr>
-    <tr id="optional-policy-info-heading" class="claims-processing-section-heading">
-      <td colspan="2"><strong>Additional Questions For International Students (Skip If Not International)</strong></td>
-    </tr>
-    <tr class="info-row policy-info-row">
-      <!-- <td colspan="1">How much medical evacuation coverage to your home country do you have?: $ <input type="number" min="0" id="evac_covered_input" ></td> -->
-      <td colspan="2">Has $50,000 emergency evacuation coverage to home country<input type="checkbox" id="evac_coverage_input" ></td>
-      
-      <!-- <td colspan="1">How much repatriation coverage to your home country do you have?: $ <input type="number" id="home_evac_travel_coverage_input" ></td> -->
-      <td colspan="2">Has $25,000 repatriation coverage to home country <input type="checkbox" id="repatriation_coverage_input" ></td>
+    <tbody id="international_removable" class="no-international-additional-qs">
+      <tr id="optional-policy-info-heading" class="claims-processing-section-heading">
+        <td colspan="2"><strong>Additional Questions For International Students</strong></td>
+      </tr>
+      <tr class="info-row policy-info-row">
+        <td colspan="1">How much medical evacuation coverage to your home country do you have?: $ <input type="number" min="0" value="0" id="evac_coverage_input" ></td>
+        <td colspan="2">Has $50,000 emergency evacuation coverage to home country<input type="checkbox" id="evac_coverage_workaround_input" ></td>
+        
+        <td colspan="1">How much repatriation coverage to your home country do you have?: $ <input type="number" value="0" id="repatriation_coverage_input" ></td>
+        <td colspan="2">Has $25,000 repatriation coverage to home country <input type="checkbox" id="repatriation_coverage_workaround_input" ></td>
 
-      <td colspan="1">Are you a J Visa holder? <input type="checkbox" id="j_visa_holder_input" ></td>
-      <!-- <td colspan="1">If you are a J Visa holder, what is your insurance deductible?: $ <input type="number" id="j_visa_deductible_input" ></td> -->
-      <td colspan="2">(J Visa Holder) has Insurance Deductible of $500 or less? <input type="checkbox" id="j_visa_deductible_input" ></td>
+        <td colspan="1">Are you a J Visa holder? <input type="checkbox" id="j_visa_holder_input" ></td>
+        <td class="j-visa-removeable non-j-visa-holder">If you are a J Visa holder, what is your insurance deductible?: $ <input type="number" value="0" id="j_visa_deductible_input"></td>
+        <td class="j-visa-removeable non-j-visa-holder">(J Visa Holder) has Insurance Deductible of $500 or less? <input type="checkbox" id="j_visa_deductible_workaround_input" ></td>
 
-      <td colspan="1">Can you submit a copy of your Visa? <input type="checkbox" id="visa_copy_input" ></td>
-      <td colspan="2">Can you submit a copy of all policy documents expressed in English, and under U.S. dollars? <input type="checkbox" id="international_translated_input" ></td>
-    </tr>
-  
+        <td colspan="1">Can you submit a copy of your Visa? <input type="checkbox" id="visa_copy_input" ></td>
+        <td colspan="2">Can you submit a copy of all policy documents expressed in English, and under U.S. dollars? <input type="checkbox" id="international_translated_input" ></td>
+      </tr>
+    </tbody>
+    
     <!-- General Requirements-->
       <!-- Academic-->
     <tr id="claim-info-heading" class="claims-processing-section-heading">
@@ -53,7 +54,7 @@
       <td colspan="2">Coverage End Date: <input type="date" id="end_date_input"></td>
     </tr>
     <tr class="info-row claim-info-row">
-      <td colspan="2">Covers Entire Academic Year? <input type="checkbox" id="academic_year_covered_input" ></td>
+      <td colspan="2">Covers Entire Academic Year? <input type="checkbox" id="academic_year_workaround_input" ></td>
     </tr>
       <!-- Inpatient Outpatient-->
     <tr class="info-row claim-info-row">

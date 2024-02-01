@@ -1,4 +1,8 @@
 // Caridinal Care Waiver
+/* Note that for a simple implementation of a UI where all the questions are binary or inputs, not compared to another
+* Policy, Claim, etc., then you can use basic HTML functionality to accomplish the logical comparisons, which is what this
+* file does. This is not a good example of logic programming (the Epilog at the bottom isn't used at all!)
+*/
 const INTERNATIONAL_INPUT_ID = "international_input";
 const EVAC_COVERAGE_INPUT_ID = "evac_coverage_input";
 const REPATRIATION_COVERAGE_INPUT_ID = "repatriation_coverage_input";
@@ -159,110 +163,99 @@ function add_event_listeners() {
 
 // C = Claim, P = Policy.
 let waiver_rules = `
-% can_waive : - remove all of the claim stuff and treat it as a simple webpage input
-% can_waive webpage as a logic program
-% Get other insurance companies to provide this information
-% Explicit notes about external data needed
+can_waive :-
+  covered
 
-can_waive() :-
-  covered()
-
-covered() :-
+covered :-
   international(yes) &
   evacuation_covered(yes) &
   requirements(yes)
 
-evacuation_covered() :-
-  has_home_evac_travel_coverage(yes) &
-  repatriation_coverage(yes) &
-  visa_coverage() &
+evacuation_covered(yes) :-
+  evac_covered(yes) &
+  repatriation_covered(yes) &
+  visa_coverage(yes)  &
   visa_copy(yes) &
   international_translated(yes)
-  %% $50,000 of medical evacuation coverage to home country %
-  %% $25,000 repatriation coveerage to home country
-  %% J Visa holders insurance deductible of $500 or less
-  %% Copy of Visa with request
 
-visa_coverage() :-
+evac_covered(yes) :-
+  evac_coverage_workaround(yes)
+
+evac_covered(yes) :-
+  evac_coverage(N) &
+  leq(50000, N)
+
+repatriation_covered(yes) :-
+  repatriation_coverage_workaround(yes)
+
+repatriation_covered(yes) :-
+  repatriation_coverage(N) &
+  leq(25000, N)
+
+visa_coverage(yes)  :-
   j_visa_holder(yes) &
-  j_visa_deductible(yes) &
+  j_visa_deductible_valid(yes)
 
-visa_coverage():-
+j_visa_deductible_valid(yes) :-
+  j_visa_deductible_workaround(yes)
+
+j_visa_deductible_valid(yes) :-
+  j_visa_deductible(N) &
+  leq(N, 500)
+
+visa_coverage(yes) :-
   j_visa_holder(no)
 
-covered() :-
+covered  :-
   international(no) &
-  requirements()
+  requirements(yes) 
 
-requirements()
-  academc_year_covered(yes) &
+requirements(yes)  :-
+  academic_year_covered(yes) &
   sf_bay_care(yes) &
-  annual_deductible(yes) &
-  oop_minimum(yes) &
+  annual_deductible_covered(yes) &
+  oop_minimum_covered(yes) &
   emb_ppaca(yes) &
-  ppaca_preventative_care(yes) &
-  pre_existing_conditions(yes) &
+  pc_ppaca(yes) &
+  pre_existing_conditions_coverage(yes) &
   prescriptions(yes) &
   double_care(yes) &
   aggregate_max_benefit(yes)
 
-% JS: academic_year = get_year(maketimestamp) % or something
-% academic_year_sd = maketimestamp(academic_year, 9, 1, 0, 0, 0)
-% academic_year_ed = maketimestamp(academic_year + 1, 8, 31, 0, 0)
-academic_year_covered() :-
-  %policy.startdate(PSD) &
-  %policy.enddate(PED) &
-  %claim.year(C, CY) & // Assumes easy access to provided year from the form (updates each academic year)
-  leq(PSD, academic_year_sd) &
-  geq(PED. academic_year_ed) &
-  % This will implicitly check for gaps, which aren't allowed. If there is a gap, then date won't exceed the range.
-  % However, maybe there are explicit gaps? Something to note
+academic_year_covered(yes) :-
+  start_date(SD) &
+  end_date(ED) &
+  % curr_date(CD) &
+  sep_first(SEPF) &
+  aug_end(AUGE) &
+  evaluate(get_year(SD), SYR) &
+  evaluate(get_year(ED), EYR) &
+  % evaluate(get_year(CD), CYR) &
+  ~leq(EYR, SYR) &
+  leq(SD, SEPF) &
+  leq(AUGE, ED)
 
-academic_year_covered() :-
-  valid_dates(yes)
+academic_year_covered(yes) :-
+  academic_year_workaround(yes)
 
-sf_bay_care() :- 
-  % covers inpatient and outpatient medical... That's just a boolean I think?
-  % same inpatient and outpatient mental
+sf_bay_care(yes)  :- 
   sf_bay_care_medical(yes) &
-  sf_bay_care_mental(yes) &
+  sf_bay_care_mental(yes)
 
-annual_deductible() :-
-  deductible(D) &
-  leq(D, 1000) % Some exceptions based on employer plans
+annual_deductible_covered(yes)  :-
+  annual_deductible(yes)
 
-annual_deductible() :-
+annual_deductible_covered(yes)  :-
+  annual_deductible(no) &
   annual_deductible_employer(yes)
 
-oop_minimum() :-
-  out_of_pocket_min(OOP) &
-  leq(OOP, 91000)
-
-oop_minimum() :-
+oop_minimum_covered(yes)  :-
+  oop_minimum(no) &
   oop_minimum_employer(yes)
 
-% emb()_ppaca :- % This needs external link research (*sigh*) https://www.healthcare.gov/coverage/what-marketplace-plans-cover/
+oop_minimum_covered(yes)  :-
+  oop_minimum(yes)
 
-% ppaca_preventative_care() :- % External research: https://www.healthcare.gov/preventive-care-adults/
-
-pre_existing_conditions() :-
+pre_existing_conditions_coverage(yes) :-
   excluded_conditions(no)
-
-%prescriptions() :-
-
-%double_care() :-
- % emergency_care(yes) &
-  %non_emergency_care(yes)
-
-%aggregate_max_benefit() :-
- % aggregate_benefits(AMB) &
-  %leq(AMB, 2000000)
-
-%aggregate_max_benefit() :-
- % condition_benefit(CB) &
-  %leq(CB, 500000)
-
-aggregate_max_benefit() :-
-  aggregate_max_benefits(yes)
-`
-;
+`;

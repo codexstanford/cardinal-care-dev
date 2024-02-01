@@ -18,6 +18,14 @@ nav a {
   color: black;
 }
 
+.no-international-additional-qs {
+  display: none;
+}
+
+.non-j-visa-holder {
+  display: none !important;
+}
+
 
 #claims-processing-table {
   width: 60%;
@@ -57,7 +65,7 @@ nav a {
   color: white;
 }
 
-.claims-processing-section-heading {
+.claims-processing-section-heading, .optional-policy-info-heading {
   background-color: lightblue;
   border: black solid 1px;
   text-align: center;
