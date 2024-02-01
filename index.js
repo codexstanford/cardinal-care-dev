@@ -1,7 +1,7 @@
 window.onload = function() {
     // Populate policy names in the grid
     const policyGrid = document.getElementById('policyGrid');
-    const policies = ['Chubb Hospital Cash', 'Cardinal Care Waiver']; // Replace with actual policies
+    const policies = ['Chubb Hospital Cash', 'AXA PPL Hot Works', 'Cardinal Care Waiver']; // Replace with actual policies
   
     policies.forEach(policy => {
       const policyLink = document.createElement('a');
