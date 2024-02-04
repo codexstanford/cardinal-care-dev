@@ -22,4 +22,3 @@ hospitalization.enddate(hosp1, 2023_1_3)
 hospitalization.endtime(hosp1, 00_00_00)
 policy.wellness_visit_confirmation_provided(policy1, yes)
 `
-module.exports = {load_example_claim};
