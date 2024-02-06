@@ -13,11 +13,14 @@ Hospitalization
 - Hospital/Location
 - Reason
 - Vaccine
+- Contraceptive service 
+- Allegy service
 - Consequence_of_occupation
 
 Person
 - DOB
 - Occupation
+- Sex
 
 Policy
 - Type

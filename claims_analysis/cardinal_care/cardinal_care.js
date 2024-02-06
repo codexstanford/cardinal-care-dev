@@ -7,10 +7,13 @@ const CLAIMANT_ID_INPUT_ID = "claimant_id_input";
 const CLAIM_DATE_INPUT_ID = "claim_date_input";
 const CLAIM_TIME_INPUT_ID = "claim_time_input";
 const PATIENT_DOB_INPUT_ID = "patient_dob_input";
+const PATIENT_SEX_INPUT_ID = "patient_sex_input";
 const PATIENT_OCCUPATION_ID = "patient_occupation_input";
 const HOSPITALIZATION_ID_INPUT_ID = "hospitalization_id_input";
 const HOSPITALIZATION_REASON_INPUT_ID = "hospitalization_reason_input";
 const HOSPITALIZATION_VACCINE_INPUT_ID = "hospital_visit_vaccine_input";
+const HOSPITALIZATION_CONTRACEPTIVE_SERVICE_INPUT_ID = "contraceptive_service_input";
+const HOSPITALIZATION_ALLERGY_SERVICE_INPUT_ID = "allergy_service_input";
 const HOSPITALIZATION_HOSPITAL_ID = "hospital_visit_hospital_input";
 const HOSPITALIZATION_STARTDATE_INPUT_ID = "hospitalization_startdate_input";
 const HOSPITALIZATION_STARTTIME_INPUT_ID = "hospitalization_starttime_input";
@@ -29,10 +32,12 @@ const INPUT_FIELD_IDS = [
   CLAIM_DATE_INPUT_ID,
   CLAIM_TIME_INPUT_ID,
   PATIENT_DOB_INPUT_ID,
+  PATIENT_SEX_INPUT_ID,
   PATIENT_OCCUPATION_ID,
   HOSPITALIZATION_ID_INPUT_ID,
   HOSPITALIZATION_REASON_INPUT_ID,
   HOSPITALIZATION_VACCINE_INPUT_ID,
+  HOSPITALIZATION_ALLERGY_SERVICE_INPUT_ID,
   HOSPITALIZATION_HOSPITAL_ID,
   HOSPITALIZATION_STARTDATE_INPUT_ID,
   HOSPITALIZATION_STARTTIME_INPUT_ID,
@@ -138,6 +143,11 @@ function get_data_from_input_fields() {
     facts_to_add += "person.occupation(" + CLAIMANT_ID_VALUE + ", "+ PATIENT_OCCUPATION_VALUE +") ";
   }
 
+  const PATIENT_SEX_VALUE = document.getElementById(PATIENT_SEX_INPUT_ID).value;
+  if (PATIENT_SEX_VALUE !== "") {
+    facts_to_add += "person.sex(" + CLAIMANT_ID_VALUE + ", "+ PATIENT_SEX_VALUE +") ";
+  }
+
   // Hospitalization facts
 
   const HOSPITALIZATION_REASON_VALUE = document.getElementById(HOSPITALIZATION_REASON_INPUT_ID).value;
@@ -148,6 +158,16 @@ function get_data_from_input_fields() {
   const HOSPITALIZATION_VACCINE_VALUE = document.getElementById(HOSPITALIZATION_VACCINE_INPUT_ID).value;
   if (HOSPITALIZATION_VACCINE_VALUE !== "") {
     facts_to_add += "hospitalization.vaccine(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_VACCINE_VALUE + ") ";
+  }
+
+  const HOSPITALIZATION_CONTRACEPTIVE_SERVICE_VALUE = document.getElementById(HOSPITALIZATION_CONTRACEPTIVE_SERVICE_INPUT_ID).value;
+  if (HOSPITALIZATION_CONTRACEPTIVE_SERVICE_VALUE !== "") {
+    facts_to_add += "hospitalization.contraceptive_service(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_CONTRACEPTIVE_SERVICE_VALUE + ") ";
+  }
+  
+  const HOSPITALIZATION_ALLERGY_SERVICE_VALUE = document.getElementById(HOSPITALIZATION_ALLERGY_SERVICE_INPUT_ID).value;
+  if (HOSPITALIZATION_ALLERGY_SERVICE_VALUE !== "") {
+    facts_to_add += "hospitalization.allergy_service(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_ALLERGY_SERVICE_VALUE + ") ";
   }
 
   const HOSPITALIZATION_HOSPITAL_VALUE = document.getElementById('hospital_visit_hospital_input').value;
@@ -264,7 +284,7 @@ policy_active(C,P):-
 valid_hospitalization(C,P):-
   claim.hospitalization(C,H) &
   hospitalization.hospital(H,Hosp) &
-  valid_hospital(Hosp) &
+  valid_hospital(Hosp, R) &
   hospitalization.reason(H,R) &
   eligible_service(C,P,R) &
   ~exception(C,P).
@@ -311,6 +331,16 @@ eligible_service(C,P,preventive_care):-
   preventive_care_limit(V,Age,Limit,MinAge,MaxAge) &
   evaluate(plus(countofall(X,preventive_care_visit(C,X)),1),Count) &
   leq(Count,Limit).
+
+  eligible_service(C,P,female_contraceptives) :-
+  claim.claimant(C,Cl) &
+  person.sex(Cl, female) &
+  claim.hospitalization(C,H) &
+  hospitalization.contraceptive_service(H,Service) &
+  fda_approved(Service).
+
+eligible_service(C,P,physician_consultation).
+eligible_service(C,P,allergy).
 
 preventive_care_limit(Vaccine,Age,Limit,MinAge,MaxAge):-
   preventive_care_limit(Vaccine,MinAge,MaxAge,Limit) &
@@ -379,6 +409,12 @@ preventive_care_visit(Claim1,Claim2):-
 
 policy_year_startdate(01_08_2023).
 
+valid_hospital(Hosp, R):-
+  valid_hospital(Hosp).
+
+valid_hospital(telemedicine, physician_consultation).
+valid_hospital(allergy_specialist, allergy).
+
 valid_hospital(stanford_medical_center).
 valid_hospital(menlo_medical_clinic).
 valid_hospital(sutter_health).
@@ -390,6 +426,13 @@ preventive_care_limit(polio,0,5,5).
 preventive_care_limit(polio,5,100,0).
 preventive_care_limit(tb,0,24,1).
 preventive_care_limit(tb,24,200,0).
+
+fda_approved(counseling).
+fda_approved(rod).
+fda_approved(larc).
+fda_approved(preogestin).
+fda_approved(oral).
+fda_approved(sterilization).
 
 lt(X,Y):-
   leq(X,Y) &

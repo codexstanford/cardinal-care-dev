@@ -29,9 +29,9 @@ policy_active(C,P):-
 valid_hospitalization(C,P):-
   claim.hospitalization(C,H) &
   hospitalization.hospital(H,Hosp) &
-  valid_hospital(Hosp) &
   hospitalization.reason(H,R) &
   eligible_service(C,P,R) &
+  valid_hospital(Hosp, R) &
   ~exception(C,P).
 
 get_timestamp_from_datetime(DATE,TIME,STAMP) :-
@@ -74,6 +74,16 @@ eligible_service(C,P,preventive_care):-
   preventive_care_limit(V,Age,Limit,MinAge,MaxAge) &
   evaluate(plus(countofall(X,preventive_care_visit(C,X)),1),Count) &
   leq(Count,Limit).
+
+eligible_service(C,P,female_contraceptives) :-
+  claim.claimant(C,Cl) &
+  person.sex(Cl, female) &
+  claim.hospitalization(C,H) &
+  hospitalization.contraceptive_service(H,Service) &
+  fda_approved(Service).
+
+eligible_service(C,P,physician_consultation).
+eligible_service(C,P,allergy).
 
 preventive_care_limit(Vaccine,Age,Limit,MinAge,MaxAge):-
   preventive_care_limit(Vaccine,MinAge,MaxAge,Limit) &
@@ -142,6 +152,12 @@ preventive_care_visit(Claim1,Claim2):-
 
 policy_year_startdate(01_08_2023).
 
+valid_hospital(Hosp, R):-
+  valid_hospital(Hosp).
+
+valid_hospital(telemedicine, physician_consultation).
+valid_hospital(allergy_specialist, allergy).
+
 valid_hospital(stanford_medical_center).
 valid_hospital(menlo_medical_clinic).
 valid_hospital(sutter_health).
@@ -154,9 +170,13 @@ preventive_care_limit(polio,5,100,0).
 preventive_care_limit(tb,0,24,1).
 preventive_care_limit(tb,24,200,0).
 
+fda_approved(counseling).
+fda_approved(rod).
+fda_approved(larc).
+fda_approved(preogestin).
+fda_approved(oral).
+fda_approved(sterilization).
+
 lt(X,Y):-
   leq(X,Y) &
   ~same(X,Y).
-
-definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
-definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
