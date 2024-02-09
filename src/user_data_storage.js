@@ -1,6 +1,6 @@
 // Dependencies: epilog.js
 
-const CURR_USER_KEY = "../../../user_datasets/current_user.hdf";
+const CURR_USER_KEY = "../../user_datasets/current_user.hdf";
 
 // Return type: an epilog dataset
 function getCurrentUserDataset() {
