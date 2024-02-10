@@ -47,6 +47,15 @@ definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..
 definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
 definition(tail(X!L),L)
 
+get_age(C_D, DOB, Age) :-
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2),YearDiff) &
+  evaluate(minus(M,M2), MonthDiff) &
+  evaluate(minus(D,D2), DayDiff) &
+  evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
+  evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
+
 exception(C,P):-
   person.occupation(armed_forces) &
   claim.consequence_of_occupation(C,yes).
@@ -55,9 +64,7 @@ eligible_service(C,P,routine_physical):-
   claim.claimant(C,Cl) &
   person.dob(Cl,DOB) &
   claim.time(C,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   physical_visit_limit(Age,Limit) &
   evaluate(plus(countofall(X,physical_visit_current_year(C,X)),1),Count) &
   leq(Count,Limit).
@@ -66,9 +73,7 @@ eligible_service(C,P,preventive_care):-
   claim.claimant(C,Cl) &
   person.dob(Cl,DOB) &
   claim.time(C,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   claim.hospitalization(C,H) &
   hospitalization.vaccine(H,V) &
   preventive_care_limit(V,Age,Limit,MinAge,MaxAge) &
@@ -135,11 +140,8 @@ preventive_care_visit(Claim1,Claim2):-
   claim.time(Claim1,C1_D,C1_T) &
   claim.time(Claim2,C2_D,C2_T) &
   person.dob(Person,DOB) &
-  evaluate(parsedate(C1_D),[D1,M1,Y1]) &
-  evaluate(parsedate(C2_D),[D2,M2,Y2]) &
-  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
-  evaluate(minus(Y1,Y_dob),Age) &
-  evaluate(minus(Y2,Y_dob),Age2) &
+  get_age(C1_D, DOB, Age1) &
+  get_age(C2_D, DOB, Age2) &
   preventive_care_limit(Vaccine,Age1,Limit,MinAge,MaxAge) &
   evaluate(minus(MaxAge,1),MaxAgeMinus) &
   leq(Age2,MaxAgeMinus) &
