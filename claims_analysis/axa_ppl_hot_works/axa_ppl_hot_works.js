@@ -105,6 +105,31 @@ function add_event_listeners() {
     
     INPUT_FIELD_WIDGET.addEventListener("change", () => update_coverage_indicator());
   }
+
+  add_visibility_changing_event_listeners();
+}
+
+function add_visibility_changing_event_listeners() {
+  // Exclusion Endorsement
+  add_row_visibility_toggle_event_listener("policy_hot_works_exclusion_endorsement_input", "exclusion-endorsement-row", function(togglingElem) { return togglingElem.checked;});
+  
+  // Precautions Amendment Endorsement
+  add_row_visibility_toggle_event_listener("policy_hot_works_precaution_amendment_endorsement_input", "precautions-amendment-endorsement-row", function(togglingElem) { return togglingElem.checked;});
+}
+
+function add_row_visibility_toggle_event_listener(togglingElemID, toggledClass, toggleCondition) {
+  document.getElementById(togglingElemID).addEventListener("change", function() {
+    let elemsToChangeVisibilityOf = document.getElementsByClassName(toggledClass);
+    if (toggleCondition(this)) {
+      for (let elem of elemsToChangeVisibilityOf) {
+        elem.style.display = "table-row";
+      }
+    } else {
+      for (let elem of elemsToChangeVisibilityOf) {
+        elem.style.display = "none";
+      }
+    }
+  } );
 }
 
 function get_data_from_input_fields() {
@@ -364,7 +389,7 @@ function build_injury_info_section() {
 function build_hot_work_exclusion_endorsement_section() {
   let rows = [];
   
-  rows.push(newHeadingRow("Hot Work Exclusion Endorsement Information", "hot-work-exclusion-endorsement-info-subheading", ["claims-processing-section-subheading"]));
+  rows.push(newHeadingRow("Hot Work Exclusion Endorsement Information", "hot-work-exclusion-endorsement-info-subheading", ["claims-processing-section-subheading", "exclusion-endorsement-row", "endorsement-info-heading"]));
 
   rows.push(newClaimsFormInputRow([newClaimsFormSelectCell(2, "", "Location where the hot work took place [Placeholder]: ", "claim_hot_work_location_input", 
   [
@@ -372,7 +397,7 @@ function build_hot_work_exclusion_endorsement_section() {
     ["none", ""],
     ["washington", "Washington"]
   ]
-  )]));
+  )], ["exclusion-endorsement-row"]));
   
   return rows;
 }
@@ -417,12 +442,12 @@ function build_precautions_taken_info_section() {
 function build_hot_works_precautions_amendment_info_section() {
   let rows = [];
 
-  rows.push(newHeadingRow("Hot Work Precautions Amendment Information", "hot-work-precautions-amendment-info-subheading", ["claims-processing-section-subheading"]));
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Does the insuree operate their own hot work permit system detailing the methods and precautions to be followed prior to, during, and subsequent to hot work?", "claim_insuree_operates_own_hot_work_permit_system_input")]));
+  rows.push(newHeadingRow("Hot Work Precautions Amendment Information", "hot-work-precautions-amendment-info-subheading", ["claims-processing-section-subheading", "precautions-amendment-endorsement-row", "endorsement-info-heading"]));
+  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Does the insuree operate their own hot work permit system detailing the methods and precautions to be followed prior to, during, and subsequent to hot work?", "claim_insuree_operates_own_hot_work_permit_system_input")], ["precautions-amendment-endorsement-row"]));
 
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has a copy of it been provided to the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_copy_sent_input")]));
+  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has a copy of it been provided to the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_copy_sent_input")], ["precautions-amendment-endorsement-row"]));
 
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has the copy been accepted by the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_accepted_in_writing_input")]));
+  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has the copy been accepted by the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_accepted_in_writing_input")], ["precautions-amendment-endorsement-row"]));
 
   return rows;
 
