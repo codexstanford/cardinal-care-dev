@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cardinal Care Dev - Cardinal Care Waiver</title>
+  <link rel="stylesheet" href="cardinal_care_waiver.css">
+</head>
+<body>
+  <nav>
+    <a href="../../index.html">List of Policies</a>
+  </nav>
+
+  <table id="claims-processing-table">
+    <tr id="coverage-indicator" class="covered-false">
+      <td colspan="2">Cannot Waive</td>
+    </tr>
+
+    <!-- International Student Information-->
+    <tr id="policy-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>International Student Information</strong></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="2">Are you an international student? <input type="checkbox" id="international_input" ></td>
+    </tr>
+    <tbody id="international_removable" class="no-international-additional-qs">
+      <tr id="optional-policy-info-heading" class="claims-processing-section-heading">
+        <td colspan="2"><strong>Additional Questions For International Students</strong></td>
+      </tr>
+      <tr class="info-row policy-info-row">
+        <td colspan="1">How much medical evacuation coverage to your home country do you have?: $ <input type="number" min="0" value="0" id="evac_coverage_input" ></td>
+        <td colspan="2">Has $50,000 emergency evacuation coverage to home country<input type="checkbox" id="evac_coverage_workaround_input" ></td>
+        
+        <td colspan="1">How much repatriation coverage to your home country do you have?: $ <input type="number" value="0" id="repatriation_coverage_input" ></td>
+        <td colspan="2">Has $25,000 repatriation coverage to home country <input type="checkbox" id="repatriation_coverage_workaround_input" ></td>
+
+        <td colspan="1">Are you a J Visa holder? <input type="checkbox" id="j_visa_holder_input" ></td>
+        <td class="j-visa-removeable non-j-visa-holder">If you are a J Visa holder, what is your insurance deductible?: $ <input type="number" value="0" id="j_visa_deductible_input"></td>
+        <td class="j-visa-removeable non-j-visa-holder">(J Visa Holder) has Insurance Deductible of $500 or less? <input type="checkbox" id="j_visa_deductible_workaround_input" ></td>
+
+        <td colspan="1">Can you submit a copy of your Visa? <input type="checkbox" id="visa_copy_input" ></td>
+        <td colspan="2">Can you submit a copy of all policy documents expressed in English, and under U.S. dollars? <input type="checkbox" id="international_translated_input" ></td>
+      </tr>
+    </tbody>
+    
+    <!-- General Requirements-->
+      <!-- Academic-->
+    <tr id="claim-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Insurance Policy Information</strong></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Coverage Start Date: <input type="date" id="start_date_input"></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Coverage End Date: <input type="date" id="end_date_input"></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Covers Entire Academic Year? <input type="checkbox" id="academic_year_workaround_input" ></td>
+    </tr>
+      <!-- Inpatient Outpatient-->
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Covers Inpatient and Outpatient Medical Care in the San Francisco Bay Area? <input type="checkbox" id="sf_bay_care_medical_input" ></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Covers Inpatient and Outpatient Mental Health Care in the San Francisco Bay Area? <input type="checkbox" id="sf_bay_care_mental_input" ></td>
+    </tr>
+      <!-- Deductible and OOP-->
+    <!-- <tr class="info-row claim-info-row">
+      <td colspan="2">What is your annual deductible: $  <input type="number" id="annual_deductible_input" ></td>
+    </tr> -->
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Is your annual deductible $1000 USD or less? <input type="checkbox" id="annual_deductible_input" ></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Do you have a special employer plan with an annual deductible above $1000? <input type="checkbox" id="annual_deductible_employer_input" ></td>
+    </tr>
+    <!-- <tr class="info-row claim-info-row">
+      <td colspan="2">What is your annual out of pocket maximum?: $ <input type="checkbox" id="annual_oop_input" ></td>
+    </tr> -->
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Is your annual out of pocket maximum $9100 USD or less? <input type="checkbox" id="oop_minimum_input" ></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Do you have a special employer plan with an annual out of pocket maximum above $9100? <input type="checkbox" id="oop_employer_input" ></td>
+    </tr>
+      <!-- External PPACA (assume true for US plans)-->
+      <tr class="info-row claim-info-row">
+        <td colspan="2">Provides the Essential Minimum Benefits required by the Patient Protection and Affordable Care Act (PPACA) with no annual or lifetime maximums
+          (Assume US-based policies do, for now.) <input type="checkbox" id="emb_ppaca_input" >
+        </td>
+      </tr>
+      <tr class="info-row claim-info-row">
+        <td colspan="2">Covers 100% of Preventive Care as defined by the PPACA? 
+          (Assume US-based policies do, for now.) <input type="checkbox" id="pc_ppaca_input" >
+        </td>
+      </tr>
+      <!-- General Exclusions-->
+      <tr class="info-row claim-info-row">
+        <td colspan="2">Contains ANY exclusions for pre-existing conditions? <input type="checkbox" id="pre_existing_conditions_input" ></td>
+      </tr>
+      <tr class="info-row claim-info-row">
+        <td colspan="2">Offers Prescription Drug Coverage? <input type="checkbox" id="prescriptions_input" ></td>
+      </tr>
+      <tr class="info-row claim-info-row">
+        <td colspan="2">Offers coverage for both non-emergency AND emergency care?<input type="checkbox" id="double_care_input" ></td>
+      </tr>
+      <tr class="info-row claim-info-row">
+        <td colspan="2">Has a lifetime aggregate maximum benefit of at least $2,000,000 USD, 
+          OR a maximum per condition/per lifetime benefit of $500,000 USD<input type="checkbox" id="aggregate_max_benefit_input" ></td>
+      </tr>
+
+  </table>
+
+  <script src="../../src/load_common_data.js"></script>
+  <script src="../../src/epilog.js"></script>
+  <script src="cardinal_care_waiver.js"></script>
+</body>
+</html>

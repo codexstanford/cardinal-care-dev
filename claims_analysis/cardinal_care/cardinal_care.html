@@ -57,7 +57,13 @@
         <option value="none"></option>
         <option value="armed_forces">Armed Forces</option>
         <option value="other" selected>Other</option>
-    </select></td>
+    </select></td></tr>
+    <tr class="info-row patient-info-row">
+      <td colspan="2">Sex <select id="patient_sex_input" class="option-dropdown">
+        <option value="none"></option>
+        <option value="male">Male</option>
+        <option value="female" selected>Female</option>
+    </select></td></tr>
     
     <!-- Hospital Visit Information-->
     <tr id="hospital-visit-info-heading" class="claims-processing-section-heading">
@@ -74,8 +80,39 @@
         <option value="alternative">Alternative Health Care</option>
         <option value="gynecological_exam">Routine gynecological exams (including Pap smears and cytology tests)</option>
         <option value="specialized_screening_counselling">Preventive screening and counseling services</option>
+        <option value="female_contraceptives">Family planning services – female contraceptives</option>
+        <option value="physician_consultation">Physician Visit (Non-surgical/non-preventive care)</option>
+        <option value="physician_consultation">Telemedicine Consultation</option>
+        <option value="allergy">Allergy test and treatment</option>
         <option value="other">Other</option>
-    </select></td>
+      </select></td>
+      <td colspan="1">Vaccine Administered  <select id="hospital_visit_vaccine_input" class="option-dropdown" name="hospitalization_vaccine" value="stanford_medical_center">
+        <option value="none"></option>
+        <option value="covid">Covid</option>
+        <option value="tb">TB</option>
+        <option value="polio">Polio</option>
+        <option value="other">Other</option>
+      </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="1">Type of Contraceptive Service: <select id="contraceptive_service_input" class="option-dropdown" name="contraceptive_service" value="none">
+          <option value="none"></option>
+          <option value="counseling">Counseling</option>
+          <option value="rod">Implantable Rod</option>
+          <option value="larc">Long-acting Reversible Contraceptives (LARC)</option>
+          <option value="preogestin">Progestin Shot/Injection (Depo-Provera)</option>
+          <option value="oral">FDA-approved Oral Contraceptives</option>
+          <option value="reviewed_oral">FDA-reviewed Oral Contraceptives</option>
+          <option value="sterilization">Sterilization</option>
+        </select>
+      </td>
+      <td colspan="1">Type of Allergic Testing: <select id="allergy_service_input" class="option-dropdown" name="allergy_service" value="none">
+          <option value="none"></option>
+          <option value="test">Testing</option>
+          <option value="injection">Injections Treatment</option>
+          <option value="sera_extracts">Allergy sera and extracts Administered via injection</option>
+        </select>
+      </td>
     </tr>
     <tr class="info-row hospitalization-info-row">
       <td colspan="2">Type of screening/counselling <select id="hospital_visit_counselling_input" class="option-dropdown" name="hospitalization_reason" value="routine_physical">
@@ -120,8 +157,11 @@
         <option value="stanford_medical_center" selected>Stanford University Medical Center</option>
         <option value="menlo_medical_clinic">Menlo Medical Clinic</option>
         <option value="sutter_health">Sutter Health/Palo Alto Medical Foundation</option>
+        <option value="telemedicine">Telemedicine</option>
+        <option value="allergy_specialist">Allergy Specialist</option>
         <option value="other">Other</option>
     </select></td>
+    </tr>
     <tr class="info-row hospitalization-info-row">
       <td colspan="2">Location where Exam/Service was performed<select id="hospital_visit_location_input" class="option-dropdown" name="hospitalization_hospital">
         <option value="none"></option>
