@@ -1,0 +1,263 @@
+covered(C):-
+    claim.policy(C,P) &
+    policy.type(P,T) &
+    covered(C,P,T).
+
+covered(C,P,cardinal):-
+    valid_insuree(C,P) &
+    policy_active(C,P) &
+    valid_hospitalization(C,P).
+
+valid_insuree(C,P):-
+    claim.claimant(C,Cl) &
+    policy.insuree(P,Cl).
+
+policy_active(C,P):-
+  claim.claimant(C,Cl) &
+  claim.hospitalization(C,H) &
+  hospitalization.start_time(H,H_START_DATE,H_START_TIME) & 
+  hospitalization.end_time(H,H_END_DATE,H_END_TIME) &
+  policy.startdate(P,Cl,P_START_DATE) &
+  policy.enddate(P,Cl,P_END_DATE) &
+  get_timestamp_from_date(H_START_DATE,H_START_STAMP) &
+  get_timestamp_from_date(H_END_DATE,H_END_STAMP) &
+  get_timestamp_from_date(P_END_DATE,P_END_STAMP) &
+  get_timestamp_from_date(P_START_DATE,P_START_STAMP) &
+  leq(P_START_STAMP,H_START_STAMP) &
+  leq(H_END_STAMP,P_END_STAMP)
+
+valid_hospitalization(C,P):-
+  claim.hospitalization(C,H) &
+  hospitalization.hospital(H,Hosp) &
+  valid_hospital(Hosp) &
+  hospitalization.reason(H,R) &
+  eligible_service(C,P,R) &
+  ~exception(C,P).
+
+get_timestamp_from_datetime(DATE,TIME,STAMP) :-
+  evaluate(parsedate(DATE),[D,M,Y]) &
+  evaluate(parsetime(TIME),[HR,MIN]) &
+  evaluate(maketimestamp(Y,M,D,HR,MIN,0),STAMP)
+
+get_timestamp_from_date(DATE,STAMP) :-
+  evaluate(parsedate(DATE),[D,M,Y]) &
+  evaluate(maketimestamp(Y,M,D,0,0,0),STAMP)
+
+definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
+definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
+definition(tail(X!L),L)
+
+exception(C,P):-
+  person.occupation(armed_forces) &
+  claim.consequence_of_occupation(C,yes).
+
+eligible_service(C,P,Service):-
+  check_policy_year_limit(C,Service) &
+  claim.hospitalization(C,H) &
+  hospitalization.location(H,L) &
+  valid_location(Service,L).
+
+eligible_service(C,P,specialized_screening_counselling):-
+  claim.hospitalization(C,H) &
+  hospitalization.screening_type(H,Type) &
+  valid_screening_list(List) &
+  member(Type,List).
+
+eligible_service(C,P,specialized_screening_counselling):-
+  claim.hospitalization(C,H) &
+  hospitalization.screening_type(H,cancer) &
+  hospitalization.cancer_type(H,lung) &
+  evaluate(countofall(X,lung_cancer_past_twelve_months(C,X)),0). 
+
+eligible_service(C,P,specialized_screening_counselling):-
+  claim.hospitalization(C,H) &
+  hospitalization.screening_type(H,cancer) &
+  check_age_range_limit(C,cancer).   
+
+eligible_service(C,P,preventive_care):-
+  claim.hospitalization(C,H) &
+  hospitalization.location(H,L) &
+  valid_location(preventive_care,L) &
+  check_age_range_limit(C,vaccine).
+
+eligible_service(C,P,X):-
+  covered_list(List) &
+  member(X,List).
+
+check_age_range_limit(Claim, cancer):- 
+  claim.claimant(Claim,Cl) &
+  person.dob(Cl,DOB) &
+  claim.time(Claim,C_D,C_T) &
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2),Age) &
+  claim.hospitalization(Claim,Hosp) &
+  hospitalization.screening_type(Hosp,cancer) &
+  hospitalization.cancer_type(Hosp,Cancer) &
+  get_age_range_limit(cancer,Cancer,Age,Limit,MinAge,MaxAge) &
+  evaluate(plus(countofall(X,age_range_visit(Claim,X,Limit,MinAge,MaxAge,DOB)),1),Count) &
+  leq(Count,Limit).
+
+check_age_range_limit(Claim,vaccine):-
+  claim.claimant(Claim,Cl) &
+  person.dob(Cl,DOB) &
+  claim.time(Claim,C_D,C_T) &
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2),Age) &
+  claim.hospitalization(Claim,Hosp) &
+  hospitalization.vaccine(Hosp,V) &
+  get_age_range_limit(vaccine,V,Age,Limit,MinAge,MaxAge) &
+  evaluate(plus(countofall(X,age_range_visit_vaccine(Claim,X)),1),Count) &
+  leq(Count,Limit).
+  
+lung_cancer_past_twelve_months(Claim1,Claim2):-
+  claim.claimant(Claim1,Cl) &
+  claim.claimant(Claim2,Cl) &
+  claim.hospitalization(Claim2,Hosp2) &
+  claim.hospitalization(Claim1,Hosp1) &
+  hospitalization.reason(Hosp1,specialized_screening_counselling) &
+  hospitalization.reason(Hosp2,specialized_screening_counselling) &
+  hospitalization.screening_type(Hosp1,cancer) &
+  hospitalization.screening_type(Hosp2,cancer) &
+  hospitalization.cancer_type(Hosp1,lung) &
+  hospitalization.cancer_type(Hosp2,lung) &
+  evaluate(parsedate(C1_D),[D,M,Y]) &
+  evaluate(parsedate(C2_D),[D2,M2,Y2]) &
+  same(Y,Y2). %%update later when date logic gets fixed
+
+
+check_policy_year_limit(C,Service):-
+  claim.claimant(C,Cl) &
+  person.dob(Cl,DOB) &
+  claim.time(C,C_D,C_T) &
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2),Age) &
+  yearly_visit_limit(Service,Age,Limit) &
+  evaluate(plus(countofall(X,visit_current_year(Service,C,X)),1),Count) &
+  leq(Count,Limit).
+
+
+get_age_range_limit(Type,Case,Age,Limit,MinAge,MaxAge):-
+  age_range_limit(Type,Case,MinAge,MaxAge,Limit) &
+  evaluate(minus(MaxAge,1),MaxAgeMinus) &
+  leq(Age,MaxAgeMinus) &
+  leq(MinAge,Age).
+
+yearly_visit_limit(Service,Age,Limit):-
+  yearly_visit_limit(Service,MinAge,MaxAge,Limit) &
+  evaluate(minus(MaxAge,1),MaxAgeMinus) &
+  leq(Age,MaxAgeMinus) &
+  leq(MinAge,Age).
+
+visit_current_year(Service,Claim1,Claim2):-
+  claim.claimant(Claim1,Person) &
+  claim.claimant(Claim2,Person) &
+  claim.policy(Claim1,Policy) &
+  claim.policy(Claim2,Policy) &
+  claim.hospitalization(Claim2,Hosp2) &
+  claim.hospitalization(Claim1,Hosp1) &
+  hospitalization.reason(Hosp1,Service) &
+  hospitalization.reason(Hosp2,Service) &
+  hospitalization.start_time(Hosp1,Hosp1_StartDate,Hosp1_StartTime) &
+  hospitalization.start_time(Hosp2,Hosp2_StartDate,Hosp2_StartTime) &
+  policy_year_startdate(Policy_StartDate) &
+  get_timestamp_from_datetime(Hosp2_StartDate,Hosp2_StartTime,Hosp2_Timestamp) &
+  get_timestamp_from_date(Policy_StartDate,Policy_Timestamp) &
+  get_timestamp_from_datetime(Hosp1_StartDate,Hosp1_StartTime,Hosp1_Timestamp) &
+  leq(Policy_Timestamp,Hosp2_Timestamp) &
+  leq(Policy_Timestamp,Hosp1_Timestamp) &
+  claim.time(Claim1,C1_D,C1_T) &
+  claim.time(Claim2,C2_D,C2_T) &
+  get_timestamp_from_datetime(C1_D,C1_T,C1_TS) &
+  get_timestamp_from_datetime(C2_D,C2_T,C2_TS) &
+  lt(C2_TS,C1_TS) &
+  covered(Claim2)
+
+age_range_visit_vaccine(Claim1,Claim2):-
+  claim.claimant(Claim1,Person) &
+  claim.claimant(Claim2,Person) &
+  claim.policy(Claim1,Policy) &
+  claim.policy(Claim2,Policy) &
+  claim.hospitalization(Claim2,Hosp2) &
+  claim.hospitalization(Claim1,Hosp1) &
+  claim.time(Claim1,C1_D,C1_T) &
+  hospitalization.reason(Hosp1,preventive_care) &
+  hospitalization.reason(Hosp2,preventive_care) &
+  hospitalization.vaccine(Hosp1,V) &
+  hospitalization.vaccine(Hosp2,V) &
+  person.dob(Person,DOB) &
+  evaluate(parsedate(C1_D),[D1,M1,Y1]) &
+  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
+  evaluate(minus(Y1,Y_dob),Age) &
+  get_age_range_limit(vaccine,V,Age,Limit,MinAge,MaxAge) &
+  age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB).
+
+age_range_visit_cancer(Claim1,Claim2):-
+  claim.claimant(Claim1,Person) &
+  claim.claimant(Claim2,Person) &
+  claim.policy(Claim1,Policy) &
+  claim.policy(Claim2,Policy) &
+  claim.hospitalization(Claim2,Hosp2) &
+  claim.hospitalization(Claim1,Hosp1) &
+  claim.time(Claim1,C1_D,C1_T) &
+  hospitalization.reason(Hosp1,specialized_screening_counselling) &
+  hospitalization.reason(Hosp2,specialized_screening_counselling) &
+  hospitalization.screening_type(Hosp1,cancer) &
+  hospitalization.screening_type(Hosp2,cancer) &
+  hospitalization.cancer_type(Hosp1,Cancer) &
+  hospitalization.cancer_type(Hosp2,Cancer) &
+  person.dob(Person,DOB) &
+  evaluate(parsedate(C1_D),[D1,M1,Y1]) &
+  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
+  evaluate(minus(Y1,Y_dob),Age) &
+  get_age_range_limit(cancer,Cancer,Age,Limit,MinAge,MaxAge) &
+  age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB).
+
+age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB):-
+  claim.time(Claim1,C1_D,C1_T) &
+  claim.time(Claim2,C2_D,C2_T) &
+  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
+  evaluate(parsedate(C2_D),[D2,M2,Y2]) &
+  evaluate(minus(Y2,Y_dob),Age2) &
+  evaluate(minus(MaxAge,1),MaxAgeMinus) &
+  leq(Age2,MaxAgeMinus) &
+  leq(MinAge,Age2) &
+  get_timestamp_from_datetime(C1_D,C1_T,C1_TS) &
+  get_timestamp_from_datetime(C2_D,C2_T,C2_TS) &
+  lt(C2_TS,C1_TS) &
+  covered(Claim2). %% update with claim line logic
+  
+lt(X,Y):-
+  leq(X,Y) &
+  ~same(X,Y).
+
+policy_year_startdate(01_08_2023).
+
+valid_hospital(stanford_medical_center).
+valid_hospital(menlo_medical_clinic).
+valid_hospital(sutter_health).
+yearly_visit_limit(routine_physical,0,22,0).
+yearly_visit_limit(routine_physical,22,200,1)
+yearly_visit_limit(gynecological_exam,0,200,1).
+valid_location(routine_physical,phys_office).
+valid_location(preventive_care,phys_office).
+valid_location(preventive_care,facility).
+valid_location(gynecological_exam,phys_office).
+valid_location(gynecological_exam,ob_office).
+valid_location(gynecological_exam,gyn_office).
+valid_location(gynecological_exam,ob_gyn).
+valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
+genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
+covered_list([breast_pump_supplies]).
+age_range_limit(vaccine,covid,0,200,3).
+age_range_limit(vaccine,polio,0,5,5).
+age_range_limit(vaccine,polio,5,100,0).
+age_range_limit(vaccine,tb,0,24,1).
+age_range_limit(vaccine,tb,24,200,0).
+age_range_limit(cancer,prostate,0,200,1). 
+age_range_limit(cancer,breast,0,200,1).
+
+definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
+definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
