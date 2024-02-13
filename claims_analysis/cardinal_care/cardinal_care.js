@@ -11,17 +11,17 @@ const PATIENT_SEX_INPUT_ID = "patient_sex_input";
 const PATIENT_OCCUPATION_ID = "patient_occupation_input";
 const HOSPITALIZATION_ID_INPUT_ID = "hospitalization_id_input";
 const HOSPITALIZATION_REASON_INPUT_ID = "hospitalization_reason_input";
-const HOSPITALIZATION_VACCINE_INPUT_ID = "hospital_visit_vaccine_input";
 const HOSPITALIZATION_CONTRACEPTIVE_SERVICE_INPUT_ID = "contraceptive_service_input";
 const HOSPITALIZATION_ALLERGY_SERVICE_INPUT_ID = "allergy_service_input";
+const HOSPITALIZATION_COUNSELLING_ID = "hospital_visit_counselling_input";
+const HOSPITALIZATION_CANCER_ID = "hospital_visit_cancer_input";
+const HOSPITALIZATION_VACCINE_INPUT_ID = "hospital_visit_vaccine_input";
 const HOSPITALIZATION_HOSPITAL_ID = "hospital_visit_hospital_input";
 const HOSPITALIZATION_STARTDATE_INPUT_ID = "hospitalization_startdate_input";
 const HOSPITALIZATION_STARTTIME_INPUT_ID = "hospitalization_starttime_input";
 const HOSPITALIZATION_ENDDATE_INPUT_ID = "hospitalization_enddate_input";
 const HOSPITALIZATION_ENDTIME_INPUT_ID = "hospitalization_endtime_input";
 const HOSPITALIZATION_COO_ID = "hospitalization_coo_input";
-const HOSPITALIZATION_COUNSELLING_ID = "hospital_visit_counselling_input";
-const HOSPITALIZATION_CANCER_ID = "hospital_visit_cancer_input";
 const HOSPITALIZATION_LOCATION_ID = "hospital_visit_location_input";
 
 const INPUT_FIELD_IDS = [
@@ -38,8 +38,9 @@ const INPUT_FIELD_IDS = [
   PATIENT_OCCUPATION_ID,
   HOSPITALIZATION_ID_INPUT_ID,
   HOSPITALIZATION_REASON_INPUT_ID,
-  HOSPITALIZATION_VACCINE_INPUT_ID,
+  HOSPITALIZATION_CONTRACEPTIVE_SERVICE_INPUT_ID,
   HOSPITALIZATION_ALLERGY_SERVICE_INPUT_ID,
+  HOSPITALIZATION_VACCINE_INPUT_ID,
   HOSPITALIZATION_HOSPITAL_ID,
   HOSPITALIZATION_STARTDATE_INPUT_ID,
   HOSPITALIZATION_STARTTIME_INPUT_ID,
@@ -171,7 +172,7 @@ function get_data_from_input_fields() {
     facts_to_add += "hospitalization.reason(" + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_REASON_VALUE + ") ";
   }
 
-  var vaccineAdministeredRow = document.getElementById('hospital_visit_vaccine_input').closest('tr');
+  var vaccineAdministeredRow = document.getElementById(HOSPITALIZATION_VACCINE_INPUT_ID).closest('tr');
   if(HOSPITALIZATION_REASON_VALUE === "preventive_care") {
     vaccineAdministeredRow.style.display = '';
   }
@@ -179,13 +180,38 @@ function get_data_from_input_fields() {
     vaccineAdministeredRow.style.display = 'none';
   }
 
-  var counsellingRow = document.getElementById('hospital_visit_counselling_input').closest('tr');
+  var counsellingRow = document.getElementById(HOSPITALIZATION_COUNSELLING_ID).closest('tr');
   if(HOSPITALIZATION_REASON_VALUE === "specialized_screening_counselling") {
     counsellingRow.style.display = '';
   }
   else {
     counsellingRow.style.display = 'none';
   }
+
+  var allergyRow = document.getElementById(HOSPITALIZATION_ALLERGY_SERVICE_INPUT_ID).closest('tr');
+  if(HOSPITALIZATION_REASON_VALUE === "allergy") {
+    allergyRow.style.display = '';
+  }
+  else {
+    allergyRow.style.display = 'none';
+  }
+
+  var contraceptiveRow = document.getElementById(HOSPITALIZATION_CONTRACEPTIVE_SERVICE_INPUT_ID).closest('tr');
+  if(HOSPITALIZATION_REASON_VALUE === "female_contraceptives") {
+    contraceptiveRow.style.display = '';
+  }
+  else {
+    contraceptiveRow.style.display = 'none';
+  }
+
+  var counsellingRow = document.getElementById(HOSPITALIZATION_COUNSELLING_ID).closest('tr');
+  if(HOSPITALIZATION_REASON_VALUE === "specialized_screening_counselling") {
+    counsellingRow.style.display = '';
+  }
+  else {
+    counsellingRow.style.display = 'none';
+  }
+
 
   const HOSPITALIZATION_VACCINE_VALUE = document.getElementById(HOSPITALIZATION_VACCINE_INPUT_ID).value;
   if (HOSPITALIZATION_VACCINE_VALUE !== "") {
@@ -239,7 +265,7 @@ function get_data_from_input_fields() {
     facts_to_add += "hospitalization.screening_type("  + HOSPITALIZATION_ID_VALUE + ", " + HOSPITALIZATION_COUNSELLING_VALUE + ") ";
   }
 
-  var cancerTypeRow = document.getElementById('hospital_visit_cancer_input').closest('tr');
+  var cancerTypeRow = document.getElementById(HOSPITALIZATION_CANCER_ID).closest('tr');
   if(HOSPITALIZATION_COUNSELLING_VALUE === "cancer") {
     cancerTypeRow.style.display = '';
   } else {
@@ -337,7 +363,7 @@ policy_active(C,P):-
 valid_hospitalization(C,P):-
   claim.hospitalization(C,H) &
   hospitalization.hospital(H,Hosp) &
-  valid_hospital(Hosp, R) &
+  valid_hospital(Hosp) &
   hospitalization.reason(H,R) &
   eligible_service(C,P,R) &
   ~exception(C,P).
@@ -354,6 +380,15 @@ get_timestamp_from_date(DATE,STAMP) :-
 definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
 definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
 definition(tail(X!L),L)
+
+get_age(C_D, DOB, Age) :-
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2),YearDiff) &
+  evaluate(minus(M,M2), MonthDiff) &
+  evaluate(minus(D,D2), DayDiff) &
+  evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
+  evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
 
 exception(C,P):-
   person.occupation(armed_forces) &
@@ -388,6 +423,27 @@ eligible_service(C,P,preventive_care):-
   valid_location(preventive_care,L) &
   check_age_range_limit(C,vaccine).
 
+eligible_service(C,P,female_contraceptives):-
+  claim.claimant(C,Cl) &
+  person.sex(Cl, female) &
+  claim.hospitalization(C,H) &
+  hospitalization.contraceptive_service(H,Service) &
+  fda_approved(Service) &
+  hospitalization.location(H,L) &
+  contraceptive_location_check(Service,L).
+
+contraceptive_location_check(Service,L):-
+  valid_location_contraceptive(Service,L).
+
+contraceptive_location_check(sterilization,L).
+
+eligible_service(C,P,X):-
+  covered_list_with_location(List) &
+  member(X,List) &
+  claim.hospitalization(C,H) &
+  hospitalization.location(H,L) &
+  valid_location(X,L).
+
 eligible_service(C,P,X):-
   covered_list(List) &
   member(X,List).
@@ -396,9 +452,7 @@ check_age_range_limit(Claim, cancer):-
   claim.claimant(Claim,Cl) &
   person.dob(Cl,DOB) &
   claim.time(Claim,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   claim.hospitalization(Claim,Hosp) &
   hospitalization.screening_type(Hosp,cancer) &
   hospitalization.cancer_type(Hosp,Cancer) &
@@ -410,9 +464,7 @@ check_age_range_limit(Claim,vaccine):-
   claim.claimant(Claim,Cl) &
   person.dob(Cl,DOB) &
   claim.time(Claim,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   claim.hospitalization(Claim,Hosp) &
   hospitalization.vaccine(Hosp,V) &
   get_age_range_limit(vaccine,V,Age,Limit,MinAge,MaxAge) &
@@ -432,31 +484,19 @@ lung_cancer_past_twelve_months(Claim1,Claim2):-
   hospitalization.cancer_type(Hosp2,lung) &
   evaluate(parsedate(C1_D),[D,M,Y]) &
   evaluate(parsedate(C2_D),[D2,M2,Y2]) &
-  same(Y,Y2). %%update later when date logic gets fixed
+  get_age(C1_D, C2_D, Age) &
+  same(Age, 0)
 
 
 check_policy_year_limit(C,Service):-
   claim.claimant(C,Cl) &
   person.dob(Cl,DOB) &
   claim.time(C,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   yearly_visit_limit(Service,Age,Limit) &
   evaluate(plus(countofall(X,visit_current_year(Service,C,X)),1),Count) &
   leq(Count,Limit).
 
-
-
-eligible_service(C,P,female_contraceptives) :-
-  claim.claimant(C,Cl) &
-  person.sex(Cl, female) &
-  claim.hospitalization(C,H) &
-  hospitalization.contraceptive_service(H,Service) &
-  fda_approved(Service).
-
-eligible_service(C,P,physician_consultation).
-eligible_service(C,P,allergy).
 
 get_age_range_limit(Type,Case,Age,Limit,MinAge,MaxAge):-
   age_range_limit(Type,Case,MinAge,MaxAge,Limit) &
@@ -501,15 +541,13 @@ age_range_visit_vaccine(Claim1,Claim2):-
   claim.policy(Claim2,Policy) &
   claim.hospitalization(Claim2,Hosp2) &
   claim.hospitalization(Claim1,Hosp1) &
-  claim.time(Claim1,C1_D,C1_T) &
   hospitalization.reason(Hosp1,preventive_care) &
   hospitalization.reason(Hosp2,preventive_care) &
   hospitalization.vaccine(Hosp1,V) &
   hospitalization.vaccine(Hosp2,V) &
+  claim.time(Claim1,C1_D,C1_T) &
   person.dob(Person,DOB) &
-  evaluate(parsedate(C1_D),[D1,M1,Y1]) &
-  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
-  evaluate(minus(Y1,Y_dob),Age) &
+  get_age(C1_D, DOB, Age) &
   get_age_range_limit(vaccine,V,Age,Limit,MinAge,MaxAge) &
   age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB).
 
@@ -528,18 +566,14 @@ age_range_visit_cancer(Claim1,Claim2):-
   hospitalization.cancer_type(Hosp1,Cancer) &
   hospitalization.cancer_type(Hosp2,Cancer) &
   person.dob(Person,DOB) &
-  evaluate(parsedate(C1_D),[D1,M1,Y1]) &
-  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
-  evaluate(minus(Y1,Y_dob),Age) &
+  get_age(C1_D, DOB, Age) &
   get_age_range_limit(cancer,Cancer,Age,Limit,MinAge,MaxAge) &
   age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB).
 
 age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB):-
   claim.time(Claim1,C1_D,C1_T) &
   claim.time(Claim2,C2_D,C2_T) &
-  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
-  evaluate(parsedate(C2_D),[D2,M2,Y2]) &
-  evaluate(minus(Y2,Y_dob),Age2) &
+  get_age(C2_D, DOB, Age2) &
   evaluate(minus(MaxAge,1),MaxAgeMinus) &
   leq(Age2,MaxAgeMinus) &
   leq(MinAge,Age2) &
@@ -554,18 +588,13 @@ lt(X,Y):-
 
 policy_year_startdate(01_08_2023).
 
-valid_hospital(Hosp, R):-
-  valid_hospital(Hosp).
-
-valid_hospital(telemedicine, physician_consultation).
-valid_hospital(allergy_specialist, allergy).
-
 valid_hospital(stanford_medical_center).
 valid_hospital(menlo_medical_clinic).
 valid_hospital(sutter_health).
 yearly_visit_limit(routine_physical,0,22,0).
 yearly_visit_limit(routine_physical,22,200,1)
 yearly_visit_limit(gynecological_exam,0,200,1).
+
 valid_location(routine_physical,phys_office).
 valid_location(preventive_care,phys_office).
 valid_location(preventive_care,facility).
@@ -573,9 +602,23 @@ valid_location(gynecological_exam,phys_office).
 valid_location(gynecological_exam,ob_office).
 valid_location(gynecological_exam,gyn_office).
 valid_location(gynecological_exam,ob_gyn).
+valid_location(physician_consultation,telemedicine)
+valid_location(physician_consultation,phys_office)
+valid_location(physician_consultation,sp_office)
+valid_location(allergy,phys_office)
+valid_location(allergy,allergy_specialist)
+
+valid_location_contraceptive(counseling,contra_office)
+valid_location_contraceptive(rod,contra_office)
+valid_location_contraceptive(larc,contra_office)
+valid_location_contraceptive(preogestin,contra_office)
+valid_location_contraceptive(oral,contra_office)
+
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
+covered_list_with_location([physician_consultation,allergy])
 covered_list([breast_pump_supplies]).
+
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).
 age_range_limit(vaccine,polio,5,100,0).
@@ -584,23 +627,10 @@ age_range_limit(vaccine,tb,24,200,0).
 age_range_limit(cancer,prostate,0,200,1). 
 age_range_limit(cancer,breast,0,200,1).
 
-definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
-preventive_care_limit(covid,0,200,3).
-preventive_care_limit(polio,0,5,5).
-preventive_care_limit(polio,5,100,0).
-preventive_care_limit(tb,0,24,1).
-preventive_care_limit(tb,24,200,0).
-
 fda_approved(counseling).
 fda_approved(rod).
 fda_approved(larc).
 fda_approved(preogestin).
 fda_approved(oral).
 fda_approved(sterilization).
-
-lt(X,Y):-
-  leq(X,Y) &
-  ~same(X,Y).
-
-  definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
 `;
