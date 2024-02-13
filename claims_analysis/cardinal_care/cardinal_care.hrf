@@ -47,6 +47,15 @@ definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..
 definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
 definition(tail(X!L),L)
 
+get_age(C_D, DOB, Age) :-
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2),YearDiff) &
+  evaluate(minus(M,M2), MonthDiff) &
+  evaluate(minus(D,D2), DayDiff) &
+  evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
+  evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
+
 exception(C,P):-
   person.occupation(armed_forces) &
   claim.consequence_of_occupation(C,yes).
@@ -80,6 +89,27 @@ eligible_service(C,P,preventive_care):-
   valid_location(preventive_care,L) &
   check_age_range_limit(C,vaccine).
 
+eligible_service(C,P,female_contraceptives):-
+  claim.claimant(C,Cl) &
+  person.sex(Cl, female) &
+  claim.hospitalization(C,H) &
+  hospitalization.contraceptive_service(H,Service) &
+  fda_approved(Service) &
+  hospitalization.location(H,L) &
+  contraceptive_location_check(Service,L).
+
+contraceptive_location_check(Service,L):-
+  valid_location_contraceptive(Service,L).
+
+contraceptive_location_check(sterilization,L).
+
+eligible_service(C,P,X):-
+  covered_list_with_location(List) &
+  member(X,List) &
+  claim.hospitalization(C,H) &
+  hospitalization.location(H,L) &
+  valid_location(X,L).
+
 eligible_service(C,P,X):-
   covered_list(List) &
   member(X,List).
@@ -88,9 +118,7 @@ check_age_range_limit(Claim, cancer):-
   claim.claimant(Claim,Cl) &
   person.dob(Cl,DOB) &
   claim.time(Claim,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   claim.hospitalization(Claim,Hosp) &
   hospitalization.screening_type(Hosp,cancer) &
   hospitalization.cancer_type(Hosp,Cancer) &
@@ -102,9 +130,7 @@ check_age_range_limit(Claim,vaccine):-
   claim.claimant(Claim,Cl) &
   person.dob(Cl,DOB) &
   claim.time(Claim,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   claim.hospitalization(Claim,Hosp) &
   hospitalization.vaccine(Hosp,V) &
   get_age_range_limit(vaccine,V,Age,Limit,MinAge,MaxAge) &
@@ -124,16 +150,15 @@ lung_cancer_past_twelve_months(Claim1,Claim2):-
   hospitalization.cancer_type(Hosp2,lung) &
   evaluate(parsedate(C1_D),[D,M,Y]) &
   evaluate(parsedate(C2_D),[D2,M2,Y2]) &
-  same(Y,Y2). %%update later when date logic gets fixed
+  get_age(C1_D, C2_D, Age) &
+  same(Age, 0)
 
 
 check_policy_year_limit(C,Service):-
   claim.claimant(C,Cl) &
   person.dob(Cl,DOB) &
   claim.time(C,C_D,C_T) &
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),Age) &
+  get_age(C_D, DOB, Age) &
   yearly_visit_limit(Service,Age,Limit) &
   evaluate(plus(countofall(X,visit_current_year(Service,C,X)),1),Count) &
   leq(Count,Limit).
@@ -182,15 +207,13 @@ age_range_visit_vaccine(Claim1,Claim2):-
   claim.policy(Claim2,Policy) &
   claim.hospitalization(Claim2,Hosp2) &
   claim.hospitalization(Claim1,Hosp1) &
-  claim.time(Claim1,C1_D,C1_T) &
   hospitalization.reason(Hosp1,preventive_care) &
   hospitalization.reason(Hosp2,preventive_care) &
   hospitalization.vaccine(Hosp1,V) &
   hospitalization.vaccine(Hosp2,V) &
+  claim.time(Claim1,C1_D,C1_T) &
   person.dob(Person,DOB) &
-  evaluate(parsedate(C1_D),[D1,M1,Y1]) &
-  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
-  evaluate(minus(Y1,Y_dob),Age) &
+  get_age(C1_D, DOB, Age) &
   get_age_range_limit(vaccine,V,Age,Limit,MinAge,MaxAge) &
   age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB).
 
@@ -209,18 +232,14 @@ age_range_visit_cancer(Claim1,Claim2):-
   hospitalization.cancer_type(Hosp1,Cancer) &
   hospitalization.cancer_type(Hosp2,Cancer) &
   person.dob(Person,DOB) &
-  evaluate(parsedate(C1_D),[D1,M1,Y1]) &
-  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
-  evaluate(minus(Y1,Y_dob),Age) &
+  get_age(C1_D, DOB, Age) &
   get_age_range_limit(cancer,Cancer,Age,Limit,MinAge,MaxAge) &
   age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB).
 
 age_range_visit(Claim1,Claim2,Limit,MinAge,MaxAge,DOB):-
   claim.time(Claim1,C1_D,C1_T) &
   claim.time(Claim2,C2_D,C2_T) &
-  evaluate(parsedate(DOB),[D_dob,M_dob,Y_dob]) &
-  evaluate(parsedate(C2_D),[D2,M2,Y2]) &
-  evaluate(minus(Y2,Y_dob),Age2) &
+  get_age(C2_D, DOB, Age2) &
   evaluate(minus(MaxAge,1),MaxAgeMinus) &
   leq(Age2,MaxAgeMinus) &
   leq(MinAge,Age2) &
@@ -241,6 +260,7 @@ valid_hospital(sutter_health).
 yearly_visit_limit(routine_physical,0,22,0).
 yearly_visit_limit(routine_physical,22,200,1)
 yearly_visit_limit(gynecological_exam,0,200,1).
+
 valid_location(routine_physical,phys_office).
 valid_location(preventive_care,phys_office).
 valid_location(preventive_care,facility).
@@ -248,9 +268,23 @@ valid_location(gynecological_exam,phys_office).
 valid_location(gynecological_exam,ob_office).
 valid_location(gynecological_exam,gyn_office).
 valid_location(gynecological_exam,ob_gyn).
+valid_location(physician_consultation,telemedicine)
+valid_location(physician_consultation,phys_office)
+valid_location(physician_consultation,sp_office)
+valid_location(allergy,phys_office)
+valid_location(allergy,allergy_specialist)
+
+valid_location_contraceptive(counseling,contra_office)
+valid_location_contraceptive(rod,contra_office)
+valid_location_contraceptive(larc,contra_office)
+valid_location_contraceptive(preogestin,contra_office)
+valid_location_contraceptive(oral,contra_office)
+
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
+covered_list_with_location([physician_consultation,allergy])
 covered_list([breast_pump_supplies]).
+
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).
 age_range_limit(vaccine,polio,5,100,0).
@@ -259,5 +293,9 @@ age_range_limit(vaccine,tb,24,200,0).
 age_range_limit(cancer,prostate,0,200,1). 
 age_range_limit(cancer,breast,0,200,1).
 
-definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
-definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
+fda_approved(counseling).
+fda_approved(rod).
+fda_approved(larc).
+fda_approved(preogestin).
+fda_approved(oral).
+fda_approved(sterilization).
