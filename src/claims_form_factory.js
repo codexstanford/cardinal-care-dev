@@ -32,7 +32,7 @@ function createTableCell(colspan, innerHTML) {
     return cell;
 }
 
-// selectOptions: only non-null when inputType === "select". Should be a list of [value, text] pairs
+// selectOptions: should be null, unless inputType === "select". Should be a list of [value, text] pairs
 function createInputElem(inputType, defaultInput, inputID, selectOptions = null) {
     let inputElement = null;
     
@@ -90,14 +90,14 @@ function newHeadingRow(titleText, rowID, classList) {
     return createTableRow(rowID, classList, headingContent.outerHTML);
 }
 
-function newClaimsFormInputRow(cellList) {
+function newClaimsFormInputRow(cellList, addtlClassList = []) {
     let innerHTML = "";
 
     for (let cell of cellList) {
         innerHTML += cell.outerHTML;
     }
 
-    return createTableRow("", ["info-row", "claim-info-row"], innerHTML);
+    return createTableRow("", ["info-row", "claim-info-row", ...addtlClassList], innerHTML);
 }
 
 function newClaimsFormInputCell(colSpan, inputType, defaultInput, cellText, inputID) {

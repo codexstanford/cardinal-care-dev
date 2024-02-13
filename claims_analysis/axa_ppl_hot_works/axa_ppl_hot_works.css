@@ -76,6 +76,10 @@ nav a {
   padding: 10px;
 }
 
+.endorsement-info-heading {
+  background-color: rgb(251, 199, 199);
+}
+
 tr.info-row {
   background-color: #fff;
   text-align: left;

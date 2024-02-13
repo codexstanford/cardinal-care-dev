@@ -105,6 +105,31 @@ function add_event_listeners() {
     
     INPUT_FIELD_WIDGET.addEventListener("change", () => update_coverage_indicator());
   }
+
+  add_visibility_changing_event_listeners();
+}
+
+function add_visibility_changing_event_listeners() {
+  // Exclusion Endorsement
+  add_row_visibility_toggle_event_listener("policy_hot_works_exclusion_endorsement_input", "exclusion-endorsement-row", function(togglingElem) { return togglingElem.checked;});
+  
+  // Precautions Amendment Endorsement
+  add_row_visibility_toggle_event_listener("policy_hot_works_precaution_amendment_endorsement_input", "precautions-amendment-endorsement-row", function(togglingElem) { return togglingElem.checked;});
+}
+
+function add_row_visibility_toggle_event_listener(togglingElemID, toggledClass, toggleCondition) {
+  document.getElementById(togglingElemID).addEventListener("change", function() {
+    let elemsToChangeVisibilityOf = document.getElementsByClassName(toggledClass);
+    if (toggleCondition(this)) {
+      for (let elem of elemsToChangeVisibilityOf) {
+        elem.style.display = "table-row";
+      }
+    } else {
+      for (let elem of elemsToChangeVisibilityOf) {
+        elem.style.display = "none";
+      }
+    }
+  } );
 }
 
 function get_data_from_input_fields() {
@@ -165,14 +190,6 @@ function get_data_from_input_fields() {
     }
     else if (inputType === "date") {
       inputValue = inputWidget.value.replace(/-/g, '_');
-      
-      let splitDate = inputValue.split("_");
-
-      let timeStamp = maketimestamp(splitDate[0], splitDate[1], splitDate[2], "00", "00", "00");
-
-      let dateFact = "datetotimestamp(" + inputValue + ", " + timeStamp + ") \n";
-
-      facts_to_add += dateFact;
     }
     else if (inputType === "time") {
       inputValue = inputWidget.value.replace(/:/g, '_') + "_00";
@@ -186,26 +203,23 @@ function get_data_from_input_fields() {
     }
 
     // Fill the template
-    let filledTemplate = FACT_TEMPLATE;
-    filledTemplate = filledTemplate.replace(/\$POLICY\$/g, POLICY_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$CLAIM\$/g, CLAIM_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$INSUREE\$/g, INSUREE_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$INJURED_PERSON\$/g, INJURED_PERSON_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$DAMAGE_CAUSE_EVENT\$/g, DAMAGE_CAUSE_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$POLLUTANT_LOCATION\$/g, POLLUTANT_LOCATION_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$ACT\$/g, ACT_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$PERIOD\$/g, PERIOD_OF_WORK_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$SUBCONTRACTOR\$/g, SUBCONTRACTOR_ID_VALUE);
-    filledTemplate = filledTemplate.replace(/\$VALUE\$/g, inputValue);
+    let filledTemplate = fillTemplate(FACT_TEMPLATE, [
+      [/\$POLICY\$/g, POLICY_ID_VALUE],
+      [/\$CLAIM\$/g, CLAIM_ID_VALUE],
+      [/\$INSUREE\$/g, INSUREE_ID_VALUE],
+      [/\$INJURED_PERSON\$/g, INJURED_PERSON_ID_VALUE],
+      [/\$DAMAGE_CAUSE_EVENT\$/g, DAMAGE_CAUSE_ID_VALUE],
+      [/\$POLLUTANT_LOCATION\$/g, POLLUTANT_LOCATION_ID_VALUE],
+      [/\$ACT\$/g, ACT_ID_VALUE],
+      [/\$PERIOD\$/g, PERIOD_OF_WORK_ID_VALUE],
+      [/\$SUBCONTRACTOR\$/g, SUBCONTRACTOR_ID_VALUE],
+      [/\$VALUE\$/g, inputValue]
+    ]);
 
     //console.log(filledTemplate);
 
     facts_to_add += filledTemplate + " ";
   }
-
-  // Compute datetimetotimestamps
-
-  facts_to_add += compute_date_time_to_time_stamps();
 
   
   let output = definemorefacts([], readdata(facts_to_add));
@@ -215,24 +229,17 @@ function get_data_from_input_fields() {
 
   return output;
 }
+/*********************** Utility Functions ***********************/
 
-function compute_date_time_to_time_stamps() {
-  let datetimetotimestamp_facts = "";
+// replacementPairs: list of [regex, string] pairs
+function fillTemplate(templateToFill, replacementPairs) {
 
-  let eventDateWidget = document.getElementById("claim_sudden_incident_date_input");
-  let eventTimeWidget = document.getElementById("claim_sudden_incident_time_input");
+  for (let [matcher, replacement] of replacementPairs) {
+    templateToFill = templateToFill.replace(matcher, replacement);
+  }
 
-  let formattedDate = eventDateWidget.value.replace(/-/g, '_');
-  let formattedTime = eventTimeWidget.value.replace(/:/g, '_') + "_00";
+  return templateToFill;
 
-  let splitDate = formattedDate.split("_");
-  let splitTime = formattedTime.split("_");
-
-  let timeStamp = maketimestamp(splitDate[0], splitDate[1], splitDate[2], splitTime[0], splitTime[1], splitTime[2]);
-
-  datetimetotimestamp_facts += "datetimetotimestamp(" + formattedDate + ", " + formattedTime + ", " + timeStamp + ") "
-  
-  return datetimetotimestamp_facts;
 }
 
 /*********************** BUILDING THE CLAIMS FORM ***********************/
@@ -382,7 +389,7 @@ function build_injury_info_section() {
 function build_hot_work_exclusion_endorsement_section() {
   let rows = [];
   
-  rows.push(newHeadingRow("Hot Work Exclusion Endorsement Information", "hot-work-exclusion-endorsement-info-subheading", ["claims-processing-section-subheading"]));
+  rows.push(newHeadingRow("Hot Work Exclusion Endorsement Information", "hot-work-exclusion-endorsement-info-subheading", ["claims-processing-section-subheading", "exclusion-endorsement-row", "endorsement-info-heading"]));
 
   rows.push(newClaimsFormInputRow([newClaimsFormSelectCell(2, "", "Location where the hot work took place [Placeholder]: ", "claim_hot_work_location_input", 
   [
@@ -390,7 +397,7 @@ function build_hot_work_exclusion_endorsement_section() {
     ["none", ""],
     ["washington", "Washington"]
   ]
-  )]));
+  )], ["exclusion-endorsement-row"]));
   
   return rows;
 }
@@ -435,12 +442,12 @@ function build_precautions_taken_info_section() {
 function build_hot_works_precautions_amendment_info_section() {
   let rows = [];
 
-  rows.push(newHeadingRow("Hot Work Precautions Amendment Information", "hot-work-precautions-amendment-info-subheading", ["claims-processing-section-subheading"]));
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Does the insuree operate their own hot work permit system detailing the methods and precautions to be followed prior to, during, and subsequent to hot work?", "claim_insuree_operates_own_hot_work_permit_system_input")]));
+  rows.push(newHeadingRow("Hot Work Precautions Amendment Information", "hot-work-precautions-amendment-info-subheading", ["claims-processing-section-subheading", "precautions-amendment-endorsement-row", "endorsement-info-heading"]));
+  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Does the insuree operate their own hot work permit system detailing the methods and precautions to be followed prior to, during, and subsequent to hot work?", "claim_insuree_operates_own_hot_work_permit_system_input")], ["precautions-amendment-endorsement-row"]));
 
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has a copy of it been provided to the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_copy_sent_input")]));
+  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has a copy of it been provided to the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_copy_sent_input")], ["precautions-amendment-endorsement-row"]));
 
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has the copy been accepted by the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_accepted_in_writing_input")]));
+  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Has the copy been accepted by the insuring company in writing?", "claim_insuree_operated_own_hot_work_permit_system_accepted_in_writing_input")], ["precautions-amendment-endorsement-row"]));
 
   return rows;
 
@@ -489,6 +496,23 @@ function build_claims_processing_table() {
 
 // Your policy rules go here
 let policy_rules = `
+
+get_timestamp_from_datetime(DATE,TIME,STAMP) :-
+  evaluate(parsedate(DATE),[Y,M,D]) &
+  evaluate(parsetime(TIME),[HR,MIN]) &
+  evaluate(maketimestamp(Y,M,D,HR,MIN,0),STAMP)
+
+get_timestamp_from_date(DATE,STAMP) :-
+  evaluate(parsedate(DATE),[Y,M,D]) &
+  evaluate(maketimestamp(Y,M,D,0,0,0),STAMP)
+
+definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
+definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
+definition(tail(X!L),L)
+
+definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(....)_(..)_(..)"))))
+definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
+
 % - Assumption: only covered if *all* damages are covered
 
 % - Limit of liability is in the schedule
@@ -519,10 +543,10 @@ policy_in_effect(P,C) :-
   policy.enddate(P, PED) &
   claim.startdate(C, CSD) &
   claim.enddate(C, CED) &
-  datetotimestamp(PSD, PSS) &
-  datetotimestamp(PED, PES) &
-  datetotimestamp(CSD, CSS) &
-  datetotimestamp(CED, CES) &
+  get_timestamp_from_date(PSD, PSS) &
+  get_timestamp_from_date(PED, PES) &
+  get_timestamp_from_date(CSD, CSS) &
+  get_timestamp_from_date(CED, CES) &
   leq(PSS, CSS) &
   leq(CES, PES)
 
@@ -579,9 +603,9 @@ covered_pollutants_damages(C) :-
   policy.enddate(P, PED) &
   event.date(Cause, CD) &
   event.time(Cause, CT) &
-  datetotimestamp(PSD, PSS) & 
-  datetotimestamp(PED, PES) & 
-  datetimetotimestamp(CD, CT, CS) &
+  get_timestamp_from_date(PSD, PSS) & 
+  get_timestamp_from_date(PED, PES) & 
+  get_timestamp_from_datetime(CD, CT, CS) &
   leq(PSS, CS) &
   leq(CS, PES)
 
