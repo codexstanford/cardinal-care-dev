@@ -86,16 +86,9 @@
         <option value="allergy">Allergy test and treatment</option>
         <option value="other">Other</option>
       </select></td>
-      <td colspan="1">Vaccine Administered  <select id="hospital_visit_vaccine_input" class="option-dropdown" name="hospitalization_vaccine" value="stanford_medical_center">
-        <option value="none"></option>
-        <option value="covid">Covid</option>
-        <option value="tb">TB</option>
-        <option value="polio">Polio</option>
-        <option value="other">Other</option>
-      </select></td>
     </tr>
     <tr class="info-row hospitalization-info-row">
-      <td colspan="1">Type of Contraceptive Service: <select id="contraceptive_service_input" class="option-dropdown" name="contraceptive_service" value="none">
+      <td colspan="2">Type of Contraceptive Service: <select id="contraceptive_service_input" class="option-dropdown" name="contraceptive_service" value="none">
           <option value="none"></option>
           <option value="counseling">Counseling</option>
           <option value="rod">Implantable Rod</option>
@@ -106,7 +99,9 @@
           <option value="sterilization">Sterilization</option>
         </select>
       </td>
-      <td colspan="1">Type of Allergic Testing: <select id="allergy_service_input" class="option-dropdown" name="allergy_service" value="none">
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Type of Allergic Testing: <select id="allergy_service_input" class="option-dropdown" name="allergy_service" value="none">
           <option value="none"></option>
           <option value="test">Testing</option>
           <option value="injection">Injections Treatment</option>
@@ -157,8 +152,6 @@
         <option value="stanford_medical_center" selected>Stanford University Medical Center</option>
         <option value="menlo_medical_clinic">Menlo Medical Clinic</option>
         <option value="sutter_health">Sutter Health/Palo Alto Medical Foundation</option>
-        <option value="telemedicine">Telemedicine</option>
-        <option value="allergy_specialist">Allergy Specialist</option>
         <option value="other">Other</option>
     </select></td>
     </tr>
@@ -166,10 +159,14 @@
       <td colspan="2">Location where Exam/Service was performed<select id="hospital_visit_location_input" class="option-dropdown" name="hospitalization_hospital">
         <option value="none"></option>
         <option value="phys_office" selected>Physician's office</option>
+        <option value="sp_office" selected>Specialist's office</option>
+        <option value="contra_office" selected>Female Contraceptive Counseling office</option>
         <option value="facility">Facility</option>
         <option value="ob_office">Obstetrician's office</option>
         <option value="gyn_office">Gynecologist's office</option>
         <option value="ob_gyn">OB/GYN office</option>
+        <option value="telemedicine">Telemedicine</option>
+        <option value="allergy_specialist">Allergy Specialist</option>
     </select></td>
     <tr class="info-row hospitalization-info-row">
       <td colspan="2">Start Date of Hospital Visit <input type="date" id="hospitalization_startdate_input" value="2023-08-02"></td>
