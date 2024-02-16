@@ -49,11 +49,9 @@ const INPUT_FIELD_IDS_TO_FACT_TEMPLATES = {
   "claim_conduction_ignition_danger_input": "claim.danger_of_ignition_by_conduction_of_heat_through_partitions_or_walls($CLAIM$, $VALUE$)",
   "claim_conduction_ignition_inspected_area_input": "claim.area_on_other_side_of_partitions_or_walls_with_danger_of_ignition_through_conduction_inspected($CLAIM$, $VALUE$)",
   "claim_conduction_ignition_removed_combustible_materials_input": "claim.area_on_other_side_of_partitions_or_walls_with_danger_of_ignition_through_conduction_combustible_materials_removed($CLAIM$, $VALUE$)",
-  "claim_safety_check_minutes_input": "work_period.num_minutes_thorough_safety_check_for_signs_of_fire_or_combustion_around_above_or_below_the_work_area_made_at_regular_intervals_after_completion_of_work_period($PERIOD$, $VALUE$)",
   "claim_insuree_operates_own_hot_work_permit_system_input": "claim.insuree_operates_own_hot_work_permit_system_detailing_methods_and_precautions_to_be_followed_prior_to_during_and_subsequent_to_hot_work($CLAIM$, $VALUE$)",
   "claim_insuree_operated_own_hot_work_permit_system_copy_sent_input": "claim.copy_of_insurees_own_hot_work_permit_system_provided_to_insuring_company_in_writing($CLAIM$, $VALUE$)",
-  "claim_insuree_operated_own_hot_work_permit_system_accepted_in_writing_input": "claim.insurees_own_hot_work_permit_system_provided_to_insuring_company_accepted_in_writing($CLAIM$, $VALUE$)",
-  "claim_took_reasonable_steps_to_obtain_subcontractor_ppl_info_boolean_input": "claim.insuree_took_reasonable_steps_to_obtain_information_from_subcontractor_prior_to_starting_work_that_they_have_ppl_insurance_in_force_during_their_period_of_involvement($CLAIM$, $SUBCONTRACTOR$, $VALUE$)"
+  "claim_insuree_operated_own_hot_work_permit_system_accepted_in_writing_input": "claim.insurees_own_hot_work_permit_system_provided_to_insuring_company_accepted_in_writing($CLAIM$, $VALUE$)"
 };
 
 const INPUT_FIELD_IDS = [POLICY_ID_INPUT_ID, CLAIM_ID_INPUT_ID, INSUREE_ID_INPUT_ID, INJURED_PERSON_ID_INPUT_ID, ...Object.keys(INPUT_FIELD_IDS_TO_FACT_TEMPLATES)];
@@ -107,6 +105,7 @@ function add_event_listeners() {
   }
 
   add_visibility_changing_event_listeners();
+  add_disable_toggling_event_listeners();
 }
 
 function add_visibility_changing_event_listeners() {
@@ -132,6 +131,22 @@ function add_row_visibility_toggle_event_listener(togglingElemID, toggledClass, 
   } );
 }
 
+function add_disable_toggling_event_listeners() {
+  document.getElementById("claim_other_damages_checkbox_input").addEventListener("change", function() {
+    let otherDamagesInputWidget = document.getElementById("claim_other_damages_text_input"); 
+
+    otherDamagesInputWidget.disabled = !this.checked;
+
+    if (this.checked) {
+      otherDamagesInputWidget.classList.remove("ignore-input-field");
+    } else {
+      otherDamagesInputWidget.classList.add("ignore-input-field");
+    }
+
+    update_coverage_indicator();
+  });
+}
+
 function get_data_from_input_fields() {
   // Need a policy, claim, insuree, and damage cause event ID
   const POLICY_ID_VALUE = document.getElementById(POLICY_ID_INPUT_ID).value;
@@ -141,17 +156,13 @@ function get_data_from_input_fields() {
   const DAMAGE_CAUSE_ID_VALUE = "damage_cause_event1";
   const POLLUTANT_LOCATION_ID_VALUE = document.getElementById("policy_territory_input").value;
   const ACT_ID_VALUE = "act_1";
-  const PERIOD_OF_WORK_ID_VALUE = "period_of_work_1";
-  const SUBCONTRACTOR_ID_VALUE = "subcontractor1";
   if (
     POLICY_ID_VALUE === '' || 
     CLAIM_ID_VALUE === '' || 
     INSUREE_ID_VALUE === '' || 
     DAMAGE_CAUSE_ID_VALUE === '' ||
     POLLUTANT_LOCATION_ID_VALUE === ''||
-    ACT_ID_VALUE === '' ||
-    PERIOD_OF_WORK_ID_VALUE === '' ||
-    SUBCONTRACTOR_ID_VALUE === ''
+    ACT_ID_VALUE === ''
     ) {
     return [];
   }
@@ -162,41 +173,17 @@ function get_data_from_input_fields() {
   facts_to_add += "claim.person_injured(" + CLAIM_ID_VALUE + ", " + INJURED_PERSON_ID_VALUE + ") ";
   facts_to_add += "claim.cause_of_damages(" + CLAIM_ID_VALUE + ", " + DAMAGE_CAUSE_ID_VALUE + ") ";
   facts_to_add += "event.pollutants_escape_or_release_location(" + DAMAGE_CAUSE_ID_VALUE + ", " + POLLUTANT_LOCATION_ID_VALUE + ") ";
-  facts_to_add += "claim.period_of_work(" + CLAIM_ID_VALUE + ", " + PERIOD_OF_WORK_ID_VALUE + ") ";
-  facts_to_add += "claim.subcontractor_appointed_to_carry_out_services_at_premises_or_site_of_customer(" + CLAIM_ID_VALUE + ", " + SUBCONTRACTOR_ID_VALUE + ") ";
 
 
-  // Get input data and fill the corresponding template
+  // Get input data from non-subelement fields and fill the corresponding template
   for (const [INPUT_FIELD_ID, FACT_TEMPLATE] of Object.entries(INPUT_FIELD_IDS_TO_FACT_TEMPLATES)) {
     let inputWidget = document.getElementById(INPUT_FIELD_ID);
 
     if (inputWidget.classList.contains("ignore-input-field")) {
       continue;
     }
-
-    // Get the input type
-    let inputType = null;
-    if (inputWidget.tagName === "select-one") {
-      inputType == "select";
-    }
-    else {
-      inputType = inputWidget.type;
-    }
-
-    // Set the value based on the type
-    let inputValue = null;
-    if (inputType === "checkbox") {
-      inputValue = inputWidget.checked ? "yes" : "no";
-    }
-    else if (inputType === "date") {
-      inputValue = inputWidget.value.replace(/-/g, '_');
-    }
-    else if (inputType === "time") {
-      inputValue = inputWidget.value.replace(/:/g, '_') + "_00";
-    }
-    else {
-      inputValue = inputWidget.value;
-    }
+    
+    let inputValue = getValueFromInputWidget(inputWidget);
 
     if (inputValue === "") {
       continue;
@@ -211,8 +198,6 @@ function get_data_from_input_fields() {
       [/\$DAMAGE_CAUSE_EVENT\$/g, DAMAGE_CAUSE_ID_VALUE],
       [/\$POLLUTANT_LOCATION\$/g, POLLUTANT_LOCATION_ID_VALUE],
       [/\$ACT\$/g, ACT_ID_VALUE],
-      [/\$PERIOD\$/g, PERIOD_OF_WORK_ID_VALUE],
-      [/\$SUBCONTRACTOR\$/g, SUBCONTRACTOR_ID_VALUE],
       [/\$VALUE\$/g, inputValue]
     ]);
 
@@ -221,6 +206,7 @@ function get_data_from_input_fields() {
     facts_to_add += filledTemplate + " ";
   }
 
+  facts_to_add += get_data_from_subelement_tables();
   
   let output = definemorefacts([], readdata(facts_to_add));
 
@@ -229,7 +215,80 @@ function get_data_from_input_fields() {
 
   return output;
 }
+
+function get_data_from_subelement_tables() {
+  const CLAIM_ID_VALUE = document.getElementById(CLAIM_ID_INPUT_ID).value;
+
+  let facts_to_add = "";
+
+  // ---  Add facts linking the subelements to the claim
+  let subelementIDFieldCells = document.getElementsByClassName("subelem-obj-const-input-cell");
+  
+  for (let i = 0; i < subelementIDFieldCells.length; i++) {
+    let subelementIDFieldCell = subelementIDFieldCells[i];
+    
+    let filledTemplate = fillTemplate(subelementIDFieldCell.dataset.factTemplate, [
+      [/\$CLAIM\$/g, CLAIM_ID_VALUE],
+      [/\$SUB_ELEM_ID\$/g, subelementIDFieldCell.dataset.subElemObjConst]
+    ]);
+    
+    facts_to_add += filledTemplate + " ";
+  }
+  
+  // --- Add facts for the subelement-specific rows
+  let subelementInputFields = document.getElementsByClassName("subelem-non-obj-const-input-field");
+
+  for (let i = 0; i < subelementInputFields.length; i++) {
+    let subelementInputField = subelementInputFields[i];
+    let inputValue = getValueFromInputWidget(subelementInputField);
+
+    if (inputValue === "") {
+      continue;
+    }
+
+    let filledTemplate = fillTemplate(subelementInputField.dataset.factTemplate, [
+      [/\$CLAIM\$/g, CLAIM_ID_VALUE],
+      [/\$SUB_ELEM_ID\$/g, subelementInputField.dataset.subElemObjConst],
+      [/\$VALUE\$/g, inputValue],
+    ]);
+    
+    facts_to_add += filledTemplate + " ";
+  }
+
+  //console.log(facts_to_add);
+  
+  return facts_to_add;
+}
+
 /*********************** Utility Functions ***********************/
+
+function getValueFromInputWidget(inputWidget) {
+  // Get the input type
+  let inputType = null;
+  if (inputWidget.tagName === "select-one") {
+    inputType == "select";
+  }
+  else {
+    inputType = inputWidget.type;
+  }
+
+  // Set the value based on the type of the widget
+  let inputValue = null;
+  if (inputType === "checkbox") {
+    inputValue = inputWidget.checked ? "yes" : "no";
+  }
+  else if (inputType === "date") {
+    inputValue = inputWidget.value.replace(/-/g, '_');
+  }
+  else if (inputType === "time") {
+    inputValue = inputWidget.value.replace(/:/g, '_') + "_00";
+  }
+  else {
+    inputValue = inputWidget.value;
+  }
+
+  return inputValue;
+}
 
 // replacementPairs: list of [regex, string] pairs
 function fillTemplate(templateToFill, replacementPairs) {
@@ -300,7 +359,7 @@ function build_damages_info_section() {
   let customElement = document.createElement("template");
   customElement.innerHTML = `
   <tr class="info-row claim-info-row">
-    <td colspan="2"><input type="checkbox" id="claim_other_damages_checkbox_input">Other type of damages: <input disabled type="text" id="claim_other_damages_text_input" value=""></td></td>
+    <td colspan="2"><input type="checkbox" id="claim_other_damages_checkbox_input">Other type of damages: <input disabled type="text" id="claim_other_damages_text_input" class="ignore-input-field" value=""></td></td>
   </tr>`;
   rows.push(customElement.content.children[0]);
   
@@ -431,10 +490,9 @@ function build_precautions_taken_info_section() {
     newClaimsFormInputCell(1, "checkbox", false, "Were combustible materials removed from the area on the other side of partitions or walls?", "claim_conduction_ignition_removed_combustible_materials_input")
   ]));
 
-  rows.push(newClaimsFormInputRow([
-    newClaimsFormInputCell(1, "text", "autofilled_id", "Periods of work:", "claim_periods_of_work_input", { disabled: true }),
-    newClaimsFormInputCell(1, "number", 31, "For each, number of minutes after its completion that a thorough safety check was conducted at regular intervals above, around, and below for signs of fire or combustion:", "claim_safety_check_minutes_input", { min: 0 })
-  ]));
+  rows.push(newClaimsFormSubElementTable("period-of-work-subelement-table", "Periods of Work", "Period of Work", "work_period", "claim.period_of_work", [
+    [{colSpan: 2, inputType: "number", defaultInput: 29, fieldSpecificIDSubstring: "claim_safety_check_minutes_input", factTemplate: "work_period.num_minutes_thorough_safety_check_for_signs_of_fire_or_combustion_around_above_or_below_the_work_area_made_at_regular_intervals_after_completion_of_work_period($SUB_ELEM_ID$, $VALUE$)", cellText: "For how many minutes after the completion of the period of work was a thorough safety check conducted at regular intervals above, around, and below for signs of fire or combustion?"}]
+  ], update_coverage_indicator));
 
   return rows;
 }
@@ -458,8 +516,9 @@ function build_subcontractor_info_section() {
 
   rows.push(newHeadingRow("Subcontractor Information", "subcontractor-info-subheading", ["claims-processing-section-subheading"]));
 
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "text", "", "Subcontractor ID: ", "claim_subcontractor_id_input")]));
-  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "checkbox", true, "Did the insuree take reasonable steps to obtain information from the subcontractor, prior to starting work, that the subcontractor has Public liability insurance in force throughout the period of involvement? ", "claim_took_reasonable_steps_to_obtain_subcontractor_ppl_info_boolean_input")]));
+  rows.push(newClaimsFormSubElementTable("subcontractors-subelement-table", "Subcontractors", "Subcontractor", "subcontractor", "claim.subcontractor_appointed_to_carry_out_services_at_premises_or_site_of_customer", [
+    [{colSpan: 2, inputType: "checkbox", defaultInput: true, fieldSpecificIDSubstring: "claim_took_reasonable_steps_to_obtain_subcontractor_ppl_info_boolean_input", factTemplate: "claim.insuree_took_reasonable_steps_to_obtain_information_from_subcontractor_prior_to_starting_work_that_they_have_ppl_insurance_in_force_during_their_period_of_involvement($CLAIM$, $SUB_ELEM_ID$, $VALUE$)", cellText: "Did the insuree take reasonable steps to obtain information from the subcontractor, prior to starting work, that the subcontractor has Public liability insurance in force throughout the period of involvement? "}]
+  ], update_coverage_indicator));
 
   return rows;
 }
@@ -478,7 +537,7 @@ function build_claims_processing_table() {
   ...build_subcontractor_info_section(),
   ...[]];
 
-  addRowsToTable("claims-processing-table", rowList);
+  addRowsToTableWithID("claims-processing-table", rowList);
 
   let inputAndSelectElements = document.querySelectorAll('input, select');
 
