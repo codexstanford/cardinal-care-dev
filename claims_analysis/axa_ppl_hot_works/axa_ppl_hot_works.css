@@ -76,10 +76,6 @@ nav a {
   padding: 10px;
 }
 
-.endorsement-info-heading {
-  background-color: rgb(251, 199, 199);
-}
-
 tr.info-row {
   background-color: #fff;
   text-align: left;
@@ -102,3 +98,64 @@ input[type="number"] {
 input[type="text"] {
   width: 75px;
 }
+
+.endorsement-info-heading {
+  background-color: rgb(251, 199, 199);
+}
+
+.subelement-table {
+  width: 100%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  text-align: center;
+}
+
+.add-another-subelement-button, .remove-this-subelement-button{
+  width: 20px;
+  height: 20px;
+  border-bottom: solid 2px #4F3C35;
+  background-color:#377BB5;
+  color:white;
+  border-radius:50%;
+  font-size:20px;
+  display:inline-flex;
+  margin: 0;
+  justify-content:center;
+  align-items: center;
+  position: relative;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.collapse-subelement-table-button, .expand-subelement-table-button {
+  width: 20px;
+  height: 20px;
+  border-bottom: solid 2px #4F3C35;
+  background-color:#377BB5;
+  color:white;
+  border-radius:50%;
+  font-size: 16px;
+  display:inline-flex;
+  margin: 0;
+  justify-content:center;
+  align-items: center;
+  position: relative;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+td.subelem-obj-const-input-cell input[type="text"] {
+  width: 120px;
+}
+
+tr.subelement-table-heading-row {
+  text-align: center;
+}
+
+tr.subelem-table-separator-row td {
+  height: 2px;
+  margin: 0;
+  padding: 0px;
+}
+
