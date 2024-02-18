@@ -90,6 +90,16 @@ eligible_service(C,P,female_contraceptives):-
   hospitalization.location(H,L) &
   contraceptive_location_check(Service,L).
 
+eligible_service(C,P,surgical_services):-
+  claim.hospitalization(C,H) &
+  hospitalization.inpatient(H,yes).
+
+eligible_service(C,P,surgical_services):-
+  claim.hospitalization(C,H) &
+  hospitalization.inpatient(H,no) &
+  hospitalization.location(H,L) &
+  valid_location(outpatient_surgery,L).
+
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Age limit for cancer
 check_age_range_limit(Claim, cancer):- 
@@ -262,6 +272,10 @@ valid_location(physician_consultation,phys_office)
 valid_location(physician_consultation,sp_office)
 valid_location(allergy,phys_office)
 valid_location(allergy,allergy_specialist)
+valid_location(outpatient_surgery,phys_office)
+valid_location(outpatient_surgery,sp_office)
+valid_location(outpatient_surgery,outpatient_dept)
+valid_location(outpatient_surgery,surgery_center)
 
 valid_location_contraceptive(counseling,contra_office)
 valid_location_contraceptive(rod,contra_office)
@@ -272,7 +286,7 @@ valid_location_contraceptive(oral,contra_office)
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
 covered_list_with_location([physician_consultation,allergy])
-covered_list([breast_pump_supplies]).
+covered_list([breast_pump_supplies,walk_in_clinics]).
 
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).
