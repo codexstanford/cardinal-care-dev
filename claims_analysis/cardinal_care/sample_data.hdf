@@ -1,0 +1,18 @@
+%% expected covered(claim1) yes
+claim.policy(claim1,policy1)
+policy.type(policy1,cardinal)
+claim.claimant(claim1,person1)
+policy.insuree(policy1,person1)
+claim.hospitalization(claim1,hosp1)
+policy.startdate(policy1,person1,01_08_2023)
+policy.enddate(policy1,person1,30_06_2024)
+hospitalization.start_time(hosp1,02_09_2023,00_00)
+hospitalization.end_time(hosp1,02_09_2023,01_13)
+hospitalization.hospital(hosp1,stanford_medical_center)
+hospitalization.reason(hosp1,routine_physical)
+hospitalization.location(hosp1,phys_office)
+person.dob(person1,01_01_2001)
+person.occupation(person1,other)
+hospitalization.consequence_of_occupation(hosp1,no)
+
+claim.time(claim1,01_01_2024,00_00)

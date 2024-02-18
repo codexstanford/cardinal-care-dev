@@ -21,7 +21,7 @@ nav a {
 
 #claims-processing-table {
   width: 60%;
-  margin: auto;
+  margin: 20px auto;
   border-collapse: collapse;
   border: 2px solid #000;
   text-align: center;
@@ -56,6 +56,30 @@ nav a {
   padding: 15px;
 }
 
+.claims-processing-section-subheading {
+  background-color: #DDF8F6;
+  border: black solid 1px;
+  text-align: center;
+}
+
+.claims-processing-section-subheading td {
+  padding: 10px;
+}
+
+.claims-processing-section-subsubheading {
+  background-color: #EEF8F6;
+  border: black solid 1px;
+  text-align: center;
+}
+
+.claims-processing-section-subsubheading td {
+  padding: 10px;
+}
+
+.endorsement-info-heading {
+  background-color: rgb(251, 199, 199);
+}
+
 tr.info-row {
   background-color: #fff;
   text-align: left;
@@ -78,4 +102,3 @@ input[type="number"] {
 input[type="text"] {
   width: 75px;
 }
-  

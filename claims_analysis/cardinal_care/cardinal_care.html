@@ -20,10 +20,12 @@
       <td colspan="2"><strong>Policy Information</strong></td>
     </tr>
     <tr class="info-row policy-info-row">
-      <td colspan="2">Policy ID: <input type="text" id="policy_id_input" value="policy1"></td>
+      <td colspan="1">Policy ID: <input type="text" id="policy_id_input" value="policy1"></td>
+      <td colspan="1">Insuree: <input type="text" id="policy_insuree_input" value="person1"></td>
     </tr>
     <tr class="info-row policy-info-row">
-      <td colspan="1">Have opted out of policy: <input type="checkbox" id="policy_opted_out_input"></td>
+      <td colspan="1">Start Date: <input type="date" id="policy_start_date_input" value="2023-08-01"></td>
+      <td colspan="1">End Date: <input type="date" id="policy_end_date_input" value="2024-07-31"></td>
     </tr>
 
     <!-- Claim Information-->
@@ -37,7 +39,10 @@
       <td colspan="2">Claimant: <input type="text" id="claimant_id_input" value="person1"></td>
     </tr>
     <tr class="info-row claim-info-row">
-      <td colspan="2">Date: <input type="date" id="claim_date_input"></td>
+      <td colspan="2">Date: <input type="date" id="claim_date_input" value="2023-09-01"></td>
+    </tr>
+    <tr class="info-row claim-info-row">
+      <td colspan="2">Time: <input type="time" id="claim_time_input" value="13:00"></td>
     </tr>
 
     <!-- Patient Information-->
@@ -45,66 +50,138 @@
       <td colspan="2"><strong>Patient Information</strong></td>
     </tr>
     <tr class="info-row patient-info-row">
-      <td colspan="2">Patient Age: <input type="number" min="0" id="patient_age_input" value="0"></td>
+      <td colspan="2">Patient DOB: <input type="date" id="patient_dob_input" value="2000-01-01"></td>
+    </tr>
+    <tr class="info-row patient-info-row">
+      <td colspan="2">Occupation <select id="patient_occupation_input" class="option-dropdown">
+        <option value="none"></option>
+        <option value="armed_forces">Armed Forces</option>
+        <option value="other" selected>Other</option>
+    </select></td></tr>
+    <tr class="info-row patient-info-row">
+      <td colspan="2">Sex <select id="patient_sex_input" class="option-dropdown">
+        <option value="none"></option>
+        <option value="male">Male</option>
+        <option value="female" selected>Female</option>
+    </select></td></tr>
+    
+    <!-- Hospital Visit Information-->
+    <tr id="hospital-visit-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Hospital Visit Information</strong></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Hospital Visit ID: <input type="text" id="hospitalization_id_input" value="hosp1"></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Reason for Hospital Visit: <select id="hospitalization_reason_input" class="option-dropdown" name="hospitalization_reason" value="routine_physical">
+        <option value="none"></option>
+        <option value="routine_physical" selected>Routine Physical</option>
+        <option value="preventive_care">Preventive Immunization</option>
+        <option value="alternative">Alternative Health Care</option>
+        <option value="gynecological_exam">Routine gynecological exams (including Pap smears and cytology tests)</option>
+        <option value="specialized_screening_counselling">Preventive screening and counseling services</option>
+        <option value="female_contraceptives">Family planning services – female contraceptives</option>
+        <option value="physician_consultation">Physician Visit (Non-surgical/non-preventive care)</option>
+        <option value="physician_consultation">Telemedicine Consultation</option>
+        <option value="allergy">Allergy test and treatment</option>
+        <option value="other">Other</option>
+      </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Type of Contraceptive Service: <select id="contraceptive_service_input" class="option-dropdown" name="contraceptive_service" value="none">
+          <option value="none"></option>
+          <option value="counseling">Counseling</option>
+          <option value="rod">Implantable Rod</option>
+          <option value="larc">Long-acting Reversible Contraceptives (LARC)</option>
+          <option value="preogestin">Progestin Shot/Injection (Depo-Provera)</option>
+          <option value="oral">FDA-approved Oral Contraceptives</option>
+          <option value="reviewed_oral">FDA-reviewed Oral Contraceptives</option>
+          <option value="sterilization">Sterilization</option>
+        </select>
+      </td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Type of Allergic Testing: <select id="allergy_service_input" class="option-dropdown" name="allergy_service" value="none">
+          <option value="none"></option>
+          <option value="test">Testing</option>
+          <option value="injection">Injections Treatment</option>
+          <option value="sera_extracts">Allergy sera and extracts Administered via injection</option>
+        </select>
+      </td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Type of screening/counselling <select id="hospital_visit_counselling_input" class="option-dropdown" name="hospitalization_reason" value="routine_physical">
+        <option value="none"></option>
+        <option value="obesity">Obesity</option>
+        <option value="healthy_diet">Healthy Diet</option>
+        <option value="alcohol_misuse">Alcohol Misuse</option>
+        <option value="tobacco_misuse">Tobacco Misuse</option>
+        <option value="depression">Depression</option>
+        <option value="sti">STI</option>
+        <option value="genetic_risk_cancer">Genetic Risk Cancer</option>
+        <option value="stress_management">Stress Management</option>
+        <option value="chronic_condition">Chronic Condition</option>
+        <option value="lactation">Lactation</option>
+        <option value="prenatal_postpartum">Prenatal/Postpartum</option>
+        <option value="cancer">Cancer</option>
+        <option value="other">Other</option>
+    </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Type of Cancer (for screening/counselling) <select id="hospital_visit_cancer_input" class="option-dropdown" name="hospitalization_reason" value="routine_physical">
+        <option value="none"></option>
+        <option value="lung">Lung</option>
+        <option value="prostate">Prostate</option>
+        <option value="breast">Breast</option>
+        <option value="other">Other</option>
+    </select></td>
     </tr>
     
-    <!-- Hospitalization Information-->
-    <tr id="hospitalization-info-heading" class="claims-processing-section-heading">
-      <td colspan="2"><strong>Hospitalization Information</strong></td>
-    </tr>
     <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Hospitalization ID: <input type="text" id="hospitalization_id_input" value="hosp1"></td>
-    </tr>
-    <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Treatment Location: <select id="hospitalization_treatment_location_input" class="option-dropdown" name="hospitalization_treatment_location">
+      <td colspan="2">Vaccine Administered  <select id="hospital_visit_vaccine_input" class="option-dropdown" name="hospitalization_vaccine" value="stanford_medical_center">
         <option value="none"></option>
-        <option value="physician_office">Physician Office</option>
+        <option value="covid">Covid</option>
+        <option value="tb">TB</option>
+        <option value="polio">Polio</option>
+        <option value="other">Other</option>
+      </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Hospital/Clinic: <select id="hospital_visit_hospital_input" class="option-dropdown" name="hospitalization_hospital">
+        <option value="none"></option>
+        <option value="stanford_medical_center" selected>Stanford University Medical Center</option>
+        <option value="menlo_medical_clinic">Menlo Medical Clinic</option>
+        <option value="sutter_health">Sutter Health/Palo Alto Medical Foundation</option>
+        <option value="other">Other</option>
+    </select></td>
+    </tr>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Location where Exam/Service was performed<select id="hospital_visit_location_input" class="option-dropdown" name="hospitalization_hospital">
+        <option value="none"></option>
+        <option value="phys_office" selected>Physician's office</option>
+        <option value="sp_office" selected>Specialist's office</option>
+        <option value="contra_office" selected>Female Contraceptive Counseling office</option>
         <option value="facility">Facility</option>
-        <option value="home">Home</option>
-        <option value="other">Other</option>
+        <option value="ob_office">Obstetrician's office</option>
+        <option value="gyn_office">Gynecologist's office</option>
+        <option value="ob_gyn">OB/GYN office</option>
+        <option value="telemedicine">Telemedicine</option>
+        <option value="allergy_specialist">Allergy Specialist</option>
     </select></td>
+    <tr class="info-row hospitalization-info-row">
+      <td colspan="2">Start Date of Hospital Visit <input type="date" id="hospitalization_startdate_input" value="2023-08-02"></td>
     </tr>
     <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Hospital Name(if applicable): <input type="text" id="hospitalization_hospital_input" value="hospital1"></td>
+      <td colspan="2">Start Time of Hospital Visit: <input type="time" id="hospitalization_starttime_input" value="00:00"></td>
     </tr>
     <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Type of Healthcare: <select id="hospitalization_type_of_healthcare_input" class="option-dropdown" name="hospitalization_type_of_healthcare">
-        <option value="none"></option>
-        <option value="preventive_care_immunizations">Preventive Care Immunizations</option>
-        <option value="routine_physical_exams">Routine Physical Exams</option>
-        <option value="ayurvedic">Ayurvedic</option>
-        <option value="other">Other</option>
-    </select></td>
+      <td colspan="2">End Date of Hospital Visit: <input type="date" id="hospitalization_enddate_input" value="2023-08-10"></td>
     </tr>
     <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Number of Previous Visits of same type <input type="number" min="0" id="hospitalization_num_prev_visits_input" value="0"></td>
+      <td colspan="2">End Time of Hospital Visit: <input type="time" id="hospitalization_endtime_input" value="01:12"></td>
     </tr>
     <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Cause of Hospitalization: <select id="hospitalization_cause_input" class="option-dropdown" name="claim_cause">
-        <option value="none"></option>
-        <option value="skydiving">Skydiving</option>
-        <option value="military_service">Military Service</option>
-        <option value="firefighting_service">Firefighting Service</option>
-        <option value="police_service">Police Service</option>
-        <option value="other">Other</option>
-    </select></td>
-    </tr>
-    <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Country in which hospitalization occurred: <select id="hospitalization_country_input" class="option-dropdown country-dropdown" name="hospitalization_country">
-        <option value="none"></option>
-    </select></td>
-    </tr>
-    <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Start Date of Hospitalization <input type="date" id="hospitalization_startdate_input"></td>
-    </tr>
-    <tr class="info-row hospitalization-info-row">
-      <td colspan="2">Start Time of Hospitalization: <input type="time" id="hospitalization_starttime_input"></td>
-    </tr>
-    <tr class="info-row hospitalization-info-row">
-      <td colspan="2">End Date of Hospitalization <input type="date" id="hospitalization_enddate_input"></td>
-    </tr>
-    <tr class="info-row hospitalization-info-row">
-      <td colspan="2">End Time of Hospitalization: <input type="time" id="hospitalization_endtime_input"></td>
+    <td colspan="2">Consequence of Occupation <input type="checkbox" id="hospitalization_coo_input"></td>
     </tr>
   </table>
 

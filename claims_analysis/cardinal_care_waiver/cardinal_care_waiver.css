@@ -18,6 +18,14 @@ nav a {
   color: black;
 }
 
+.no-international-additional-qs {
+  display: none;
+}
+
+.non-j-visa-holder {
+  display: none !important;
+}
+
 
 #claims-processing-table {
   width: 60%;
@@ -25,6 +33,17 @@ nav a {
   border-collapse: collapse;
   border: 2px solid #000;
   text-align: center;
+}
+
+#claims-processing-table input {
+  margin-left: auto;
+}
+
+#claims-processing-table .info-row td {
+  padding: 10px;
+  border: solid black 1px;
+  display: flex;
+  align-items: center; /* Center align contents vertically */
 }
 
 #coverage-indicator {
@@ -46,7 +65,7 @@ nav a {
   color: white;
 }
 
-.claims-processing-section-heading {
+.claims-processing-section-heading, .optional-policy-info-heading {
   background-color: lightblue;
   border: black solid 1px;
   text-align: center;
@@ -67,8 +86,10 @@ tr.info-row td {
   border: solid black 1px;
 }
 
+
 input[type="checkbox"] {
   margin-right: 5px;
+  align-self: right;
 }
 
 input[type="number"] {
@@ -78,4 +99,3 @@ input[type="number"] {
 input[type="text"] {
   width: 75px;
 }
-  
