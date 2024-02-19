@@ -291,6 +291,7 @@ valid_hospital(sutter_health).
 yearly_visit_limit(routine_physical,0,22,0).
 yearly_visit_limit(routine_physical,22,200,1)
 yearly_visit_limit(gynecological_exam,0,200,1).
+yearly_visit_limit(home_health_care,0,200,100).
 
 valid_location(routine_physical,phys_office).
 valid_location(preventive_care,phys_office).
@@ -305,6 +306,8 @@ valid_location(physician_consultation,sp_office)
 valid_location(allergy,phys_office)
 valid_location(allergy,allergy_specialist)
 valid_location(home_health_care,home)
+valid_location(inpatient_care,hospital)
+valid_location(non_surgical_physican_service,hospital)
 
 valid_location_contraceptive(counseling,contra_office)
 valid_location_contraceptive(rod,contra_office)
@@ -314,8 +317,8 @@ valid_location_contraceptive(oral,contra_office)
 
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
-covered_list_with_location([physician_consultation,allergy,home_health_care])
-covered_list([breast_pump_supplies,inpatient_care]).
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service])
+covered_list([breast_pump_supplies]).
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).

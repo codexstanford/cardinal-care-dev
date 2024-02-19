@@ -41,7 +41,8 @@ Hospitalization
 --- inpatient_care
 --- outpatient_surgery
 --- home_health_care
---- family_member_present (Family Member or Caregiver Present)
+--- non_surgical_physican_service
+- family_member_present (Family Member or Caregiver Present)
 
 - home_service
 --- transportation
