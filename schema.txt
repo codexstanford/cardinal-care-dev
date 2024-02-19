@@ -52,6 +52,8 @@ Hospitalization
 - Vaccine
 - Contraceptive service 
 - Allegy service
+- Contraceptive service 
+- Allegy service
 - Consequence_of_occupation
 - screening_type
 - cancer_type

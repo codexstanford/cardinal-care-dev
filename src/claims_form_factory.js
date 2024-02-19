@@ -1,6 +1,5 @@
 // No return value
-// Fills the table with the specified ID with the rows in the list
-function addRowsToTable(tableElemID, rowList) {
+function addRowsToTableWithID(tableElemID, rowList) {
      let table = document.getElementById(tableElemID);
 
      for (let i = 0; i < rowList.length; i++) {
@@ -8,7 +7,43 @@ function addRowsToTable(tableElemID, rowList) {
      }
 }
 
-function createTableRow(rowID, classList, innerHTML) {
+// Can be used for headings, subheadings, and subsubheadings (and beyond)
+function newHeadingRow(titleText, rowID, classList) {
+    let headingContent = _newTableCell(2, "<strong>" + titleText + "</strong>");
+    
+    let headingRow = _newTableRow(rowID, classList);
+    headingRow.appendChild(headingContent);
+
+    return headingRow;
+}
+
+function newClaimsFormInputRow(cellList, addtlClassList = []) {
+    let inputRow = _newTableRow("", ["info-row", "claim-info-row", ...addtlClassList]);
+
+    for (let cell of cellList) {
+        inputRow.appendChild(cell);
+    }
+
+    return inputRow;
+}
+
+function newClaimsFormInputCell(colSpan, inputType, defaultInput, cellText, inputID, disabled = false) {
+    let inputElem = _newInputElem(inputType, defaultInput, inputID);
+
+    inputElem.disabled = disabled;
+    
+    return _newTableCell(colSpan, cellText + inputElem.outerHTML);
+}
+
+function newClaimsFormSelectCell(colSpan, defaultInput, cellText, inputID, selectOptions) {
+    let inputElem = _newInputElem("select", defaultInput, inputID, selectOptions);
+    
+    return _newTableCell(colSpan, cellText + inputElem.outerHTML);
+}
+
+/********* START helper functions for the creation of table rows, cells, and input elements *********/
+
+function _newTableRow(rowID, classList) {
     let row = document.createElement("tr");
 
     if (rowID !== "") {
@@ -16,13 +51,11 @@ function createTableRow(rowID, classList, innerHTML) {
     }
 
     row.classList.add(...classList);
-
-    row.innerHTML = innerHTML;
     
     return row;
 }
 
-function createTableCell(colspan, innerHTML) {
+function _newTableCell(colspan, innerHTML) {
     let cell = document.createElement("td");
 
     cell.colSpan = colspan;
@@ -33,7 +66,7 @@ function createTableCell(colspan, innerHTML) {
 }
 
 // selectOptions: should be null, unless inputType === "select". Should be a list of [value, text] pairs
-function createInputElem(inputType, defaultInput, inputID, selectOptions = null) {
+function _newInputElem(inputType, defaultInput, inputID, selectOptions = null) {
     let inputElement = null;
     
     if (inputType === "select") {
@@ -84,30 +117,226 @@ function createInputElem(inputType, defaultInput, inputID, selectOptions = null)
     return errorElement.content.children[0];
 }
 
-// Functional for headings, subheadings, and subsubheadings
-function newHeadingRow(titleText, rowID, classList) {
-    let headingContent = createTableCell(2, "<strong>" + titleText + "</strong>");
-    return createTableRow(rowID, classList, headingContent.outerHTML);
+/********* END Private helper functions for the creation of table rows, cells, and input elements *********/
+
+
+// A collapsible table that allows the user to create and enter information about multiple objects of the same type (e.g. periods of work, vaccinations)
+// Returns a row containing a single cell, which contains the table
+function newClaimsFormSubElementTable(subElementTableID, subElementTableTitle, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
+
+    let subElementTable = document.createElement("table");
+
+    subElementTable.id = subElementTableID;
+    subElementTable.classList.add("subelement-table");
+
+    // Class for rows of the table that contain information about subelements (i.e. not the heading row)
+    const SUB_ELEM_ID_AND_CLASS_PREFIX = subElementTableTitle.toLowerCase().replace(/\s/g, '-');
+    const SUB_ELEM_ROW_CLASS = SUB_ELEM_ID_AND_CLASS_PREFIX + "-subelem-input-row";
+
+    // Create the collapse, expand, "add another subelement" and "remove this subelement" buttons
+        // Creates and adds the event listeners for each button
+        // "removeThisSubElemButtonPrototype" is only used in the event listener for the "add another subelement" button, but currently returned anyway
+    let [collapseSubElemTableButton, expandSubElemTableButton, addAnotherSubElemButton, removeThisSubElemButtonPrototype] = _createSubElemTableButtons(subElementTable, subElementTableID, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback);
+    
+
+    // -- Build the heading row, with an "add another subelement" button
+    let headingRowCell = _newTableCell(2, "");
+        // Collapse/expand buttons
+    headingRowCell.appendChild(collapseSubElemTableButton);
+    headingRowCell.appendChild(expandSubElemTableButton);
+
+        // Title
+    let headingRowTitle = document.createElement("strong");
+    headingRowTitle.innerHTML = " " + subElementTableTitle + " ";
+    headingRowCell.appendChild(headingRowTitle);
+        // "Add another subelement" button
+    headingRowCell.appendChild(addAnotherSubElemButton);
+
+    let headingRow = _newTableRow(subElementTableID, ["subelement-table-heading-row", "claims-processing-section-subheading"]);
+    headingRow.appendChild(headingRowCell);
+
+    // -- Add the heading to the subelement table
+    subElementTable.appendChild(headingRow);
+
+    // -- Wrap the subelement table in a row and cell for the outermost table
+    let containerCell = _newTableCell(2, "");
+    containerCell.appendChild(subElementTable);
+    containerCell.classList.add("subelement-table-container-cell");
+
+    let containerRow = _newTableRow(subElementTableID + "-container-row", ["info-row", "claim-info-row", "subelement-table-container"]);
+    containerRow.appendChild(containerCell);
+    return containerRow;
 }
 
-function newClaimsFormInputRow(cellList, addtlClassList = []) {
-    let innerHTML = "";
+/********* Private helper functions for the creation of subelement tables *********/
 
-    for (let cell of cellList) {
-        innerHTML += cell.outerHTML;
+// Creates the collapse, expand, "add another subelement", and "remove this subelement" buttons
+function _createSubElemTableButtons(subElementTable, subElementTableID, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
+    // -- Collapse Button
+    let collapseSubElemTableButton = document.createElement("button");
+    collapseSubElemTableButton.innerHTML = "v";
+    collapseSubElemTableButton.classList.add("collapse-subelement-table-button");
+    const COLLAPSE_SUB_ELEM_TABLE_BUTTON_ID = subElementTableID + "-collapse-subelement-table-button";
+    collapseSubElemTableButton.id = COLLAPSE_SUB_ELEM_TABLE_BUTTON_ID;
+
+        // Collapse Callback
+    collapseSubElemTableButton.addEventListener("click", function() {
+        let subElemTableRows = document.getElementsByClassName(SUB_ELEM_ROW_CLASS);
+
+        for (let i = 0; i < subElemTableRows.length; i++) {
+            subElemTableRows[i].style.display = "none";
+        }
+
+        collapseSubElemTableButton.style.display = "none";
+        expandSubElemTableButton.style.display = "inline-flex";
+    });
+
+    // -- Expand Button
+
+    let expandSubElemTableButton = document.createElement("button");
+    expandSubElemTableButton.innerHTML = ">";
+    expandSubElemTableButton.classList.add("expand-subelement-table-button");
+    const EXPAND_SUB_ELEM_TABLE_BUTTON_ID = subElementTableID + "-expand-subelement-table-button";
+    expandSubElemTableButton.id = EXPAND_SUB_ELEM_TABLE_BUTTON_ID;
+    expandSubElemTableButton.style.display = "none";
+
+        // Expand Callback
+    function expandSubElemTableCallback() {
+        let subElemTableRows = document.getElementsByClassName(SUB_ELEM_ROW_CLASS);
+
+        for (let i = 0; i < subElemTableRows.length; i++) {
+            subElemTableRows[i].style.display = "table-row";
+        }
+
+        expandSubElemTableButton.style.display = "none";
+        collapseSubElemTableButton.style.display = "inline-flex";
     }
 
-    return createTableRow("", ["info-row", "claim-info-row", ...addtlClassList], innerHTML);
+    expandSubElemTableButton.addEventListener("click", expandSubElemTableCallback);
+
+    // -- "Remove This Subelement" Button
+    let removeThisSubElemButtonPrototype = document.createElement("button");
+    removeThisSubElemButtonPrototype.innerHTML = "-";
+    let removeThisSubElemButtonClass = subElementTableID + "-remove-this-subelement-button";
+    removeThisSubElemButtonPrototype.classList.add(removeThisSubElemButtonClass, "remove-this-subelement-button");
+
+        // "Remove This Subelement" callback is constructed in _addEventListenerForAddAnotherButton
+
+    // -- "Add Another Subelement" Button
+    let addAnotherSubElemButton = document.createElement("button");
+    addAnotherSubElemButton.innerHTML = "+";
+    let addAnotherSubElemButtonClass = subElementTableID + "-add-another-subelement-button";
+    addAnotherSubElemButton.classList.add(addAnotherSubElemButtonClass, "add-another-subelement-button");
+    
+    _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElemButton, removeThisSubElemButtonPrototype, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, expandSubElemTableCallback, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback);
+    
+    return [collapseSubElemTableButton, expandSubElemTableButton, addAnotherSubElemButton, removeThisSubElemButtonPrototype];
 }
 
-function newClaimsFormInputCell(colSpan, inputType, defaultInput, cellText, inputID) {
-    let inputElem = createInputElem(inputType, defaultInput, inputID);
-    
-    return createTableCell(colSpan, cellText + inputElem.outerHTML);
+function _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElemButton, removeThisSubElemButtonPrototype, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, expandSubElemTableCallback, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
+    // For a given subelement table, this class is given to all cells that contain an input element for the object constant of a subelement.
+        // For now, used to get all the object constants for subelements of a given type.
+    const SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS = SUB_ELEM_ID_AND_CLASS_PREFIX + "-subelem-id-input-cell";
+
+    // Function to add rows for a new subelement
+    // For me: Take a look and conceptually clean this up, if necessary
+    addAnotherSubElemButton.addEventListener("click", function() {
+        // --- Ensure the subelement table isn't collapsed before adding another subelement. 
+        expandSubElemTableCallback();
+        
+        // Compute the suffix of the element id by incrementing the index of the last subelement by one.
+        let subElemIndex = 0;
+        let currentSubElemIDInputCells = document.getElementsByClassName(SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS);
+        if (currentSubElemIDInputCells.length > 0) {
+            // Get the number off the end of the id of the last subelem id row
+            subElemIndex = parseInt(currentSubElemIDInputCells.item(currentSubElemIDInputCells.length - 1).id.substring(SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS.length+1));
+            subElemIndex += 1;
+        }
+
+        // Compute a class that will be shared by all rows for this subelement
+        const THIS_SUB_ELEM_ROW_CLASS = SUB_ELEM_ID_AND_CLASS_PREFIX + "-subelem-input-row-" + subElemIndex;
+        
+        // --- Construct the rows for a new subelement
+
+        // -- Create the row that displays the object constant of the subelement
+        const SUB_ELEM_OBJ_CONST = subElementEpilogType + "_obj_" + subElemIndex;
+        let subElemObjConstInputFieldID = SUB_ELEM_ID_AND_CLASS_PREFIX + "-subelem-id-input-field-" + subElemIndex;
+        let newSubElemObjConstCell = newClaimsFormInputCell(2, "text", SUB_ELEM_OBJ_CONST, " "+ subElementEnglishName + " ID: ", subElemObjConstInputFieldID, true);
+        newSubElemObjConstCell.id = SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS + "-" + subElemIndex;
+        newSubElemObjConstCell.classList.add(SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS, "subelem-obj-const-input-cell");
+        // Set the data needed for linking the subelement to the claim
+        newSubElemObjConstCell.dataset.subElemObjConst = SUB_ELEM_OBJ_CONST;
+        newSubElemObjConstCell.dataset.factTemplate = subElementAttributeRelationPredicate + "($CLAIM$, $SUB_ELEM_ID$)";
+
+        // Create the button for removing the rows for this subelement
+        let newRemoveThisSubElemButton = document.createElement("button");
+        newRemoveThisSubElemButton.innerHTML = removeThisSubElemButtonPrototype.innerHTML;
+        newRemoveThisSubElemButton.classList.add(...removeThisSubElemButtonPrototype.classList)
+
+            // Add the "remove this subelement" callback to the button
+        newRemoveThisSubElemButton.addEventListener("click", function() {
+            // thisSubElemRows is a live HTMLCollection, so removing elements from the DOM will remove elements from thisSubElemRows
+            let thisSubElemRows = document.getElementsByClassName(THIS_SUB_ELEM_ROW_CLASS);
+            while (thisSubElemRows.length > 0) {
+                thisSubElemRows[0].parentNode.removeChild(thisSubElemRows[0]);
+            }
+            update_coverage_indicator_callback();
+        });
+
+        // Prepend in order to put the button to the left of the object constant text and input field
+        newSubElemObjConstCell.prepend(newRemoveThisSubElemButton);
+        // Package the cell into a row
+        let newSubElemObjConstRow = newClaimsFormInputRow([newSubElemObjConstCell], [SUB_ELEM_ROW_CLASS, THIS_SUB_ELEM_ROW_CLASS]);
+        
+
+        // -- Build the rows specific to this type of subelement
+        let subElementSpecificRows = [];
+
+        for (let rowSpec of subElementSpecificRowSpecs) {
+            let cellList = [];
+
+            for (let cellSpec of rowSpec) {
+                let inputID = SUB_ELEM_ID_AND_CLASS_PREFIX + "-" + cellSpec.fieldSpecificIDSubstring + "-" +subElemIndex;
+                cellList.push(_newSubElemInputCell(cellSpec.colSpan, cellSpec.inputType, cellSpec.defaultInput, cellSpec.cellText, inputID, cellSpec.factTemplate, SUB_ELEM_OBJ_CONST, update_coverage_indicator_callback));
+            }
+
+            subElementSpecificRows.push(newClaimsFormInputRow(cellList, [SUB_ELEM_ROW_CLASS, THIS_SUB_ELEM_ROW_CLASS]));
+        }
+
+        // --- Add the rows to the table        
+        // -- A row to visually separate the rows for one subelement from rows for another. 
+        let separatorCell = _newTableCell(2, "");
+        let separatorRow = newClaimsFormInputRow([separatorCell], [SUB_ELEM_ROW_CLASS, THIS_SUB_ELEM_ROW_CLASS, "subelem-table-separator-row"]);
+        subElementTable.appendChild(separatorRow);
+
+        // Add the object constant display row
+        subElementTable.appendChild(newSubElemObjConstRow);
+
+        // After the the separator and object constant display rows, add the rows specific to this type of subelement
+        for (let subElementSpecificRow of subElementSpecificRows) {
+            subElementTable.appendChild(subElementSpecificRow);
+        }
+
+        // Update coverage indicator to reflect the new subelement data
+        update_coverage_indicator_callback();
+    });
 }
 
-function newClaimsFormSelectCell(colSpan, defaultInput, cellText, inputID, selectOptions) {
-    let inputElem = createInputElem("select", defaultInput, inputID, selectOptions);
+// Distinct from newClaimsFormInputCell, since additional data is required to build input cells in subelement tables
+function _newSubElemInputCell(colSpan, inputType, defaultInput, cellText, inputID, factTemplate, SUB_ELEM_OBJ_CONST, update_coverage_indicator_callback) {
+    let inputElem = _newInputElem(inputType, defaultInput, inputID);
     
-    return createTableCell(colSpan, cellText + inputElem.outerHTML);
+    // Class for all subelement input cells, regardless of their specific table
+    inputElem.classList.add("subelem-non-obj-const-input-field");
+    
+    // Set the data needed for filling the fact template, which likely requires knowing the object constant of the subelement
+    inputElem.dataset.subElemObjConst = SUB_ELEM_OBJ_CONST;
+    inputElem.dataset.factTemplate = factTemplate;
+
+    inputElem.addEventListener("change", () => update_coverage_indicator_callback());
+
+    let inputCell = _newTableCell(colSpan, cellText);
+    inputCell.appendChild(inputElem);
+
+    return inputCell;
 }
