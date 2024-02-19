@@ -1,0 +1,91 @@
+%% expected - covered(claim1) - yes
+%% covered(claim2) - no 
+%% test cases for preventive care
+claim.policy(claim1,policy1)
+policy.type(policy1,cardinal)
+claim.claimant(claim1,person1)
+policy.insuree(policy1,person1)
+claim.hospitalization(claim1,hosp1)
+policy.startdate(policy1,person1,01_08_2023)
+policy.enddate(policy1,person1,30_06_2024)
+hospitalization.start_time(hosp1,02_09_2023,00_00)
+hospitalization.end_time(hosp1,02_09_2023,01_13)
+hospitalization.hospital(hosp1,stanford_medical_center)
+hospitalization.reason(hosp1,preventive_care)
+hospitalization.vaccine(hosp1,tb)
+hospitalization.location(hosp1,phys_office)
+person.dob(person1,01_01_2001)
+person.occupation(person1,other)
+hospitalization.consequence_of_occupation(hosp1,no)
+
+claim.policy(claim2,policy1)
+claim.claimant(claim2,person1)
+claim.hospitalization(claim2,hosp2)
+hospitalization.start_time(hosp2,02_10_2023,00_00)
+hospitalization.end_time(hosp2,02_10_2023,01_13)
+hospitalization.hospital(hosp2,stanford_medical_center)
+hospitalization.reason(hosp2,preventive_care)
+hospitalization.vaccine(hosp2,tb)
+person.dob(person1,01_01_2001)
+person.occupation(person1,other)
+hospitalization.consequence_of_occupation(hosp2,no)
+hospitalization.location(hosp2,phys_office)
+
+
+claim.time(claim1,01_01_2024,00_00)
+claim.time(claim2,01_02_2024,00_00)
+
+%% test cases for routine_physical
+
+%% expected - covered(claim3) - yes
+%% covered(claim4) - no 
+claim.policy(claim3,policy1)
+policy.type(policy1,cardinal)
+claim.claimant(claim3,person2)
+policy.insuree(policy1,person2)
+claim.hospitalization(claim3,hosp3)
+policy.startdate(policy1,person2,01_08_2023)
+policy.enddate(policy1,person2,30_06_2024)
+hospitalization.start_time(hosp3,02_09_2023,00_00)
+hospitalization.end_time(hosp3,02_09_2023,01_13)
+hospitalization.hospital(hosp3,stanford_medical_center)
+hospitalization.reason(hosp3,routine_physical)
+person.dob(person2,01_01_2001)
+person.occupation(person2,other)
+hospitalization.consequence_of_occupation(hosp3,no)
+hospitalization.location(hosp3,phys_office)
+
+
+claim.policy(claim4,policy1)
+claim.claimant(claim4,person2)
+claim.hospitalization(claim4,hosp4)
+hospitalization.start_time(hosp4,02_08_2023,00_00)
+hospitalization.end_time(hosp4,02_08_2023,01_13)
+hospitalization.hospital(hosp4,stanford_medical_center)
+hospitalization.reason(hosp4,routine_physical)
+person.dob(person2,01_01_2001)
+hospitalization.consequence_of_occupation(hosp4,no)
+hospitalization.location(hosp4,phys_office)
+
+claim.time(claim3,01_01_2024,00_00)
+claim.time(claim4,01_02_2024,00_00)
+
+%% test cases for inpatient_care
+%% expected - covered(claim5) - yes
+claim.policy(claim5,policy1)
+policy.type(policy1,cardinal)
+claim.claimant(claim5,person3)
+policy.insuree(policy1,person3)
+claim.hospitalization(claim5,hosp5)
+policy.startdate(policy1,person3,01_08_2023)
+policy.enddate(policy1,person3,30_06_2024)
+hospitalization.start_time(hosp5,02_09_2023,00_00)
+hospitalization.end_time(hosp5,02_09_2023,01_13)
+hospitalization.hospital(hosp5,stanford_medical_center)
+hospitalization.reason(hosp5,inpatient_care)
+person.dob(person3,01_01_2001)
+person.occupation(person3,other)
+hospitalization.consequence_of_occupation(hosp3,no)
+hospitalization.location(hosp3,phys_office)
+claim.time(claim5,01_01_2024,00_00)
+
