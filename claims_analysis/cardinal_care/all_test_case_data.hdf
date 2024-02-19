@@ -89,3 +89,5 @@ hospitalization.consequence_of_occupation(hosp3,no)
 hospitalization.location(hosp3,phys_office)
 claim.time(claim5,01_01_2024,00_00)
 
+%% test cases for outpatient_surgery
+
