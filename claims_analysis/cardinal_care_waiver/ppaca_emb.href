@@ -1,0 +1,204 @@
+emb_covered :-
+  covered
+
+covered :-
+  ambulatory_covered(yes) &
+  emergency_services_covered(yes) &
+  hospitalization_covered(yes) &
+  birthcare_covered(yes) &
+  mental_substance_services_covered(yes) &
+  prescriptions_covered(yes) & % no more details on the website...
+  rehabilitative_habilitative_services_devices_covered(yes) &
+  laboratory_services_covered(yes) &
+  preventative_services_covered(yes) % depends on age &
+  pedriatic_services_covered(yes)
+
+ambulatory_covered(yes) :- % Have no clue what this entails, or how in-depth this must be %
+  outpatient_care_covered(yes) &
+  hospital_mandated(no)
+
+emergency_services_covered(yes) :-
+  emergency_pre_approval(no) &
+  out_network_cost(OUTC) &
+  ~same(out_network_cost, -1)
+
+hospitalization_covered(yes) :-
+  surgery_covered(yes) &
+  overnight_covered(yes)
+
+birthcare_covered(yes) :- % Note: even if pregnancy begins before coverage starts, will be covered %
+  pregnancy_covered(yes) &
+  maternity_covered(yes) &
+  newborn_covered(yes)
+
+mental_substance_services_covered(yes) :-
+  behaviorial_health_treatment_covered(yes) &
+  mental_inpatient_services_covered(yes) &
+  behaviorial_health_inpatient_services_covered(yes) &
+  substance_use_disorder_treatment_covered(yes) &
+  ~exclusions(pre_existing_mental_conditions) &
+  ~exclusions(pre_eisting_behavioral_health_conditions) &
+  spending_limit(SLIMIT) &
+  same(SLIMIT, 0)
+
+behaviorial_health_treatment(psychotherapy)
+behaviorial_health_treatment(counseling)
+
+preventative_services_covered(yes) :- % depends on age, all adult hospitalization_covered
+  ppaca_pc(yes)
+
+
+pedriatic_services_covered(yes) :-
+  pediatric_oral_care_coverage(yes) &
+  pediatric_vision_care_coverage(yes)
+
+
+
+ppaca_pc(yes) :-
+  preventative_services_covered(yes)
+
+preventative_services_covered(yes) :- % depends on age, all adult hospitalization_covered
+  patient(P) &
+  patient.type(P, adult) &
+  ~patient.gender(woman) &
+  ppaca_pc_adult(yes)
+
+
+preventative_services_covered(yes) :- % depends on age, women hospitalization_covered
+  patient(P) &
+  patient.type(P, adult) &
+  patient.gender(woman) &
+  ppaca_pc_adult(yes) &
+  ppaca_pc_woman(yes)
+
+
+preventative_services_covered(yes) :- % depends on age, children hospitalization_covered
+  patient(P) &  
+  patient.type(P, child) &
+  ppaca_pc_child
+
+ppaca_pc_adult(yes) :-
+  abdominal_aortic_aneurysim_screening(yes) &
+  alcohol_misuse_screening_counseling(yes) &
+  aspirin_use(yes) &
+  blood_pressure_screening(yes) &
+  cholesterol_screening(yes) &
+  colorectal_cancer_screening(yes) &
+  depression_screening(yes) &
+  diabetes_type2_screening(yes) &
+  diet_counseling(yes) &
+  falls_prevention(yes) &
+  hepatitis_b_screening(yes) &
+  hepatitis_c_screening(yes) &
+  hiv_screening(yes) &
+  hiv_prep_medication(yes) &
+  immunizations(yes) &
+  lung_cancer_screening(yes) &
+  obesity_screening_counseling(yes) &
+  sti_prevention_counseling(yes) &
+  statin_medication(yees) &
+  syphilis_screening(yes) &
+  tobacco_use_screening(yes) &
+  tuberculosis_screening(yes)
+
+abdominal_aortic_aneurysim_screening(yes) :-
+  patient(P) &
+  patient.gender(P, man) &
+  quantity(Q) &
+  ~leq(Q, 0)
+
+aspirin_use(yes) :-
+  patient(P) &
+  patient.age(A) &
+  cardiovascular_risk(P, yes) &
+  geq(A, 50) &
+  leq(A, 59) &
+  aspirin_use_covered(yes)
+
+aspirin_use(yes) :-
+  patient(P) &
+  patient.age(A) &
+  ~cardiovascular_risk(P, yes)
+
+aspirin_use(yes) :-
+  patient(P) &
+  patient.age(A) &
+  lt(A, 50) ||
+  gt(A, 59)
+
+colorectal_cancer_screening(yes) :-
+  patient(P) &
+  patient.age(A) &
+  geq(A, 45) &
+  leq(A, 75) &
+  colorectal_cancer_screening_covered(yes)
+
+colorectal_cancer_screening(yes) :-
+  patient(P) &
+  patient.age(A) &
+  geq(A, 45) &
+  leq(A, 75) 
+
+diabetes_type2_screening(yes) :-
+  patient(P) &
+  overwight_obese(P, yes) &
+  patient.age(A) &
+  geq(A, 40) &
+  leq(A, 70) &
+  diabetes_type2_screening_covered(yes)
+  
+diabetes_type2_screening(yes) :-
+  patient(P) &
+  ~overwight_obese(P, yes) &
+
+diabetes_type2_screening(yes) :-
+  patient(P) &
+  patient.age(A) &
+  lt(A, 40) ||
+  gt(A, 70)
+
+  
+overweight_obese(P, yes) :=
+  overweidght(P, yes) ||
+  obese(P, yes)
+
+diet_counseling(yes) :-
+  patient(P) &
+  chronic_disease_risk(P, yes)
+
+falls_prevention(yes) :-
+  patient(P) &
+  patient.age(A) &
+  geq(A, 65) &
+  community_setting_living(P, yes) &
+  treatment(T) &                    %% Adjust based on architecture
+  falls_prevention_treatment(T)
+
+falls_prevention_treatment(exercise)
+falls_prevention_treatment(vitamin_d)
+falls_prevention_treatment(physical_therapy)
+
+
+hepatitis_b_screening(yes)
+hepatitis_c_screening(yes) 
+hiv_screening(yes) 
+hiv_prep_medication(yes) 
+immunizations(yes) 
+lung_cancer_screening(yes) 
+obesity_screening_counseling(yes) 
+sti_prevention_counseling(yes) 
+statin_medication(yees) 
+syphilis_screening(yes) 
+tobacco_use_screening(yes) 
+tuberculosis_screening(yes)
+
+
+lt(X,Y):-
+  leq(X,Y) &
+  ~same(X,Y).
+
+gt(X,Y) :-
+  ~leq(X,Y)
+
+gte(X,Y):-
+  ~lt(X, Y)

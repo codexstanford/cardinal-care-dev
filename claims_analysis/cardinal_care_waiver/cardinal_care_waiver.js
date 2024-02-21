@@ -16,10 +16,10 @@ const SF_BAY_CARE_MEDICAL_INPUT_ID = "sf_bay_care_medical_input" ;
 const SF_BAY_CARE_MENTAL_INPUT_ID = "sf_bay_care_mental_input" ;
 const ANNUAL_DEDUCTIBLE_INPUT_ID = "annual_deductible_input";
 const ANNUAL_DEDUCTIBLE_EMPLOYER_INPUT_ID = "annual_deductible_employer_input";
-const OOP_MINIMUM_INPUT_ID = "oop_minimum_input";
+const OOP_MAX_INPUT_ID = "oop_max_input";
 const OOP_EMPLOYER_INPUT_ID = "oop_employer_input";
-const EMB_PPACA_INPUT_ID = "emb_ppaca_input";
-const PC_PPACA_INPUT_ID = "pc_ppaca_input";
+const PPACA_EMB_INPUT_ID = "ppaca_emb_input";
+const PPACA_PC_INPUT_ID = "ppaca_pc_input";
 const PRE_EXISTING_CONDITIONS_INPUT_ID = "pre_existing_conditions_input";
 const PRESCRIPTIONS_INPUT_ID = "prescriptions_input";
 const DOUBLE_CARE_INPUT_ID = "double_care_input";
@@ -43,11 +43,11 @@ const INPUT_FIELD_IDS = [
   SF_BAY_CARE_MENTAL_INPUT_ID,
   ANNUAL_DEDUCTIBLE_INPUT_ID,
   ANNUAL_DEDUCTIBLE_EMPLOYER_INPUT_ID,
-  OOP_MINIMUM_INPUT_ID,
+  OOP_MAX_INPUT_ID,
   OOP_EMPLOYER_INPUT_ID,
-  EMB_PPACA_INPUT_ID,
-  PC_PPACA_INPUT_ID,
-  PRE_EXISTING_CONDITIONS_INPUT_ID,
+  PPACA_EMB_INPUT_ID,
+  PPACA_PC_INPUT_ID,
+  PRE_EXISTING_CONDITIONS_INPUT_ID, //
   PRESCRIPTIONS_INPUT_ID,
   DOUBLE_CARE_INPUT_ID,
   AGGREGATE_MAX_BENEFIT_INPUT_ID
@@ -115,10 +115,10 @@ function get_data_from_input_fields() { // This is version without Epilog
   facts_to_add += "sf_bay_care_mental(" + INPUT_FIELD_VALUES['SF_BAY_CARE_MENTAL'] + ") ";
   facts_to_add += "annual_deductible(" + INPUT_FIELD_VALUES['ANNUAL_DEDUCTIBLE'] + ") ";
   facts_to_add += "annual_deductible_employer(" + INPUT_FIELD_VALUES['ANNUAL_DEDUCTIBLE_EMPLOYER'] + ") ";
-  facts_to_add += "oop_minimum(" + INPUT_FIELD_VALUES['OOP_MINIMUM'] + ") ";
-  facts_to_add += "oop_minimum_employer(" + INPUT_FIELD_VALUES['OOP_EMPLOYER'] + ") ";
-  facts_to_add += "emb_ppaca(" + INPUT_FIELD_VALUES['EMB_PPACA'] + ") ";
-  facts_to_add += "pc_ppaca(" + INPUT_FIELD_VALUES['PC_PPACA'] + ") ";
+  facts_to_add += "oop_max(" + INPUT_FIELD_VALUES['OOP_MAX'] + ") ";
+  facts_to_add += "oop_max_employer(" + INPUT_FIELD_VALUES['OOP_EMPLOYER'] + ") ";
+  facts_to_add += "ppaca_emb(" + INPUT_FIELD_VALUES['PPACA_EMB'] + ") ";
+  facts_to_add += "ppaca_pc(" + INPUT_FIELD_VALUES['PPACA_PC'] + ") ";
   facts_to_add += "excluded_conditions(" + INPUT_FIELD_VALUES['PRE_EXISTING_CONDITIONS'] + ") ";
   facts_to_add += "prescriptions(" + INPUT_FIELD_VALUES['PRESCRIPTIONS'] + ") ";
   facts_to_add += "double_care(" + INPUT_FIELD_VALUES['DOUBLE_CARE'] + ") ";
@@ -257,9 +257,9 @@ requirements(yes)  :-
   academic_year_covered(yes) &
   sf_bay_care(yes) &
   annual_deductible_covered(yes) &
-  oop_minimum_covered(yes) &
-  emb_ppaca(yes) &
-  pc_ppaca(yes) &
+  oop_max_covered(yes) &
+  ppaca_emb(yes) &
+  ppaca_pc(yes) &
   pre_existing_conditions_coverage(yes) &
   prescriptions(yes) &
   double_care(yes) &
@@ -271,9 +271,9 @@ academic_year_covered(yes) :-
   % curr_date(CD) &
   sep_first(SEPF) &
   aug_end(AUGE) &
-  evaluate(get_year(SD), SYR) &
-  evaluate(get_year(ED), EYR) &
-  % evaluate(get_year(CD), CYR) &
+  evaluate(getyear(SD), SYR) &
+  evaluate(getyear(ED), EYR) &
+  % evaluate(getyear(CD), CYR) &
   ~leq(EYR, SYR) &
   leq(SD, SEPF) &
   leq(AUGE, ED)
@@ -282,23 +282,64 @@ academic_year_covered(yes) :-
   academic_year_workaround(yes)
 
 sf_bay_care(yes)  :- 
-  sf_bay_care_medical(yes) &
-  sf_bay_care_mental(yes)
+  sf_bay_care_in_medical(SFINMED) &
+  ~leq((SFINMED, -1) &
+  sf_bay_care_out_medical(SFOUTMED) &
+  ~leq((SFOUTMED, -1) &
+  sf_bay_care_in_mental(SFINMNEN) &
+  ~leq(SFINMEN, -1) &
+  sf_bay_care_out_mental(SFOUTMNEN) &
+  ~leq((SFOUTMEN, -1) &
 
 annual_deductible_covered(yes)  :-
-  annual_deductible(yes)
+  annual_deductible(AD) &
+  leq(AD, 1000)
 
 annual_deductible_covered(yes)  :-
-  annual_deductible(no) &
-  annual_deductible_employer(yes)
+  annual_deductible(AD) &
+  annual_deductible_employer(yes) &
 
-oop_minimum_covered(yes)  :-
-  oop_minimum(no) &
-  oop_minimum_employer(yes)
+oop_max_covered(yes)  :-
+  oop_max(no) &
+  oop_max_employer(yes)
 
-oop_minimum_covered(yes)  :-
-  oop_minimum(yes)
+oop_max_covered(yes)  :-
+  oop_max(OOP) &
+  leq(OOP, 9100)
 
 pre_existing_conditions_coverage(yes) :-
   excluded_conditions(no)
+
+double_care(yes) :-
+  emergency_care(yes) %&
+  %nonemergency_care(yes) % Confused on best way to form this one. %
+
+emergency_care(yes) :-
+  emergency_room_cost(N) &
+  gt(N, -1) &
+  %emergency_transport_cost(TC) &
+  %gt(TC, -1)
+
+
+aggregate_max_benefit(yes) :-
+  aggregate_max_benefit_num(N) &
+  geq(N, 2000000)
+
+aggregate_max_benefit(yes) :-
+  max_benefit_per_condition_num(N) &
+  geq(N, 500000)
+
+aggregate_max_benefit(yes) :-
+  aggregate_max_benefit_num(N) &
+  same(N, -1)
+
+lt(X,Y):-
+  leq(X,Y) &
+  ~same(X,Y).
+
+gt(X,Y) :-
+  ~leq(X,Y)
+
+gte(X,Y):-
+  ~lt(X, Y)
 `;
