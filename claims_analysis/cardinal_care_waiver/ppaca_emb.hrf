@@ -52,8 +52,6 @@ pedriatic_services_covered(yes) :-
   pediatric_oral_care_coverage(yes) &
   pediatric_vision_care_coverage(yes)
 
-
-
 ppaca_pc(yes) :-
   preventative_services_covered(yes)
 
@@ -156,7 +154,6 @@ diabetes_type2_screening(yes) :-
   patient.age(A) &
   lt(A, 40) ||
   gt(A, 70)
-
   
 overweight_obese(P, yes) :=
   overweidght(P, yes) ||

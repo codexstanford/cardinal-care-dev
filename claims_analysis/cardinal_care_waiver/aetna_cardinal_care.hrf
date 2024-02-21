@@ -9,7 +9,7 @@ annual_deductible(500)
 oop_max(4000)
 emb_ppaca(yes)
 pc_ppaca(yes)
-excluded_conditions(no)
+excluded_conditions(no) % look into that
 prescriptions(yes) % Needs data available at kp.og/formulary%
 prescriptions_tier1_retail(10)
 prescriptions_tier1_mail(35) % Mail also refers to naame-brand for now?
