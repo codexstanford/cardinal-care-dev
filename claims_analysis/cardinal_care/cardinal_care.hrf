@@ -251,7 +251,8 @@ visit_current_year(Service,Claim1,Claim2):-
 contraceptive_location_check(Service,L):-
   valid_location_contraceptive(Service,L).
 
-contraceptive_location_check(sterilization,L).
+contraceptive_location_check(sterilization_surgery_for_women,L).
+contraceptive_location_check(sterilization_surgery_for_men,L).
 
 %%%%%%%%%%%%%%%%%%% Exceptions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -343,11 +344,25 @@ age_range_limit(cancer,breast,0,200,1).
 
 fda_approved(counseling).
 fda_approved(rod).
-fda_approved(larc).
-fda_approved(preogestin).
 fda_approved(oral).
-fda_approved(sterilization).
-
+fda_approved(sterilization_surgery_for_women).
+fda_approved(sterilization_surgery_for_men).
+fda_approved(larc).
+fda_approved(iud_with_preogestin).
+fda_approved(implantable_rod).
+fda_approved(progestin_shot_injection).
+fda_approved(the_pill_estrogen_and_progestin).
+fda_approved(the_mini_pill_progestin).
+fda_approved(patch).
+fda_approved(vaginal_contraceptive_ring).
+fda_approved(diaphragm_with_spermicide).
+fda_approved(sponge_with_spermicide).
+fda_approved(cervical_cap_with_spermicide).
+fda_approved(male_condom).
+fda_approved(female_condom).
+fda_approved(spermicide).
+fda_approved(levonorgestrel_15_mg).
+fda_approved(ulipristal_acetate).
 
 %%%%%%%%%%%%%%%%%%% Helper Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
