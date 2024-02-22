@@ -323,6 +323,10 @@ valid_location_contraceptive(oral,contra_office)
 valid_service_provider(inpatient_surgical_services, operating_surgeon)
 valid_service_provider(inpatient_surgical_services, anesthetist)
 valid_service_provider(inpatient_surgical_services, surgical_assistant)
+valid_service_provider(outpatient_surgical_services, operating_surgeon)
+valid_service_provider(outpatient_surgical_services, anesthetist)
+valid_service_provider(outpatient_surgical_services, surgical_assistant)
+
 
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
