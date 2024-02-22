@@ -56,10 +56,35 @@ get_age(C_D, DOB, Age) :-
   evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
   evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
 
+minor_or_dependent(C,Cl):-
+  person.dependent(Cl,yes).
+
+minor_or_dependent(C,Cl):-
+  person.dob(Cl,DOB) &
+  claim.time(C,C_D,C_T) &
+  get_age(C_D, DOB, Age) &
+  leq(Age,17).
+
 exception(C,P):-
-  person.occupation(armed_forces) &
+  claim.claimant(C,Cl) &
+  person.occupation(Cl,armed_forces) &
   claim.consequence_of_occupation(C,yes).
 
+exception(C,P):-
+  claim.hospitalization(C,H) &
+  hospitalization.reason(H,home_health_care) &
+  home_not_covered_list(List) &
+  hospitalization.home_service(H,Service) &
+  member(Service,List).
+
+exception(C,P):-
+  claim.hospitalization(C,H) &
+  hospitalization.reason(H,home_health_care) &
+  claim.claimant(C,Cl) &
+  minor_or_dependent(C,Cl) &
+  hospitalization.family_member_present(H,no).
+
+%%% Services that have location restriction and visit limit in the policy year
 eligible_service(C,P,Service):-
   check_policy_year_limit(C,Service) &
   claim.hospitalization(C,H) &
@@ -98,11 +123,7 @@ eligible_service(C,P,female_contraceptives):-
   hospitalization.location(H,L) &
   contraceptive_location_check(Service,L).
 
-contraceptive_location_check(Service,L):-
-  valid_location_contraceptive(Service,L).
-
-contraceptive_location_check(sterilization,L).
-
+%%% Services that are covered with only location restriction
 eligible_service(C,P,X):-
   covered_list_with_location(List) &
   member(X,List) &
@@ -110,10 +131,20 @@ eligible_service(C,P,X):-
   hospitalization.location(H,L) &
   valid_location(X,L).
 
+eligible_service(C,P,outpatient_surgery):-
+  claim.hospitalization(C,H) &
+  hospitalization.location(H,outpatient_department) &
+  hospitalization.service_provider(H,operating_physician).
+
+%%% Services that are covered with no location/visit limit
 eligible_service(C,P,X):-
   covered_list(List) &
   member(X,List).
 
+contraceptive_location_check(Service,L):-
+  valid_location_contraceptive(Service,L).
+
+contraceptive_location_check(sterilization,L).
 check_age_range_limit(Claim, cancer):- 
   claim.claimant(Claim,Cl) &
   person.dob(Cl,DOB) &
@@ -260,6 +291,7 @@ valid_hospital(sutter_health).
 yearly_visit_limit(routine_physical,0,22,0).
 yearly_visit_limit(routine_physical,22,200,1)
 yearly_visit_limit(gynecological_exam,0,200,1).
+yearly_visit_limit(home_health_care,0,200,100).
 
 valid_location(routine_physical,phys_office).
 valid_location(preventive_care,phys_office).
@@ -273,6 +305,9 @@ valid_location(physician_consultation,phys_office)
 valid_location(physician_consultation,sp_office)
 valid_location(allergy,phys_office)
 valid_location(allergy,allergy_specialist)
+valid_location(home_health_care,home)
+valid_location(inpatient_care,hospital)
+valid_location(non_surgical_physican_service,hospital)
 
 valid_location_contraceptive(counseling,contra_office)
 valid_location_contraceptive(rod,contra_office)
@@ -282,9 +317,9 @@ valid_location_contraceptive(oral,contra_office)
 
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
-covered_list_with_location([physician_consultation,allergy])
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service])
 covered_list([breast_pump_supplies]).
-
+home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).
 age_range_limit(vaccine,polio,5,100,0).
