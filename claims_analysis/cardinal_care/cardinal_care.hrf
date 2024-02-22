@@ -258,7 +258,8 @@ contraceptive_location_check(sterilization,L).
 exception(C,P):-
   claim.claimant(C,Cl) &
   person.occupation(Cl,armed_forces) &
-  claim.consequence_of_occupation(C,yes).
+  claim.hospitalization(C,H) &
+  hospitalization.consequence_of_occupation(H,yes).
 
 exception(C,P):-
   claim.hospitalization(C,H) &
@@ -301,9 +302,10 @@ valid_location(allergy,phys_office)
 valid_location(allergy,allergy_specialist)
 valid_location(inpatient_surgical_services,hospital)
 valid_location(inpatient_surgical_services,birthing_center)
-valid_location(outpatient_surgical_services,physician_office)
-valid_location(outpatient_surgical_services,specialist_office)
+valid_location(outpatient_surgical_services,phys_office)
+valid_location(outpatient_surgical_services,sp_office)
 valid_location(outpatient_surgical_services,outpatient_dept)
+valid_location(outpatient_surgical_services,surgery_center)
 valid_location(inpatient_care,hospital)
 valid_location(inpatient_care,birthing_center)
 valid_location(outpatient_surgery_facility_charges,outpatient_dept)
@@ -377,5 +379,5 @@ minor_or_dependent(C,Cl):-
 minor_or_dependent(C,Cl):-
   person.dob(Cl,DOB) &
   claim.time(C,C_D,C_T) &
-  get_age(C_D, DOB, Age) &
+  get_date_diff(C_D, DOB, Age) &
   leq(Age,17).
