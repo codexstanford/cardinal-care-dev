@@ -10,17 +10,60 @@ Claim
 Hospitalization
 - Startdate
 - Enddate
-- Hospital/Location
+- Hospital
+--- stanford_medical_center
+--- menlo_medical_clinic
+--- sutter_health
+- Location
+--- phys_office
+--- facility
+--- ob_office
+--- gyn_office
+--- ob_gyn
+--- sp_office
+--- allergy_specialist
+--- home
+--- contra_office
+--- outpatient_department
 - Reason
+--- specialized_screening_counselling
+----- cancer
+----- obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum
+--- preventive_care
+--- female_contraceptives
+--- routine_physical
+--- gynecological_exam
+--- physician_consultation
+--- allergy
+--- breast_pump_supplies
+--- physician_consultation
+--- allergy
+--- inpatient_care
+--- outpatient_surgery
+--- home_health_care
+--- non_surgical_physican_service
+- family_member_present (Family Member or Caregiver Present)
+
+- home_service
+--- transportation
+--- homemaker_service
+--- home_delivery
+--- maintenance_therapy
+- service_provider
 - Vaccine
 - Contraceptive service 
 - Allegy service
+- Contraceptive service 
+- Allegy service
 - Consequence_of_occupation
+- screening_type
+- cancer_type
 
 Person
 - DOB
 - Occupation
 - Sex
+- Dependent
 
 Policy
 - Type
