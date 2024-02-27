@@ -43,6 +43,9 @@ Hospitalization
 --- home_health_care
 --- non_surgical_physican_service
 - family_member_present (Family Member or Caregiver Present)
+- type_of_care
+--- Emergency
+--- Non emergency
 
 - home_service
 --- transportation

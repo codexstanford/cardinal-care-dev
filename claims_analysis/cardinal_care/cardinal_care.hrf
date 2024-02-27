@@ -34,6 +34,14 @@ valid_hospitalization(C,P):-
   eligible_service(C,P,R) &
   ~exception(C,P).
 
+%% seperate rule for emergency room as out of network hospitals are covered
+valid_hospitalization(C,P):-
+  claim.hospitalization(C,H) &
+  hospitalization.reason(H,emergency_room) &
+  hospitalization.type_of_care(H,emergency) &
+  ~exception(C,P).
+
+
 get_timestamp_from_datetime(DATE,TIME,STAMP) :-
   evaluate(parsedate(DATE),[D,M,Y]) &
   evaluate(parsetime(TIME),[HR,MIN]) &
@@ -55,6 +63,15 @@ get_age(C_D, DOB, Age) :-
   evaluate(minus(D,D2), DayDiff) &
   evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
   evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
+
+get_age_in_months(C_D, DOB, AgeInMonths) :-
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2), YearDiff) &
+  evaluate(minus(M,M2), MonthDiff) &
+  evaluate(minus(D,D2), DayDiff) &
+  evaluate(plus(imul(12, YearDiff), MonthDiff), PreliminaryMonths) &
+  evaluate(if(leq(DayDiff, -1), minus(PreliminaryMonths, 1), true, PreliminaryMonths), AgeInMonths).
 
 minor_or_dependent(C,Cl):-
   person.dependent(Cl,yes).
@@ -318,7 +335,7 @@ valid_location_contraceptive(oral,contra_office)
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
 covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service])
-covered_list([breast_pump_supplies]).
+covered_list([breast_pump_supplies,hospice,skilled_nursing]).
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).
@@ -328,6 +345,14 @@ age_range_limit(vaccine,tb,24,200,0).
 age_range_limit(cancer,prostate,0,200,1). 
 age_range_limit(cancer,breast,0,200,1).
 
+age_range_limit(vaccine,rsv,0,8,1,m)
+age_range_limit(vaccine,rsv,8,19,1,m).
+age_range_limit(vaccine,rsv,19,24,0,m).
+age_range_limit(vaccine,rsv,2,200,0,y).
+age_range_limit(vaccine,hep_b,0,1,1,m).
+age_range_limit(vaccine,hep_b,1,3,1,m).
+age_range_limit(vaccine,hep_b,3,4,0,m).
+age_range_limit(vaccine,hep_b,4,18,1,m).
 fda_approved(counseling).
 fda_approved(rod).
 fda_approved(larc).
