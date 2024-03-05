@@ -283,13 +283,13 @@ academic_year_covered(yes) :-
 
 sf_bay_care(yes)  :- 
   sf_bay_care_in_medical(SFINMED) &
-  ~leq((SFINMED, -1) &
+  distinct(SFINMED, NULL) &
   sf_bay_care_out_medical(SFOUTMED) &
-  ~leq((SFOUTMED, -1) &
+  distinct(SFOUTMED, NULL) &
   sf_bay_care_in_mental(SFINMNEN) &
-  ~leq(SFINMEN, -1) &
+  distinct(SFINMEN, NULL) &
   sf_bay_care_out_mental(SFOUTMNEN) &
-  ~leq((SFOUTMEN, -1) &
+  distinct(SFOUTMEN, NULL) &
 
 annual_deductible_covered(yes)  :-
   annual_deductible(AD) &
@@ -316,9 +316,9 @@ double_care(yes) :-
 
 emergency_care(yes) :-
   emergency_room_cost(N) &
-  gt(N, -1) &
+  distinct(N, NULL) &
   %emergency_transport_cost(TC) &
-  %gt(TC, -1)
+  %distinct(TC, NULL)
 
 
 aggregate_max_benefit(yes) :-
@@ -331,7 +331,7 @@ aggregate_max_benefit(yes) :-
 
 aggregate_max_benefit(yes) :-
   aggregate_max_benefit_num(N) &
-  same(N, -1)
+  same(N, NULL)
 
 lt(X,Y):-
   leq(X,Y) &

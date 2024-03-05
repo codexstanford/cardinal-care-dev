@@ -1,41 +1,51 @@
-emb_covered :-
-  covered
+emb_covered(C) :-
+  claim.policy(C, P) &
+  policy.type(P,T) &
+  covered(C,P,T)
 
-covered :-
-  ambulatory_covered(yes) &
-  emergency_services_covered(yes) &
-  hospitalization_covered(yes) &
-  birthcare_covered(yes) &
-  mental_substance_services_covered(yes) &
-  prescriptions_covered(yes) & % no more details on the website...
-  rehabilitative_habilitative_services_devices_covered(yes) &
-  laboratory_services_covered(yes) &
-  preventative_services_covered(yes) % depends on age &
-  pedriatic_services_covered(yes)
+covered(C, P, ppaca_emb) :-
+  ambulatory_covered(C, P) &
+  emergency_services_covered(C, P) &
+  hospitalization_covered(C, P) &
+  birthcare_covered(C, P) &
+  mental_substance_services_covered(C, P) &
+  prescriptions_covered(C, P) & % no more details on the website...
+  rehabilitative_habilitative_services_devices_covered(C, P) &
+  laboratory_services_covered(C, P) &
+  preventative_services_covered(C, P) & % depends on age & gender
+  pedriatic_services_covered(C, P) &
+  birth_control_coverage(C, P) &
+  breastfeeding_coverage(C, P)
 
-ambulatory_covered(yes) :- % Have no clue what this entails, or how in-depth this must be %
-  outpatient_care_covered(yes) &
-  hospital_mandated(no)
+ambulatory_covered(C, P) :- % Have no clue what this entails, or how in-depth this must be %
+  eligible_service(C, P, outpatient_care) &
+  ~hospital_mandated(C, P)
 
-emergency_services_covered(yes) :-
-  emergency_pre_approval(no) &
+emergency_services_covered(C, P) :-
+  ~emergency_pre_approval(C, P) &
   out_network_cost(OUTC) &
-  ~same(out_network_cost, -1)
+  distinct(out_network_cost, NULL)
 
-hospitalization_covered(yes) :-
-  surgery_covered(yes) &
-  overnight_covered(yes)
+emergency_services_covered(C, P) :-
+  eligible_service(C, P, emergency_services)
 
-birthcare_covered(yes) :- % Note: even if pregnancy begins before coverage starts, will be covered %
-  pregnancy_covered(yes) &
-  maternity_covered(yes) &
-  newborn_covered(yes)
+hospitalization_covered(C, P) :-
+  surgery_covered(C, P) &
+  overnight_covered(C, P)
 
-mental_substance_services_covered(yes) :-
-  behaviorial_health_treatment_covered(yes) &
-  mental_inpatient_services_covered(yes) &
-  behaviorial_health_inpatient_services_covered(yes) &
-  substance_use_disorder_treatment_covered(yes) &
+hospitalization_covered(C, P) :-
+  eligible_service(C, P, hospitalization)
+
+birthcare_covered(C, P) :- % Note: even if pregnancy begins before coverage starts, will be covered %
+  pregnancy_covered(C, P) &
+  maternity_covered(C, P) &
+  newborn_covered(C, P)
+
+mental_substance_services_covered(C, P) :-
+  behaviorial_health_treatment_covered(C, P) &
+  mental_inpatient_services_covered(C, P) &
+  behaviorial_health_inpatient_services_covered(C, P) &
+  substance_use_disorder_treatment_covered(C, P) &
   ~exclusions(pre_existing_mental_conditions) &
   ~exclusions(pre_eisting_behavioral_health_conditions) &
   spending_limit(SLIMIT) &
@@ -44,150 +54,434 @@ mental_substance_services_covered(yes) :-
 behaviorial_health_treatment(psychotherapy)
 behaviorial_health_treatment(counseling)
 
-preventative_services_covered(yes) :- % depends on age, all adult hospitalization_covered
-  ppaca_pc(yes)
+prescriptions_covered(C, P) :-            % placeholder
+  eligible_service(C, P, prescriptions)
 
+rehabilitative_habilitative_services_devices_covered(C, P) :-   % placeholder
+  eligible_service(C, P, rehabilitative_habilitative_services_devices)
 
-pedriatic_services_covered(yes) :-
-  pediatric_oral_care_coverage(yes) &
-  pediatric_vision_care_coverage(yes)
+preventative_services_covered(C, P) :- % depends on age, all adult hospitalization_covered
+  ppaca_pc(C, P)
 
-ppaca_pc(yes) :-
-  preventative_services_covered(yes)
+pedriatic_services_covered(C, P) :-
+  oral_health_risk_assessment(C, P, Per) &
+  vision_screening(C, P, Per)
 
-preventative_services_covered(yes) :- % depends on age, all adult hospitalization_covered
-  patient(P) &
-  patient.type(P, adult) &
-  ~patient.gender(woman) &
-  ppaca_pc_adult(yes)
+pedriatic_services_covered(C, P) :-         % placeholder workaround for prescription depth
+  eligible_service(pedriatic_services)
 
+ppaca_pc(C, P) :-
+  preventative_services_coverage(C, P)
 
-preventative_services_covered(yes) :- % depends on age, women hospitalization_covered
-  patient(P) &
-  patient.type(P, adult) &
-  patient.gender(woman) &
-  ppaca_pc_adult(yes) &
-  ppaca_pc_woman(yes)
+preventative_services_coverage(C, P) :- % depends on age, all adult hospitalization_covered
+  claim.person(C, Per) &
+  person.type(P, adult) &
+  ~person.sex(P, woman) &
+  ppaca_pc_adult(C, Per)
 
+preventative_services_coverage(C, P) :- % depends on age, women hospitalization_covered
+  claim.person(C, Per) &
+  person.type(P, adult) &
+  person.sex(P, woman) &
+  ppaca_pc_adult(C, P, Per) &
+  ppaca_pc_woman(C, P, Per)
 
-preventative_services_covered(yes) :- % depends on age, children hospitalization_covered
-  patient(P) &  
-  patient.type(P, child) &
-  ppaca_pc_child
+preventative_services_coverage(C, P) :- % depends on age, children hospitalization_covered
+  claim.person(C, Per) &  
+  person.type(Per, child) &
+  ppaca_pc_child(C, P, Per)
 
-ppaca_pc_adult(yes) :-
-  abdominal_aortic_aneurysim_screening(yes) &
-  alcohol_misuse_screening_counseling(yes) &
-  aspirin_use(yes) &
-  blood_pressure_screening(yes) &
-  cholesterol_screening(yes) &
-  colorectal_cancer_screening(yes) &
-  depression_screening(yes) &
-  diabetes_type2_screening(yes) &
-  diet_counseling(yes) &
-  falls_prevention(yes) &
-  hepatitis_b_screening(yes) &
-  hepatitis_c_screening(yes) &
-  hiv_screening(yes) &
-  hiv_prep_medication(yes) &
-  immunizations(yes) &
-  lung_cancer_screening(yes) &
-  obesity_screening_counseling(yes) &
-  sti_prevention_counseling(yes) &
-  statin_medication(yees) &
-  syphilis_screening(yes) &
-  tobacco_use_screening(yes) &
-  tuberculosis_screening(yes)
+ppaca_pc_adult(C, P, Per) :-
+  abdominal_aortic_aneurysim_screening_covered(C, P, Per) &
+  alcohol_misuse_screening_counseling(C, P, Per) &
+  aspirin_use(C, P, Per) &
+  blood_pressure_screening(C, P, Per) &
+  cholesterol_screening(C, P, Per) &
+  colorectal_cancer_screening(C, P, Per) &
+  depression_screening(C, P, Per) &
+  diabetes_type2_screening(C, P, Per) &
+  diet_counseling(C, P, Per) &
+  falls_prevention(C, P, Per) &
+  hepatitis_b_screening(C, P, Per) &
+  hepatitis_c_screening(C, P, Per) &
+  hiv_screening(C, P, Per) &
+  hiv_prep_medication(C, P, Per) &
+  immunizations(C, P, Per) &
+  lung_cancer_screening(C, P, Per) &
+  obesity_screening_counseling(C, P, Per) &
+  sti_prevention_counseling(C, P, Per) &
+  statin_medication(C, P, Per) &
+  syphilis_screening(C, P, Per) &
+  tobacco_use_screening(C, P, Per) &
+  tuberculosis_screening(C, P, Per)
 
-abdominal_aortic_aneurysim_screening(yes) :-
-  patient(P) &
-  patient.gender(P, man) &
-  quantity(Q) &
-  ~leq(Q, 0)
+abdominal_aortic_aneurysim_screening(C, P, Per) :-
+  person.sex(Per, man) &
+  person.age(Per, A) &
+  geq(A, 65) &
+  leq(A, 75) &
+  person.smoked_quantity(Q) & % Times spoked > 0
+  distinct(Q, 0)
 
-aspirin_use(yes) :-
-  patient(P) &
-  patient.age(A) &
-  cardiovascular_risk(P, yes) &
+alcohol_misuse_screening_counseling(C, P) :-
+  eligible_service(C, P, alcohol_misuse_screening_counseling)
+
+aspirin_use(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  cardiovascular_risk(Per) &
   geq(A, 50) &
   leq(A, 59) &
-  aspirin_use_covered(yes)
+  eligible_service(C, P, aspirin_use)
 
-aspirin_use(yes) :-
-  patient(P) &
-  patient.age(A) &
-  ~cardiovascular_risk(P, yes)
+aspirin_use(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  ~cardiovascular_risk(Per)
 
-aspirin_use(yes) :-
-  patient(P) &
-  patient.age(A) &
-  lt(A, 50) ||
+aspirin_use(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  lt(A, 50) |
   gt(A, 59)
 
-colorectal_cancer_screening(yes) :-
-  patient(P) &
-  patient.age(A) &
+blood_pressure_screening(C, P) :-
+  eligible_service(C, P, blood_pressure_screening)
+
+cholesterol_screening(C, P, Per) :- % Vague wordin here "for adults of certain ages or at higher risk"
+  eligible_service(C, P, cholesterol_screening)
+
+colorectal_cancer_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
   geq(A, 45) &
   leq(A, 75) &
-  colorectal_cancer_screening_covered(yes)
+  eligible_service(C, P, colorectal_cancer_screening)
 
-colorectal_cancer_screening(yes) :-
-  patient(P) &
-  patient.age(A) &
-  geq(A, 45) &
-  leq(A, 75) 
+colorectal_cancer_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  lt(A, 45) |
+  gt(A, 75)
 
-diabetes_type2_screening(yes) :-
-  patient(P) &
-  overwight_obese(P, yes) &
-  patient.age(A) &
+depression_screening(C, P, Per) :-
+  eligible_service(C, P, depression_screening)
+
+diabetes_type2_screening(C, P, Per) :-
+  person(Per) &
+  person.overwight_obese(P, yes) &
+  person.age(A) &
   geq(A, 40) &
-  leq(A, 70) &
-  diabetes_type2_screening_covered(yes)
+  leq(A, 70)
   
-diabetes_type2_screening(yes) :-
-  patient(P) &
-  ~overwight_obese(P, yes) &
+diabetes_type2_screening(C, P, Per) :-
+  person(Per) &
+  ~overwight_obese(Per) &
 
-diabetes_type2_screening(yes) :-
-  patient(P) &
-  patient.age(A) &
-  lt(A, 40) ||
+diabetes_type2_screening(C, P, Per) :-
+  person(Per) &
+  person.age(A) &
+  lt(A, 40) |
   gt(A, 70)
   
-overweight_obese(P, yes) :=
-  overweidght(P, yes) ||
-  obese(P, yes)
+overweight_obese(Per) :-
+  overweight(Per) |
+  obese(Per)
 
-diet_counseling(yes) :-
-  patient(P) &
-  chronic_disease_risk(P, yes)
+diet_counseling(C, P, Per) :-
+  person(Per) &
+  person.chronic_disease_risk(Per, yes) &
+  eligible_service(C, P, diet_counseling)
 
-falls_prevention(yes) :-
-  patient(P) &
-  patient.age(A) &
+falls_prevention(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
   geq(A, 65) &
-  community_setting_living(P, yes) &
-  treatment(T) &                    %% Adjust based on architecture
-  falls_prevention_treatment(T)
+  community_setting_living(Per) &
+  claim.treatment(C, T) &                    %% Adjust based on architecture
+  falls_prevention_treatment(T) &
+  eligible_service(falls_prevention)
+
+falls_prevention(C, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  lt(A, 65) |
+  ~community_setting_living(Per)
+
+community_setting_living(Per) :-
+  person.living_setting(community_living)     %% Expand upon this
 
 falls_prevention_treatment(exercise)
-falls_prevention_treatment(vitamin_d)
+falls_prevention_treatment(vitamin_d_use)
 falls_prevention_treatment(physical_therapy)
 
+hepatitis_b_screening(C, P, Per) :-
+  person(Per) &
+  hepatitis_b_risk(Per) &
+  eligible_service(hepatitis_b_screening)
 
-hepatitis_b_screening(yes)
-hepatitis_c_screening(yes) 
-hiv_screening(yes) 
-hiv_prep_medication(yes) 
-immunizations(yes) 
-lung_cancer_screening(yes) 
-obesity_screening_counseling(yes) 
-sti_prevention_counseling(yes) 
-statin_medication(yees) 
-syphilis_screening(yes) 
-tobacco_use_screening(yes) 
-tuberculosis_screening(yes)
+hepatitis_b_screening(C, P, Per) :-
+  person(Per) &
+  ~hepatitis_b_risk(Per)
+
+hepatitis_b_risk(Per) :-
+  person.hiv_positive(Per, R)
+
+hepatitis_b_risk(Per) :-
+  person.hepatitis_c_positive(Per, R)
+
+hepatitis_b_risk(Per) :-
+  person.kidney_failure(Per, R)
+
+hepatitis_b_risk(Per) :-
+  person.kidney_failure(Per, R)
+
+hepatitis_b_risk(Per) :-
+  person.country(Per, C) &
+  hepatitis_b_risk_country(C)         % 2% Hep_b prevalence
+
+hepatitis_b_risk(Per) :-
+  person.parent(Par) &
+  ~person.vaccinated(hepatitis_b) &
+  person.country(Per, C) &
+  high_hepatitis_b_risk(C)               %8% hep_b_prevalence
+
+hepatitis_b_risk(Per) :-
+  person(Per) &
+  drug_needle_use(Per)
+
+hepatitis_b_risk(Per) :-
+  person(Per) &                            % Lives with or has sex with hep_b
+  person.close_contact(P) &
+  person.hepatitis_b_positive(P)
+
+hepatitis_b_risk(Per) :-
+  person(Per) &                            % Lives with or has sex with hep_b
+  person.sex(man) &
+  person.sexual_orientation(Per, O) &     % best way to encode "man who has sex with men"
+  distinct(O, heterosexual)
+  person.sexually_active(Per, yes)
+
+hepatitis_b_risk(Per) :-
+  person(Per) &                            % Lives with or has sex with hep_b
+  weakened_immune_system(Per)
+
+hepatitis_b_risk(Per) :-
+  person(Per) &                            % Lives with or has sex with hep_b
+  jail_prison_history(Per)
+
+hepatitis_c_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  geq(A, 18) &
+  leq(A, 79) &
+  eligible_service(C, P, hepatitis_c_screening)
+
+hepatitis_c_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  lt(A, 18) |
+  gt(A, 79)
+
+hiv_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  geq(A, 15) &
+  leq(A, 65) &
+  eligible_service(C, P, hiv_screening)
+
+hiv_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  hiv_risk(Per) &
+  eligible_service(C, P, hiv_screening)
+
+hiv_prep_medication(C, P, Per) :-
+  person(Per) &
+  person.type(adult) &
+  ~hiv_positive(Per) &
+  hiv_risk(Per)
+
+hiv_prep_medication(C, P, Per) :-
+  person(Per) &
+  ~person.type(adult)
+
+hiv_prep_medication(C, P, Per) :-
+  person(Per) &
+  hiv_positive(Per)
+
+hiv_prep_medication(C, P, Per) :-
+  person(Per) &
+  ~hiv_risk(Per)
+
+immunizations(C, P, Per) :-
+  person(P) &
+  immunization_covered(C, P, chickenpox) &
+  immunization_covered(C, P, diptheria) &
+  immunization_covered(C, P, hepatitis_a) &
+  immunization_covered(C, P, hepatitis_b) &
+  immunization_covered(C, P, hpv) &
+  immunization_covered(C, P, measles) &
+  immunization_covered(C, P, meningococcal) &
+  immunization_covered(C, P, mumps) &
+  immunization_covered(C, P, pertussis) &
+  immunization_covered(C, P, pneumococcal) &
+  immunization_covered(C, P, rubella) &
+  immunization_covered(C, P, shingles) &
+  immunization_covered(C, P, tetanus)
+
+lung_cancer_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  geq(A, 50) &
+  leq(A, 80) &
+  lung_cancer_risk(Per) &
+  eligible_service(C, P, hiv_screening)
+
+lung_cancer_risk(Per) :-
+  heavy_smoker(Per)
+  
+lung_cancer_risk(Per) :-
+  quit_smoking_time(Per, A) &
+  leq(A, 15)
+
+obesity_screening_counseling(C, P, Per) :-
+  eligible_service(obesity_screening_counseling)
+
+sti_prevention_counseling(C, P, Per) :-
+  high_sti_risk(Per) &
+  eligible_service(sti_prevention_counseling)
+
+sti_prevention_counseling(C, P, Per) :-
+  ~high_sti_risk(Per) &
+
+statin_medication(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  geq(A, 40) &
+  leq(A, 75) &
+  statin_risk(Per) &
+  eligible_service(C, P, hiv_screening)
+
+statin_medication(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  lt(A, 40) |
+  gt(A, 75)
+
+statin_medication(C, P, Per) :-
+  person(Per) &
+  ~statin_risk(Per) 
+
+syphilis_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  geq(A, 40) &
+  leq(A, 75) &
+  syphilis_risk(Per) &
+  eligible_service(C, P, syphilis_screening)
+
+syphilis_screening(C, P, Per) :-
+  person(Per) &
+  person.age(Per, A) &
+  lt(A, 40) |
+  gt(A, 75)
+
+syphilis_screening(C, P, Per) :-
+  person(Per) &
+  ~syphilis_risk(Per)
+
+tobacco_use_screening(C, P, Per) :-
+  person(Per) &
+  person.type(adult) &
+  eligible_service(C, P, tobacco_use_screening)
+
+tuberculosis_screening(C, P, Per) :-
+  person(Per) &
+  person.type(adult) &
+  ~tuberculosis_symptomos(Per) &
+  tuberculosis_risk(Per)
+
+ppaca_pc_woman(C, P, Per) :-
+  breastfeeding_coverage(C, P, Per) &
+  birth_control_coverage(C, P, Per) &
+  folic_acid_coverage(C, P, Per) &
+  gestational_diabetes_screening(C, P, Per) &
+  gonorrhea_screening(C, P, Per) &
+  hepatitis_b_screening(C, P, Per) &
+  maternal_depression_screening(C, P, Per) &
+  preeclampsia_prevention_screening(C, P, Per) &
+  rh_incompatibility_screening(C, P, Per) &
+  syphilis_screening(C, P, Per) &
+  expanded_tobacco_intervention_counseling(C, P, Per) &
+  uti_screening(C, P, Per)
+
+breastfeeding_support(C, P, Per) :-
+  eligible_service(breastfeeding_coverage)
+
+birth_control_coverage(C, P, Per) :-
+  eligible_service(birth_control_coverage)
+
+folic_acid_coverage(C, P, Per) :-
+  eligible_service(folic_acid_coverage)
+
+gestational_diabetes_screening(C, P, Per) :-
+  eligible_service(gestational_diabetes_screening)
+
+gonorrhea_screening(C, P, Per) :-
+  eligible_service(gonorrhea_screening)
+
+hepatitis_b_screening(C, P, Per) :-
+  eligible_service(hepatitis_b_screening)
+
+maternal_depression_screening(C, P, Per) :-
+  eligible_service(maternal_depression_screening)
+
+preeclampsia_prevention_screening(C, P, Per) :-
+  eligible_service(preeclampsia_prevention_screening)
+
+rh_incompatibility_screening(C, P, Per) :-
+  eligible_service(rh_incompatibility_screening)
+
+syphilis_screening(C, P, Per) :-
+  eligible_service(syphilis_screening)
+
+expanded_tobacco_intervention_counseling(C, P, Per) :-
+  eligible_service(expanded_tobacco_intervention_counseling)
+
+uti_screening(C, P, Per) :-
+  eligible_service(uti_screening)
+
+ppaca_pc_child(C, P, Per) :-      
+  alcohol_tobacco_drug_assessment(C, P, Per) &
+  autism_screening(C, P, Per) &
+  behavioral_assessments(C, P, Per) &
+  gestational_diabetes_screening(C, P, Per) &
+  bilirubin_concentration_screening(C, P, Per) &
+  blood_pressure_screening(C, P, Per) &
+  newborn_blood_screening(C, P, Per) &
+  depression_screening(C, P, Per) &
+  developmental_screening(C, P, Per) &
+  dyslipidemia_screening(C, P, Per) &
+  fluoride_supplement_coverage(C, P, Per) &
+  fluoride_varnish_coverage(C, P, Per) &
+  gonorrhea_preventive_medication_coverage(C, P, Per) &
+  hearing_screening(C, P, Per) &
+  bmi_screening_coverage(C, P, Per) &
+  hematocrit_hemoglobin_screening(C, P, Per) &
+  hepatitis_b_screening(C, P, Per) &
+  hiv_screening(C, P, Per) &
+  hypothyroidism_screening(C, P, Per) &
+  hiv_prep_medication(C, P, Per) &
+  immunization_covered(C, P, Per) &
+  lead_screening(C, P, Per) &
+  obesity_screening_counseling(C, P, Per) &
+  oral_health_risk_assessment(C, P, Per) &
+  phenylketonuria_screening(C, P, Per) &
+  sti_prevention_counseling(C, P, Per) &
+  tuberculin_testing_coverage(C, P, Per) &
+  vision_screening(C, P, Per) &
+  well_baby_well_child_visits(C, P, Per)
 
 
 lt(X,Y):-

@@ -3,7 +3,7 @@ covered(C) :-
   policy.type(P, T) &
   covered(C, P, T)
 
-covered(C, P, cardinal) :-
+covered(C, P, kaiser_hmo) :-
   valid_insuree(C,P) &
   policy_active(C,P) &
   claim.type(C, T) &
@@ -19,6 +19,11 @@ policy_active(C,P) :-
   policy.startdate(P, C1, P_START_DATE) & 
   policy.enddate(P,C1, P_END_DATE) & 
   claim.date(C, C_DATE) &
+  %get_timestamp_from_date(P_END_DATE, P_END_STAMP) &
+  %get_timestamp_from_date(P_START_DATE, P_START_STAMP) &
+  %get_timestamp_from_date(C_DATE, C_DATE_STAMP) &
+  %leq(P_START_STAMP, C_DATE_STAMP) &
+  %leq(C_DATE_STAMP, P_END_STAMP)
   leq(P_START_DATE, C_DATE) &
   leq(C_DATE, P_END_DATE)
   % Need more here to determine valid range, but it will depend on a query so trying not to hardcode.
@@ -32,9 +37,10 @@ eligible_service(C, P, prescription):-
   claim.item(C, X) &
   elligible_prescription(C, P, X)
 
-elligible_prescription(C, P, X) :-
+elligible_prescription(C, P, X) :-      % QWuantity Limit and other exceptions
   prescriptions_list(List) &
   member(X, List) &
+  ~prescription_exception(C, P, X) &
   prescription_cost(C, P, X)
 
 prescription_cost(C, P, X) :-
@@ -42,18 +48,16 @@ prescription_cost(C, P, X) :-
   gt(T, 0) % &
   %tier.prescriptions_tier_cost(T, C)
   
-~international(cardinal)
+~international(kaiser_hmo)
 
 prescriptions_list([ibuprofen, diphenhydramine_hcl, oxycodone_hcl, tracleer, cayston]).
 prescription.tier(ibuprofen, 1)
 prescription.tier(diphenhydramine_hcl, 1)
 prescription.tier(ocycodone_hcl, 1)
-prescription.tier(cayston, 0)        % Denotes not covered
-prescription_tier_cost(1, 10)
-prescription_tier_cost(2, 35)
-prescription_tier_cost(3, 50)
-prescription_tier_cost(4, 50)
-prescription_tier_cost(5, 50)
+prescription.tier(cayston, 4)
+prescription_tier_cost(1, 20)
+prescription_tier_cost(2, 40)
+prescription_tier_cost(4, 40)
 
 lt(X,Y):-
   leq(X,Y) &
@@ -68,30 +72,37 @@ gte(X,Y):-
 
 
 
-% Encode as a ruleset, not a dataset.
-international(no) % User Input%
-start_date(1672563661000) % Jan 1 2023 %
-end_date(1737450061000) % Jan 21 2025, dummy dates %
-sf_bay_care_in_medical(500) % Might be 100?
+% User Input
+start_date(1672563661000) 
+% Jan 1 2023 %
+end_date(1737450061000) 
+% Jan 21 2025, dummy dates 
+sf_bay_care_in_medical(150)
 sf_bay_care_out_medical(0)
-sf_bay_care_in_mental(500)
-sf_bay_care_out_mental(25)
-annual_deductible(500)
-oop_max(4000)
+sf_bay_care_in_mental(150)
+sf_bay_care_out_mental(30)
+annual_deductible(0)
+oop_max(3500)
 emb_ppaca(yes)
 pc_ppaca(yes)
-excluded_conditions(no) % look into that
-prescriptions(yes) % Needs data available at kp.og/formulary%
-prescriptions_tier1_retail(10)
-prescriptions_tier1_mail(35) % Mail also refers to naame-brand for now?
-prescriptions_tier2_retail(50)
-prescriptions_tier2_mail(50)
-emergency_room_cost(100)
-emergency_transport_cost(0)
+excluded_conditions(no) % NULL?
+prescriptions(yes) 
+% Needs data available at kp.og/formulary
+prescriptions_tier1_mail(20)
+prescriptions_tier2_mail(80)
+
+prescription_tier_cost(1, 10)
+prescription_tier_cost(2, 40)
+prescription_tier_cost(4, 40)
+
+emergency_room_cost(200)
+emergency_transport_cost(50)
 provider_urgent_care_cost(30)
-outside_urgent_care_cost(-1)
-aggregate_max_benefit_num(-1) % unsure if truly is no max%
+outside_urgent_care_cost(NULL)
+aggregate_max_benefit_num(NULL) 
+% unsure if truly is no max
 
 sep_first(1725177661000)
 aug_end(1754035261000)
-academic_year_workaround(yes) % For Sierra checks wih getyear %
+academic_year_workaround(yes) % For Sierra checks wih getyear
+

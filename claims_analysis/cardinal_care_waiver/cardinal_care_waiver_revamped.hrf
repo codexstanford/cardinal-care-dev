@@ -1,0 +1,137 @@
+can_waive :-
+  covered
+
+covered :-
+  international(yes) &
+  evacuation_covered(yes) &
+  requirements(yes)
+
+evacuation_covered(yes) :-
+  evac_covered(yes) &
+  repatriation_covered(yes) &
+  visa_coverage(yes)  &
+  visa_copy(yes) &
+  international_translated(yes)
+
+evac_covered(yes) :-
+  evac_coverage_workaround(yes)
+
+evac_covered(yes) :-
+  evac_coverage(N) &
+  leq(50000, N)
+
+repatriation_covered(yes) :-
+  repatriation_coverage_workaround(yes)
+
+repatriation_covered(yes) :-
+  repatriation_coverage(N) &
+  leq(25000, N)
+
+visa_coverage(yes)  :-
+  j_visa_holder(yes) &
+  j_visa_deductible_valid(yes)
+
+j_visa_deductible_valid(yes) :-
+  j_visa_deductible_workaround(yes)
+
+j_visa_deductible_valid(yes) :-
+  j_visa_deductible(N) &
+  leq(N, 500)
+
+visa_coverage(yes) :-
+  j_visa_holder(no)
+
+covered  :-
+  international(no) &
+  requirements(yes) 
+
+requirements(yes)  :-
+  academic_year_covered(yes) &
+  sf_bay_care(yes) &
+  annual_deductible_covered(yes) &
+  oop_max_covered(yes) &
+  ppaca_emb(yes) &
+  ppaca_pc(yes) &
+  pre_existing_conditions_coverage(yes) &
+  prescriptions(yes) &
+  double_care(yes) &
+  aggregate_max_benefit(yes)
+
+academic_year_covered(yes) :-
+  start_date(SD) &
+  end_date(ED) &
+  % curr_date(CD) &
+  sep_first(SEPF) &
+  aug_end(AUGE) &
+  evaluate(getyear(SD), SYR) &
+  evaluate(getyear(ED), EYR) &
+  % evaluate(getyear(CD), CYR) &
+  ~leq(EYR, SYR) &
+  leq(SD, SEPF) &
+  leq(AUGE, ED)
+
+academic_year_covered(yes) :-
+  academic_year_workaround(yes)
+
+sf_bay_care(yes)  :- 
+  sf_bay_care_in_medical(SFINMED) &
+  distinct(SFINMED, NULL) &
+  sf_bay_care_out_medical(SFOUTMED) &
+  distinct(SFOUTMED, NULL) &
+  sf_bay_care_in_mental(SFINMNEN) &
+  distinct(SFINMEN, NULL) &
+  sf_bay_care_out_mental(SFOUTMNEN) &
+  distinct(SFOUTMEN, NULL) &
+
+annual_deductible_covered(yes)  :-
+  annual_deductible(AD) &
+  leq(AD, 1000)
+
+annual_deductible_covered(yes)  :-
+  annual_deductible(AD) &
+  annual_deductible_employer(yes) &
+
+oop_max_covered(yes)  :-
+  oop_max(no) &
+  oop_max_employer(yes)
+
+oop_max_covered(yes)  :-
+  oop_max(OOP) &
+  leq(OOP, 9100)
+
+pre_existing_conditions_coverage(yes) :-
+  excluded_conditions(no)
+
+double_care(yes) :-
+  emergency_care(yes) %&
+  %nonemergency_care(yes) % Confused on best way to form this one. %
+
+emergency_care(yes) :-
+  emergency_room_cost(N) &
+  distinct(N, NULL) &
+  %emergency_transport_cost(TC) &
+  %distinct(TC, NULL)
+
+
+aggregate_max_benefit(yes) :-
+  aggregate_max_benefit_num(N) &
+  geq(N, 2000000)
+
+aggregate_max_benefit(yes) :-
+  max_benefit_per_condition_num(N) &
+  geq(N, 500000)
+
+aggregate_max_benefit(yes) :-
+  aggregate_max_benefit_num(N) &
+  same(N, NULL)
+
+lt(X,Y):-
+  leq(X,Y) &
+  ~same(X,Y).
+
+gt(X,Y) :-
+  ~leq(X,Y)
+
+gte(X,Y):-
+  ~lt(X, Y)
+`;

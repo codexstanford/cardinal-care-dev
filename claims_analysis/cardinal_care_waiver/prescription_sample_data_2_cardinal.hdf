@@ -1,0 +1,11 @@
+claim(2001)
+claim.policy(2001,policy2221)
+claim.claimant(2001,person2)
+claim.date(2001,1700000000000)
+claim.type(2001,prescription)
+claim.item(2001,cayston)
+policy.type(policy2221,cardinal)
+policy.insuree(policy2221,person2)
+policy.startdate(policy2221,person2,1672563661000)
+policy.enddate(policy2221,person2,1737450061000)
+
