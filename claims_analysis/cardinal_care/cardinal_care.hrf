@@ -421,8 +421,8 @@ valid_service_provider(outpatient_surgical_services, surgical_assistant)
 
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service])
-covered_list([breast_pump_supplies,hospice,skilled_nursing]).
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services])
+covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing]).
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).
@@ -499,6 +499,4 @@ minor_or_dependent(C,Cl):-
   claim.time(C,C_D,C_T) &
   get_date_diff(C_D, DOB, Age) &
   leq(Age,17).
-
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services])
 
