@@ -20,11 +20,15 @@ Hospitalization
 --- ob_office
 --- gyn_office
 --- ob_gyn
+--- telemedicine
 --- sp_office
 --- allergy_specialist
---- home
 --- contra_office
---- outpatient_department
+--- birthing_center
+--- outpatient_dept
+--- surgery_center
+--- home
+--- hospital
 - Reason
 --- specialized_screening_counselling
 ----- cancer
@@ -39,7 +43,7 @@ Hospitalization
 --- physician_consultation
 --- allergy
 --- inpatient_care
---- outpatient_surgery
+--- outpatient_surgery_facility_charges
 --- home_health_care
 --- non_surgical_physican_service
 - family_member_present (Family Member or Caregiver Present)
