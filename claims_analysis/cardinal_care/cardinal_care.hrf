@@ -43,65 +43,12 @@ valid_hospitalization(C,P):-
   hospitalization.type_of_care(H,emergency) &
   ~exception(C,P).
 
-
-get_timestamp_from_datetime(DATE,TIME,STAMP) :-
-  evaluate(parsedate(DATE),[D,M,Y]) &
-  evaluate(parsetime(TIME),[HR,MIN]) &
-  evaluate(maketimestamp(Y,M,D,HR,MIN,0),STAMP)
-
-get_timestamp_from_date(DATE,STAMP) :-
-  evaluate(parsedate(DATE),[D,M,Y]) &
-  evaluate(maketimestamp(Y,M,D,0,0,0),STAMP)
-
 definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
 definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
 definition(tail(X!L),L)
 
-get_age(C_D, DOB, Age) :-
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2),YearDiff) &
-  evaluate(minus(M,M2), MonthDiff) &
-  evaluate(minus(D,D2), DayDiff) &
-  evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
-  evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
 
-get_age_in_months(C_D, DOB, AgeInMonths) :-
-  evaluate(parsedate(C_D),[D,M,Y]) &
-  evaluate(parsedate(DOB),[D2,M2,Y2]) &
-  evaluate(minus(Y,Y2), YearDiff) &
-  evaluate(minus(M,M2), MonthDiff) &
-  evaluate(minus(D,D2), DayDiff) &
-  evaluate(plus(imul(12, YearDiff), MonthDiff), PreliminaryMonths) &
-  evaluate(if(leq(DayDiff, -1), minus(PreliminaryMonths, 1), true, PreliminaryMonths), AgeInMonths).
 
-minor_or_dependent(C,Cl):-
-  person.dependent(Cl,yes).
-
-minor_or_dependent(C,Cl):-
-  person.dob(Cl,DOB) &
-  claim.time(C,C_D,C_T) &
-  get_age(C_D, DOB, Age) &
-  leq(Age,17).
-
-exception(C,P):-
-  claim.claimant(C,Cl) &
-  person.occupation(Cl,armed_forces) &
-  claim.consequence_of_occupation(C,yes).
-
-exception(C,P):-
-  claim.hospitalization(C,H) &
-  hospitalization.reason(H,home_health_care) &
-  home_not_covered_list(List) &
-  hospitalization.home_service(H,Service) &
-  member(Service,List).
-
-exception(C,P):-
-  claim.hospitalization(C,H) &
-  hospitalization.reason(H,home_health_care) &
-  claim.claimant(C,Cl) &
-  minor_or_dependent(C,Cl) &
-  hospitalization.family_member_present(H,no).
 
 %%% Services that have location restriction and visit limit in the policy year
 
@@ -157,8 +104,8 @@ eligible_service(C,P,preventive_care):-
   claim.claimant(C,Cl) &
   person.dob(Cl,DOB) &
   hospitalization.start_time(H,C_D,C_T) &
-  get_age(C_D, DOB, Y) &
-  get_age_in_months(C_D, DOB, M) &
+  get_date_diff(C_D, DOB, Y) &
+  get_date_diff_in_months(C_D, DOB, M) &
   age_range_limit_hepb(C,N,Y,M) &
   hospitalization.vaccine_dose_count(H,D) &
   leq(D,N).
@@ -530,6 +477,15 @@ get_date_diff(C_D, C_D2, Age) :-
   evaluate(minus(D,D2), DayDiff) &
   evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
   evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
+
+get_date_diff_in_months(C_D, DOB, AgeInMonths) :-
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2), YearDiff) &
+  evaluate(minus(M,M2), MonthDiff) &
+  evaluate(minus(D,D2), DayDiff) &
+  evaluate(plus(imul(12, YearDiff), MonthDiff), PreliminaryMonths) &
+  evaluate(if(leq(DayDiff, -1), minus(PreliminaryMonths, 1), true, PreliminaryMonths), AgeInMonths).
 
 lt(X,Y):-
   leq(X,Y) &

@@ -2,7 +2,7 @@
 
 %% test cases for preventive_care
 
-%% expected - covered(claim1) - yesa
+%% expected - covered(claim1) - yes
 %% covered(claim2) - no 
 claim.policy(claim1,policy1)
 policy.type(policy1,cardinal)
