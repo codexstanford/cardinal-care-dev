@@ -42,6 +42,8 @@ Hospitalization
 --- breast_pump_supplies
 --- physician_consultation
 --- allergy
+--- inpatient_surgical_services
+--- outpatient_surgical_services
 --- inpatient_care
 --- outpatient_surgery_facility_charges
 --- home_health_care
