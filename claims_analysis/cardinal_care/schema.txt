@@ -46,7 +46,13 @@ Hospitalization
 - type_of_care
 --- Emergency
 --- Non emergency
-
+- mother_hbsag (Mother's HBsAg status for hep_b vaccines)
+--- Negative
+--- Positive
+--- Unknown
+- vaccine_brand
+- anti_hbs_count (count of anti-HBs in mlU/mL for hep_b vaccines )
+-birth_weight (birth weight in grams)
 - home_service
 --- transportation
 --- homemaker_service
@@ -54,6 +60,7 @@ Hospitalization
 --- maintenance_therapy
 - service_provider
 - Vaccine
+- vaccine_count
 - Contraceptive service 
 - Allegy service
 - Contraceptive service 
