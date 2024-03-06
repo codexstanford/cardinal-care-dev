@@ -1,9 +1,9 @@
 covered(C):-
     claim.policy(C,P) &
     policy.type(P,T) &
-    covered(C,P,T).
+    covered_under_policy(C,P,T).
 
-covered(C,P,cardinal):-
+covered_under_policy(C,P,cardinal):-
     valid_insuree(C,P) &
     policy_active(C,P) &
     valid_hospitalization(C,P).
@@ -36,6 +36,15 @@ valid_hospitalization(C,P):-
   eligible_service(C,P,R) &
   ~exception(C,P).
 
+%% seperate rule for emergency room as out of network hospitals are covered
+valid_hospitalization(C,P):-
+  claim.hospitalization(C,H) &
+  hospitalization.reason(H,emergency_room) &
+  hospitalization.type_of_care(H,emergency) &
+  ~exception(C,P).
+
+
+%%% Services that have location restriction and visit limit in the policy year
 
 %%%%%%%%%%%%%%%%%%% Eligible Services %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % yearly limit and location
@@ -81,6 +90,20 @@ eligible_service(C,P,preventive_care):-
   valid_location(preventive_care,L) &
   check_age_range_limit(C,vaccine).
 
+eligible_service(C,P,preventive_care):-
+  claim.hospitalization(C,H) &
+  hospitalization.location(H,L) &
+  valid_location(preventive_care,L) &
+  hospitalization.vaccine(H,hep_b) &
+  claim.claimant(C,Cl) &
+  person.dob(Cl,DOB) &
+  hospitalization.start_time(H,C_D,C_T) &
+  get_date_diff(C_D, DOB, Y) &
+  get_date_diff_in_months(C_D, DOB, M) &
+  age_range_limit_hepb(C,N,Y,M) &
+  hospitalization.vaccine_dose_count(H,D) &
+  leq(D,N).
+
 eligible_service(C,P,female_contraceptives):-
   claim.claimant(C,Cl) &
   person.sex(Cl, female) &
@@ -111,6 +134,65 @@ eligible_service(C,P,outpatient_surgery_facility_charges):-
   valid_location(outpatient_surgery_facility_charges,L).
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Age limits for hep_b vaccines
+
+age_range_limit_hepb(C,1,Y,0).
+
+age_range_limit_hepb(C,3,Y,M):-
+  leq(2,M) &
+  leq(M,5).
+
+age_range_limit_hepb(C,4,Y,M):-
+  leq(6,M) &
+  leq(Y,17).
+
+age_range_limit_hepb(C,4,18,M):-
+  claim.hospitalization(C,H) &
+  hospitalization.vaccine_brand(H,twinrix).
+
+age_range_limit_hepb(C,4,Y,M):- 
+  leq(19,Y) &
+  leq(Y,200).
+
+age_range_limit_hepb(C,7,Y,M):-
+  leq(Y,2) &
+  claim.hospitalization(C,H) &
+  mother_hbsag_positive_unknown(H) &
+  hospitalization.anti_hbs_count(H,Count) &
+  leq(Count,10).
+
+mother_hbsag_positive_unknown(H):-
+  hospitalization.mother_hbsag(H,positive)
+
+mother_hbsag_positive_unknown(H):-
+  hospitalization.mother_hbsag(H,unknown)
+
+age_range_limit_hepb(C,7,Y,M):-
+  leq(Y,2) &
+  claim.hospitalization(C,H) &
+  hospitalization.birth_weight(H,Weight) &
+  leq(Weight,2000) &
+  hospitalization.anti_hbs_count(H,Count) &
+  leq(Count,10).
+
+age_range_limit_hepb(C,7,Y,M):-
+  claim.claimant(C,Cl) &
+  eligible_for_revaccination(Cl) &
+  person.occupation(Cl,healthcare_worker) &
+  hospitalization.anti_hbs_count(H,Count) &
+  leq(Count,10).
+
+eligible_for_revaccination(Cl):-
+  person.occupation(Cl,healthcare_worker)
+
+eligible_for_revaccination(Cl):-
+  person.condition(Cl,immunocompromised)
+
+eligible_for_revaccination(Cl):-
+  person.condition(Cl,hemodialysis_patient).
+
+
 % Age limit for cancer
 check_age_range_limit(Claim, cancer):- 
   claim.claimant(Claim,Cl) &
@@ -152,7 +234,7 @@ age_range_visit_vaccine(Claim1,Claim2):-
   person.dob(Person,DOB) &
   get_date_diff(C1_D, DOB, Age) &
   get_age_range_limit(vaccine,V,Age,Limit,MinAge,MaxAge) &
-  age_range_visit(Claim2,MinAge,MaxAge,DOB).
+  age_range_visit(Claim1,Claim2,MinAge,MaxAge,DOB).
 
 % check if the two claims are for the same cancer type and within the age range
 age_range_visit_cancer(Claim1,Claim2):-
@@ -172,11 +254,12 @@ age_range_visit_cancer(Claim1,Claim2):-
   person.dob(Person,DOB) &
   get_date_diff(C1_D, DOB, Age) &
   get_age_range_limit(cancer,Cancer,Age,Limit,MinAge,MaxAge) &
-  age_range_visit(Claim2,MinAge,MaxAge,DOB).
+  age_range_visit(Claim1,Claim2,MinAge,MaxAge,DOB).
 
 % check if the claim is within the age range
-age_range_visit(Claim2,MinAge,MaxAge,DOB):-
+age_range_visit(Claim1,Claim2,MinAge,MaxAge,DOB):-
   claim.time(Claim2,C2_D,C2_T) &
+  claim.time(Claim1,C1_D,C1_T) &
   get_date_diff(C2_D, DOB, Age2) &
   leq(Age2,MaxAge) &
   leq(MinAge,Age2) &
@@ -245,8 +328,9 @@ visit_current_year(Service,Claim1,Claim2):-
   claim.time(Claim2,C2_D,C2_T) &
   get_timestamp_from_datetime(C1_D,C1_T,C1_TS) &
   get_timestamp_from_datetime(C2_D,C2_T,C2_TS) &
-  lt(C2_TS,C1_TS) &
-  covered(Claim2)
+  lt(C2_TS,C1_TS) 
+  % &
+  % covered(Claim2)
   
 contraceptive_location_check(Service,L):-
   valid_location_contraceptive(Service,L).
@@ -332,7 +416,7 @@ valid_service_provider(outpatient_surgical_services, surgical_assistant)
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
 covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services])
-covered_list([breast_pump_supplies,walk_in_clinics]).
+covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing]).
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 age_range_limit(vaccine,covid,0,200,3).
 age_range_limit(vaccine,polio,0,5,5).
@@ -388,6 +472,15 @@ get_date_diff(C_D, C_D2, Age) :-
   evaluate(plus(imul(31,MonthDiff), DayDiff), MDDiff) &
   evaluate(plus(YearDiff, if(leq(MDDiff,-1), -1, true, 0)), Age)
 
+get_date_diff_in_months(C_D, DOB, AgeInMonths) :-
+  evaluate(parsedate(C_D),[D,M,Y]) &
+  evaluate(parsedate(DOB),[D2,M2,Y2]) &
+  evaluate(minus(Y,Y2), YearDiff) &
+  evaluate(minus(M,M2), MonthDiff) &
+  evaluate(minus(D,D2), DayDiff) &
+  evaluate(plus(imul(12, YearDiff), MonthDiff), PreliminaryMonths) &
+  evaluate(if(leq(DayDiff, -1), minus(PreliminaryMonths, 1), true, PreliminaryMonths), AgeInMonths).
+
 lt(X,Y):-
   leq(X,Y) &
   ~same(X,Y).
@@ -400,3 +493,4 @@ minor_or_dependent(C,Cl):-
   claim.time(C,C_D,C_T) &
   get_date_diff(C_D, DOB, Age) &
   leq(Age,17).
+
