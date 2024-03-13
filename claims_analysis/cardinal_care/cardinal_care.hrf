@@ -40,12 +40,6 @@ valid_hospitalization(C,P):-
   claim.type_of_care(C,emergency) &
   ~exception(C,P).
 
-definition(parsedate(DATE),map(readstring,tail(matches(stringify(DATE),"(..)_(..)_(....)"))))
-definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..)"))))
-definition(tail(X!L),L)
-
-
-
 
 %%% Services that have location restriction and visit limit in the policy year
 
