@@ -8,8 +8,8 @@ Claim
 
 
 Hospitalization
-- Startdate
-- Enddate
+- hosp_start_time
+- hosp_end_time
 - Hospital
 --- stanford_medical_center
 --- menlo_medical_clinic
@@ -74,6 +74,9 @@ Hospitalization
 - Consequence_of_occupation
 - screening_type
 - cancer_type
+- previous_vaccines_pfizer (for covid)
+- previous_vaccines_moderna (for covid)
+- previous_vaccines_other (for covid, covers janssen and novovax only)
 
 Person
 - DOB

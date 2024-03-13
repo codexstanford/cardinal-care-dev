@@ -94,6 +94,24 @@ eligible_service(C,P,preventive_care):-
   claim.vaccine_dose_count(C,D) &
   leq(D,N).
 
+eligible_service(C,P,preventive_care):-
+  claim.location(C,L) &
+  valid_location(preventive_care,L) &
+  claim.vaccine(C,covid) &
+  claim.claimant(C,Cl) &
+  person.dob(Cl,DOB) &
+  claim.hosp_start_time(C,C_D,C_T) &
+  get_date_diff(C_D, DOB, Y) &
+  get_date_diff_in_months(C_D, DOB, M) &
+  person.immunocompromised(Cl,Immuno_Status) &
+  claim.vaccine_brand(C,Type) &
+  claim.previous_vaccines_pfizer(C,Count_P) &
+  claim.previous_vaccines_moderna(C,Count_M) &
+  claim.previous_vaccines_other(C,Count_O) &
+  age_range_limit_covid(C,N,Y,M,Immuno_Status,Type,Count_P,Count_M,Count_O) &
+  claim.vaccine_dose_count(C,D) &
+  leq(D,N).
+
 eligible_service(C,P,female_contraceptives):-
   claim.claimant(C,Cl) &
   person.sex(Cl, female) &
@@ -121,6 +139,67 @@ eligible_service(C,P,outpatient_surgery_facility_charges):-
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%% Age limits for covid vaccines
+age_range_limit_covid(C,2,Y,M,no,moderna,0,0,0):-
+  leq(Y,4) &
+  leq(6,M).
+
+age_range_limit_covid(C,3,Y,M,I,pfizer,0,0,0):-
+  leq(Y,4) &
+  leq(6,M).
+
+age_range_limit_covid(C,1,Y,M,no,moderna,P_doses,M_doses,O_doses):-
+  leq(Y,4) &
+  leq(6,M) &
+  leq(1,M_doses).
+
+age_range_limit_covid(C,2,Y,M,I,pfizer,1,M_doses,O_doses):-
+  leq(Y,4) &
+  leq(6,M).
+
+age_range_limit_covid(C,1,Y,M,I,pfizer,P_doses,M_doses,O_doses):-
+  leq(Y,4) &
+  leq(6,M) &
+  leq(2,P_doses).
+
+age_range_limit_covid(C,1,Y,M,no,pfizer,0,0,0):-
+  leq(5,Y).
+
+age_range_limit_covid(C,1,Y,M,no,moderna,0,0,0):-
+  leq(5,Y).
+
+age_range_limit_covid(C,2,Y,M,I,novovax,0,0,0):-
+  leq(5,Y).
+
+age_range_limit_covid(C,1,Y,M,no,V,P_doses,M_doses,O_doses):-
+  evaluate(plus(P_doses,M_doses,O_doses),Total) &
+  leq(5,Y) &
+  leq(1,Total).
+
+age_range_limit_covid(C,3,Y,M,yes,moderna,0,0,0):-
+  leq(6,M).
+
+age_range_limit_covid(C,2,Y,M,yes,moderna,P_doses,1,O_doses):-
+  leq(6,M).
+
+age_range_limit_covid(C,1,Y,M,yes,moderna,P_doses,M_doses,O_doses):-
+  leq(6,M) &
+  leq(2,P_doses).
+
+age_range_limit_covid(C,3,Y,M,yes,pfizer,0,0,0):-
+  leq(5,Y).
+
+age_range_limit_covid(C,2,Y,M,yes,pfizer,1,M_doses,O_doses):-
+  leq(5,Y).
+
+age_range_limit_covid(C,1,Y,M,yes,pfizer,P_doses,M_doses,O_doses):-
+  leq(5,Y) &
+  leq(2,P_doses).
+
+age_range_limit_covid(C,1,Y,M,yes,V,P_doses,M_doses,O_doses):-
+  leq(12,Y) &
+  leq(1,O_doses).
+  
 %%% Age limits for hep_b vaccines
 
 age_range_limit_hepb(C,1,Y,0).
