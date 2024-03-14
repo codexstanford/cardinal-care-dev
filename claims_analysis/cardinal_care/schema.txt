@@ -73,6 +73,7 @@ Claim
 - previous_vaccines_pfizer (for covid)
 - previous_vaccines_moderna (for covid)
 - previous_vaccines_other (for covid, covers janssen and novovax only)
+- previous_vaccines_flu_more_than_2
 
 Person
 - DOB
