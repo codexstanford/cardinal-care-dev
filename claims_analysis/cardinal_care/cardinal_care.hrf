@@ -125,8 +125,8 @@ eligible_service(C,P,preventive_care):-
   claim.hosp_start_time(C,C_D,C_T) &
   get_date_diff_in_months(C_D, DOB, M) &
   claim.previous_vaccines_flu_more_than_2(Prev_Count) & % more than 2 vaccine doses till now (not annual)
-  age_range_limit_flu(C,N,min_age,max_age,Prev_Count) &
-  leq(min_age, M) & leq (M, max_age) &
+  age_range_limit_flu(C,N,Min_age,Max_age,Prev_Count) &
+  leq(Min_age, M) & leq (M, Max_age) &
   claim.vaccine_dose_count_annual(C,D) &
   leq(D,N).
 
