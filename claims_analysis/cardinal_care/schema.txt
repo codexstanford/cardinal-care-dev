@@ -1,15 +1,15 @@
 Schema
 
 Claim
-- policy
-- time
-- claimant
-- hospitalization
+- Policy
+- Date
+- Claimant
+- Hospitalization
 
 
 Hospitalization
-- Startdate
-- Enddate
+- hosp_start_time
+- hosp_end_time
 - Hospital
 --- stanford_medical_center
 --- menlo_medical_clinic
@@ -30,14 +30,16 @@ Hospitalization
 --- home
 --- hospital
 - Reason
---- rountine_physical
---- preventive_care
---- gynecological_exam
 --- specialized_screening_counselling
 ----- cancer
 ----- obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum
---- breast_pump_supplies
+--- preventive_care
 --- female_contraceptives
+--- routine_physical
+--- gynecological_exam
+--- physician_consultation
+--- allergy
+--- breast_pump_supplies
 --- physician_consultation
 --- allergy
 --- inpatient_surgical_services
@@ -47,29 +49,44 @@ Hospitalization
 --- home_health_care
 --- non_surgical_physican_service
 - family_member_present (Family Member or Caregiver Present)
+- type_of_care
+--- Emergency
+--- Non emergency
+- mother_hbsag (Mother's HBsAg status for hep_b vaccines)
+--- Negative
+--- Positive
+--- Unknown
+- vaccine_brand
+- anti_hbs_count (count of anti-HBs in mlU/mL for hep_b vaccines )
+-birth_weight (birth weight in grams)
 - home_service
 --- transportation
 --- homemaker_service
 --- home_delivery
 --- maintenance_therapy
 - service_provider
-- vaccine
-- contraceptive_service
-- consequence_of_occupation
+- Vaccine
+- vaccine_count
+- Contraceptive service 
+- Allegy service
+- Contraceptive service 
+- Allegy service
+- Consequence_of_occupation
 - screening_type
 - cancer_type
+- previous_vaccines_pfizer (for covid)
+- previous_vaccines_moderna (for covid)
+- previous_vaccines_other (for covid, covers janssen and novovax only)
 
 Person
-- dob
-- occupation
-- sex
---- Male
---- Female
-- dependent
+- DOB
+- Occupation
+- Sex
+- Dependent
 
 Policy
-- type
-- insuree
-- startdate
+- Type
+- Insuree
+- Startdate
 - enddate
 
