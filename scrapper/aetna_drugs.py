@@ -8,7 +8,7 @@ response = requests.get(url)
 soup = BeautifulSoup(response.text, 'html.parser')
 
 a_tags = soup.find_all('a', id=lambda x: x and x.startswith('lbDrug_'))
-drug_list = [a['onclick'].split('drugNameClicked(')[-1].split(');')[0].split(',') for a in a_tags[:2000]]
+drug_list = [a['onclick'].split('drugNameClicked(')[-1].split(');')[0].split(',') for a in a_tags]
 drug_info = []
 while len(drug_list) > 0:
     drug_name, _, drug_id = drug_list[-1]
@@ -39,6 +39,9 @@ while len(drug_list) > 0:
             generic_name = tds[0]
         generic_name = generic_name.text
         print(brand_name, generic_name)
+        therapeutic_classes = tds[1].find_all('a')
+        therapeutic_class = therapeutic_classes[0].text.replace('-', '_')
+        subtherapeutic_class = therapeutic_classes[1].text.replace('-', '_')
         dose = tds[2].text
         status = tds[3].find('img')['alt']
         notes = []
@@ -49,8 +52,22 @@ while len(drug_list) > 0:
             details = a['onclick'].split('Details: |')[-1].split("'")[0].strip()
             notes.append(img['alt'] + ': ' + details)
 
-        drug_info.append([drug_id, generic_name, '' if brand_name is None else brand_name, dose, status, notes])
+        drug_info.append([drug_id, generic_name, '' if brand_name is None else brand_name, therapeutic_class, subtherapeutic_class, dose, status, notes])
         tr = tr.find_next_sibling('tr')
 
-df = pd.DataFrame(drug_info, columns=['drug_id', 'generic_name', 'brand_name', 'dose', 'status', 'notes'])
-df.to_csv('../external_data/aetna_drugs.csv', index=False, mode='a', header=False)
+cols = ['drug_id', 'generic_name', 'brand_name', 'therapeutic_class', 'subtherapeutic_class', 'dose', 'status', 'notes']
+
+df = pd.DataFrame(drug_info, columns=cols)
+df.to_csv('../external_data/aetna_drugs.csv', index=False, mode='w', header=False)
+
+with open('../external_data/aetna_drugs.hdf', 'w') as f:
+    for i, values in df.iterrows():
+        for col in cols[:-1]:
+            f.write(f'aetna_drugs.{col}(prescription_drug_{i}, {str(values[col]).replace(" ", "_").lower()})\n')
+        for note in values['notes']:
+            if notes == '':
+                continue
+            type = note.split(': ')[0].replace(' ', '_').lower()
+            note = note.split(': ')[1].replace(' ', '_').lower().replace('.', '').replace('(', '').replace(')', '')
+            f.write(f'aetna_drugs.note(prescription_drug_{i}, {type}, {note})\n')
+        f.write('\n')
