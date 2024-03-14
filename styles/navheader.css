@@ -1,0 +1,16 @@
+.nav-header-container {
+    display: flex;
+    width: 80vw;
+    margin: 40px auto auto auto;
+}
+
+.nav-header-container button {
+    padding: 10px 20px;
+    height: 50px;
+    font-size: 12pt;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    color: #A5A2AA;
+    border: 2px solid #A5A2AA;
+}

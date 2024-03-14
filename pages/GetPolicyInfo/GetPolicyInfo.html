@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get Policy Info</title>
+    <link rel="stylesheet" href="../../styles/variables.css">
+    <link rel="stylesheet" href="../../styles/progressbar.css">
+    <link rel="stylesheet" href="../../styles/inputfields.css">
+    <link rel="stylesheet" href="GetPolicyInfo.css">
+</head>
+<body>
+    <div id="header-container"> 
+        <button id = "back-button">BACK</button>
+        
+        <div class="progress-bar">
+        </div>
+    
+        <button id = "profile-button">PROFILE</button>
+      </div>  
+    
+      <div id="main-content-container">
+        <div id="all-question-container">
+          <div class="single-question-container" style="display: none;">
+            <div class="question-text">Which of the following policies do you have?</div>
+    
+            <div id="policy-multiselect-container" class = "question-input-container">
+              <button class="policy-multiselect-button">AETNA CARDINAL CARE</button>
+              <button class="policy-multiselect-button">KAISER HMO (not implemented)</button>
+            </div>
+          </div>
+
+          <div class="single-question-container" style="display: none;">
+            <div class="question-text">When does your coverage <br>start and end?</div>
+    
+            <div id="coverage-date-input-container" class = "question-input-container">
+                <label for="coverage-start-date-input" class="text-input-label">START DATE</label>
+                <input type="text" class="text-input-field" id="coverage-start-date-input" name="coverage-start-date" placeholder="MM-DD-YYYY">
+                
+                <label for="coverage-end-date-input" class="text-input-label">END DATE</label>
+                <input type="text" class="text-input-field" id="coverage-end-date-input" name="coverage-end-date" placeholder="MM-DD-YYYY">
+            </div>
+          </div>
+        </div>
+    
+        <button id="next-finish-button" >NEXT</button>
+      </div>
+
+    <script src="../../src/plain-js/epilog.js"></script>
+    <script type = "module" src="../../out/pages/GetPolicyInfo.js"></script>
+    
+</body>
+</html>

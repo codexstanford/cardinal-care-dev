@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cardinal Care Dev - Sign In </title>
+  <link rel="stylesheet" href="../../styles/variables.css">
+  <link rel="stylesheet" href="../../styles/inputfields.css">
+  <link rel="stylesheet" href="../../styles/navheader.css">
+  <link rel="stylesheet" href="SignIn.css">
+</head>
+
+<body id="page-container">
+
+  <div id="header-container" class="nav-header-container">
+    <button id="back-button">BACK</button>
+  </div>
+
+  <div id="main-content-container">
+    <div id="username-signin-input-container" class="question-input-container">
+      <label for="username-signin-input-field" class="text-input-label">USERNAME</label>
+      <input type="text" class="text-input-field" id="username-signin-input-field" name="username-signin">
+    </div>
+
+    <div id="password-signin-input-container" class="question-input-container">
+
+      <label for="password-signin-input-field" class="text-input-label">PASSWORD</label>
+      <input type="password" class="text-input-field" id="password-signin-input-field" name="password-signin">
+    </div>
+
+    <button id="signin-button" class="disabled-button">SIGN IN</button>
+
+    <div class="helper-text-container">
+      <div class="helper-text">Forgot your password? <a class="helper-link">Click here</a></div>
+      <div class="helper-text">Don't have an account? <a class="helper-link" href="../SignUp/SignUp.html">Sign up</a></div>
+    </div>
+
+  </div>
+
+  <script src="../../src/plain-js/epilog.js"></script>
+  <script type="module" src="../../out/pages/SignIn.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Explore Coverage</title>
+    <link rel="stylesheet" href="../../styles/variables.css">
+    <link rel="stylesheet" href="ExploreCoverage.css">
+</head>
+<body>
+
+  <div id="header-container"> 
+    <button id = "back-button">BACK</button>
+
+    <button id = "profile-button">PROFILE</button>
+  </div>
+
+  <table id="claims-processing-table">
+    <tr id ="coverage-indicator" class="covered-false">
+      <td colspan="2">Covered</td>
+    </tr>
+
+    <!-- Policy Information -->
+    <tr id="policy-info-heading" class="claims-processing-section-heading">
+      <td colspan="2"><strong>Policy Information</strong></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="2">Policy ID: <input type="text" id="policy_id_input" value="policy1"></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="2">Insuree: <input type="text" id="policy_insuree_input" value="person1"></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="1">Start Date of Policy: <input type="date" id="policy_startdate_input" value="2024-01-01"></td>
+      <td colspan="1">End Date of Policy: <input type="date" id="policy_enddate_input" value="2025-01-01"></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="2">Policy Territory [Placeholder]: <select id="policy_territory_input" class="option-dropdown" name="policy_territory">
+        <option value="california">California</option>
+        <option value="none"></option>
+        <option value="washington">Washington</option>
+      </select></td>
+    </tr>
+    <tr class="info-row policy-info-row">
+      <td colspan="1">Has Hot Works Exclusion Endorsement: <input type="checkbox" id="policy_hot_works_exclusion_endorsement_input" checked></td>
+      <td colspan="1">Has Hot Works Precaution Amendment Endorsement: <input type="checkbox" id="policy_hot_works_precaution_amendment_endorsement_input" checked></td>
+    </tr>
+
+    <!-- Remainder of form is generated via code in axa_ppl_hot_works.js -->
+
+
+  <script src="../../src/plain-js/epilog.js"></script>
+  <script type = "module" src="../../out/pages/ExploreCoverage.js"></script>
+</body>
+</html>

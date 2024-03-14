@@ -2,29 +2,41 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background-color: var(--main-bg-color);
 }
 
-nav {
-  background-color: lightgray;
-  color: #fff;
-  text-align: center;
-  padding: 10px 0;
-  margin-bottom: 20px;
-  border: black solid 1px;
-  font-size: 40px;
+#header-container {
+  display: flex;
+  width: 80vw;
+  justify-content: space-around;
+  margin: 50px auto auto auto;
 }
 
-nav a {
-  color: black;
+#header-container button {
+  padding: 10px 20px;
+  height: 50px;
+  font-size: 12pt;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: transparent;
+  color: #A5A2AA;
+  border: 2px solid #A5A2AA;
 }
 
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
 #claims-processing-table {
   width: 60vw;
   margin: 20px auto;
   border-collapse: collapse;
-  border: 2px solid #000;
+  border: var(--main-bg-color) solid 2px;
   text-align: center;
+  color: #000000;
 }
 
 #coverage-indicator {
@@ -46,10 +58,13 @@ nav a {
   color: white;
 }
 
+.claims-processing-section-heading, .claims-processing-section-subheading, .claims-processing-section-subsubheading {
+  border: var(--main-bg-color) solid 1px;
+  text-align: center;
+}
+
 .claims-processing-section-heading {
   background-color: lightblue;
-  border: black solid 1px;
-  text-align: center;
 }
 
 .claims-processing-section-heading td {
@@ -58,8 +73,6 @@ nav a {
 
 .claims-processing-section-subheading {
   background-color: #DDF8F6;
-  border: black solid 1px;
-  text-align: center;
 }
 
 .claims-processing-section-subheading td {
@@ -68,8 +81,6 @@ nav a {
 
 .claims-processing-section-subsubheading {
   background-color: #EEF8F6;
-  border: black solid 1px;
-  text-align: center;
 }
 
 .claims-processing-section-subsubheading td {
@@ -77,14 +88,14 @@ nav a {
 }
 
 tr.info-row {
-  background-color: #fff;
+  background-color: var(--claim-table-bg-color);
   text-align: left;
   font-size: 16px;
 }
 
 tr.info-row td {
   padding: 10px;
-  border: solid black 1px;
+  border: var(--main-bg-color) solid 1px;
 }
 
 input[type="checkbox"] {

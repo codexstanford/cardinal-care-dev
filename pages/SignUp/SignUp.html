@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cardinal Care Dev - Sign Up </title>
+  <link rel="stylesheet" href="../../styles/variables.css">
+  <link rel="stylesheet" href="../../styles/progressbar.css">
+  <link rel="stylesheet" href="../../styles/inputfields.css">
+  <link rel="stylesheet" href="SignUp.css">
+</head>
+<body id="page-container">
+  <div id="header-container"> 
+    <button id = "back-button">BACK</button>
+    
+    <div class="progress-bar">
+    </div>
+
+    <button id = "signin-nav-button">SIGN IN</button>
+  </div>
+
+  <div id="main-content-container">
+    <div id="all-question-container">
+
+      <div class="single-question-container" style="display: none;">
+        <div class="question-text-container">
+          <div class="question-text">Pick a username</div>
+        </div>
+
+        <div id="username-input-container" class="question-input-container">
+            <label for="username-input-field" class="text-input-label">USERNAME</label>
+            <input type="text" class="text-input-field" id="username-input-field" name="username">
+        </div>
+
+        <button class="progress-question-button" id="username-question-button">NEXT</button>
+      </div>
+      <div class="single-question-container" style="display: none;">
+        <div class="question-text-container">
+          <div class="question-text question-maintext">What's your email?</div>
+          <div class="question-text question-subtext">We'll send you password for your account.</div>
+        </div>
+
+        <div id="email-input-container" class="question-input-container">
+            <label for="email-input-field" class="text-input-label">EMAIL</label>
+            <input type="text" class="text-input-field" id="email-input-field" name="email">
+        </div>
+
+        <button class="progress-question-button" id = "send-email-button">SEND EMAIL</button>
+        
+      </div>
+
+      <div class="single-question-container"  style="display: none;">
+        <div class="question-text-container">
+          <div class="question-text question-maintext">Check your email</div>
+          <div class="question-text question-subtext">You should have received a message with the <br> subject line "www-data".</div>
+        </div>
+
+        <div id="username-signin-input-container" class="question-input-container">
+            <label for="username-signin-input-field" class="text-input-label">USERNAME</label>
+            <input type="text" class="text-input-field" id="username-signin-input-field" name="username-signin">
+        </div>
+
+        <div id="password-signin-input-container" class="question-input-container">
+            <label for="password-signin-input-field" class="text-input-label">PASSWORD</label>
+            <input type="password" class="text-input-field" id="password-signin-input-field" name="password-signin">
+        </div>
+
+        <button class="progress-question-button" id = "signin-button">SIGN IN</button>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../../src/plain-js/epilog.js"></script>
+  <script type = "module" src="../../out/pages/SignUp.js"></script>
+</body>
+</html>
