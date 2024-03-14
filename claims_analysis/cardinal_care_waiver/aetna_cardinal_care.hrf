@@ -6,7 +6,7 @@ covered(C) :-
 covered(C, P, cardinal) :-
   valid_insuree(C,P) &
   policy_active(C,P) &
-  claim.type(C, T) &
+  claim.reason(C, T) &
   eligible_service(C,P,T)
 
 valid_insuree(C,P) :-
@@ -28,32 +28,105 @@ get_timestamp_from_date(DATE,STAMP) :-
   evaluate(maketimestamp(Y,M,D,1,1,1), STAMP)
 
 eligible_service(C, P, prescription):-
-  claim.type(C, prescription) &
+  claim.reason(C, prescription) &
   claim.item(C, X) &
   elligible_prescription(C, P, X)
 
 elligible_prescription(C, P, X) :-
-  prescriptions_list(List) &
-  member(X, List) &
-  prescription_cost(C, P, X)
+  aetna_drugs(List) &
+  aetna_drugs.drug_id(X, N) & % Check that there doeds exist a drug_id 
+  ~exception_prescriptions(C, P, X) &
+  prescription_cost(C, P, X) 
+
+% Encoding of exception:
+exception_prescriptions(C, P, X) :-
+  %aetna_drugs.note(X, Label, Note) &
+  %exception_prescriptions_note(C, P, X, Label, Note)
+  % distinct(List, []) % & % If any notes exist, then there is an exception. NOT A LONG TERM SOLUTION
+  % For example, will result in a user "drop down" for now. Then we can ask how many received in past X days, 
+  % but once again like with waiver, kind of similar to "changes based on prescription so wasted work may occur"
+
+exception_prescriptions_note(C, P, X, Label, Note) :-
+  same(Label, age_restriction) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :-
+  same(Label, ibc) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :-
+  same(Label, lgc) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :- % Drug coverage for Student Health Members!!!
+  same(Label, n10) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :- % Drug tier when CE does not apply
+  same(Label, n7) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :- % Drug specific coverage
+  same(Label, n8) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :-
+  same(Label, prior_authorization) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :- % Quantity Limit Restriction Based on Age
+  same(Label, qlr) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :-
+  same(Label, quantity_limit) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :-
+  same(Label, select_otc_program) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :- % Only available for select plans
+  same(Label, spc) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :-
+  same(Label, step_therapy) 
+
+exception_prescriptions_note(C, P, X, Label, Note) :- % Safert and/or more effective treatements are available (not an exclusion then)
+  %same(Label, stx) 
 
 prescription_cost(C, P, X) :-
-  prescription.tier(X, T) &
-  gt(T, 0) % &
-  %tier.prescriptions_tier_cost(T, C)
+  aetna_drugs.status(X, T) &
+  distinct(T, nf) &
+  prescription_tier_cost(T, N) %& % numerical value to add later
+  % cost_to_add(C, P, N)  % relation to add to coverage sum
+
+prescription_cost(C, P, X) :-
+  aetna_drugs.status(X, T) &
+  same(T, nf) &
+  aetna_drugs.note(X, Label, Note) &
+  same(Label, n10) &
+  prescription_tier_cost(T, Note) %& % numerical value to add later
+  % cost_to_add(C, P, N)  % relation to add to coverage sum
   
 ~international(cardinal)
 
-prescriptions_list([ibuprofen, diphenhydramine_hcl, oxycodone_hcl, tracleer, cayston]).
-prescription.tier(ibuprofen, 1)
-prescription.tier(diphenhydramine_hcl, 1)
-prescription.tier(ocycodone_hcl, 1)
-prescription.tier(cayston, 0)        % Denotes not covered
-prescription_tier_cost(1, 10)
-prescription_tier_cost(2, 35)
-prescription_tier_cost(3, 50)
-prescription_tier_cost(4, 50)
-prescription_tier_cost(5, 50)
+% prescriptions_list([ibuprofen_oral_tablet_400_mg, cayston_inhalation_solution_reconstituted_75_mg]) % Need to scale this properly (change to prescription_drug_X)???
+% Current data doesn't have presciptions in list form; need string processing to get the id
+
+aetna_drugs.drug_id(prescription_drug_2158, 010518)
+aetna_drugs.generic_name(prescription_drug_2158, ibuprofen_oral_tablet_400_mg)
+aetna_drugs.brand_name(prescription_drug_2158, )
+aetna_drugs.therapeutic_class(prescription_drug_2158, analgesics___drugs_to_treat_pain_and_inflammation)
+aetna_drugs.subtherapeutic_class(prescription_drug_2158, nsaids)
+aetna_drugs.dose(prescription_drug_2158, tablet_400_mg)
+aetna_drugs.status(prescription_drug_2158, pg)
+
+aetna_drugs.drug_id(prescription_drug_3182, 147190)
+aetna_drugs.generic_name(prescription_drug_3182, aztreonam_lysine)
+aetna_drugs.brand_name(prescription_drug_3182, cayston_inhalation_solution_reconstituted_75_mg)
+aetna_drugs.therapeutic_class(prescription_drug_3182, respiratory___drugs_to_treat_breathing_disorders)
+aetna_drugs.subtherapeutic_class(prescription_drug_3182, cystic_fibrosis)
+aetna_drugs.dose(prescription_drug_3182, solution_reconstituted_75_mg)
+aetna_drugs.status(prescription_drug_3182, nf)
+
+
+% nf Denotes not covered
+prescription_tier_cost(pg, 10)
+prescription_tier_cost(pb, 35)
+prescription_tier_cost(npb, 50)
+prescription_tier_cost(sp, 50)
+prescription_tier_cost(ce, 50)
 
 lt(X,Y):-
   leq(X,Y) &

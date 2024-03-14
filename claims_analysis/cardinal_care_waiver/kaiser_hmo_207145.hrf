@@ -45,9 +45,29 @@ elligible_prescription(C, P, X) :-      % QWuantity Limit and other exceptions
 
 prescription_cost(C, P, X) :-
   prescription.tier(X, T) &
-  gt(T, 0) % &
-  %tier.prescriptions_tier_cost(T, C)
+  prescriptions_tier_cost(T, C)
+
+% Using actual data format will transitition to this! 
+% elligible_prescription(C, P, X) :-
+%   kaiser_hmo_drugs(List) &
+%   kaiser_hmo_drugs.drug_id(X, N) & % Check that there doeds exist a drug_id 
+%   ~exception_prescriptions(C, P, X) &
+%   prescription_cost(C, P, X) 
+
+% % Encoding of exception:
+% exception_prescriptions(C, P, X) :-
+%   kaiser_hmo_drugs.note(X)
+%   % distinct(List, []) % & % If any notes exist, then there is an exception. NOT A LONG TERM SOLUTION
+%   % For example, will result in a user "drop down" for now. Then we can ask how many received in past X days, 
+%   % but once again like with waiver, kind of similar to "changes based on prescription so wasted work may occur"
+
+% prescription_cost(C, P, X) :-
+%   kaiser_hmo_drugs.status(X, T) &
+%   prescription_tier_cost(T, N) %& % numerical value to add later, should account for non-formulary by this relation failing
+%   % cost_to_add(C, P, N)  % relation to add to coverage sum
   
+
+
 ~international(kaiser_hmo)
 
 prescriptions_list([ibuprofen, diphenhydramine_hcl, oxycodone_hcl, tracleer, cayston]).
