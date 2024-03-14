@@ -127,7 +127,7 @@ eligible_service(C,P,preventive_care):-
   claim.previous_vaccines_flu_more_than_2(Prev_Count) & % more than 2 vaccine doses till now (not annual)
   age_range_limit_flu(C,N,min_age,max_age,Prev_Count) &
   leq(min_age, M) & leq (M, max_age) &
-  claim.vaccine_dose_count(C,D) &
+  claim.vaccine_dose_count_annual(C,D) &
   leq(D,N).
 
 eligible_service(C,P,female_contraceptives):-

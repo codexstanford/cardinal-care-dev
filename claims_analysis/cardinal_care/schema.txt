@@ -62,7 +62,8 @@ Claim
 --- maintenance_therapy
 - service_provider
 - Vaccine
-- vaccine_count
+- vaccine_dose_count
+- vaccine_dose_count_annual
 - Contraceptive service 
 - Allegy service
 - Contraceptive service 
