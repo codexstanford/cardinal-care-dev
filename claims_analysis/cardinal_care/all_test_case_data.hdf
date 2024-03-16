@@ -1,4 +1,5 @@
-%% expected - covered(X) - claim1,claim3,claim5,claim6,claim8,claim11,claim12, claim_a1, claim_a2, claim_a3, claim_a4, claim_a6, claim_a9, claim_a11
+%% expected - covered(X) - claim1,claim3,claim5,claim6,claim8,claim11,claim12, 
+%% claim_a1, claim_a2, claim_a3, claim_a4, claim_a6, claim_a9, claim_a11,claim_a14,claim_a17
 
 %% test cases for preventive_care
 
@@ -68,6 +69,7 @@ claim.location(claim4,phys_office)
 
 claim.time(claim3,01_01_2024,00_00)
 claim.time(claim4,01_02_2024,00_00)
+
 
 %% test cases for inpatient_care
 %% expected - covered(claim5) - yes
@@ -209,6 +211,63 @@ claim.consequence_of_occupation(claim13,no)
 claim.location(claim13,outpatient_dept)
 claim.service_provider(claim13,other)
 claim.time(claim13,01_01_2024,00_00)
+
+
+%% test cases for contraceptives
+%% expected - covered(claim14) - yes
+
+
+claim.policy(claim14,policy1)
+policy.type(policy1,cardinal)
+claim.claimant(claim14,person14)
+policy.insuree(policy1,person14)
+policy.startdate(policy1,person14,01_08_2023)
+policy.enddate(policy1,person14,30_06_2024)
+claim.hosp_start_time(claim14,02_09_2023,00_00)
+claim.hosp_end_time(claim14,02_09_2023,01_13)
+claim.hospital(claim14,stanford_medical_center)
+claim.reason(claim14,female_contraceptives)
+person.dob(person14,01_01_2001)
+person.occupation(person14,other)
+claim.consequence_of_occupation(claim14,no)
+claim.location(claim14,contra_office)
+claim.time(claim14,01_01_2024,00_00)
+claim.contraceptive_service(C,iud_with_progestin)
+
+claim.policy(claim15,policy1)
+policy.type(policy1,cardinal)
+claim.claimant(claim15,person15)
+policy.insuree(policy1,person15)
+policy.startdate(policy1,person15,01_08_2023)
+policy.enddate(policy1,person15,30_06_2024)
+claim.hosp_start_time(claim15,02_09_2023,00_00)
+claim.hosp_end_time(claim15,02_09_2023,01_13)
+claim.hospital(claim15,stanford_medical_center)
+claim.reason(claim15,female_contraceptives)
+person.dob(person15,01_01_2001)
+person.occupation(person15,other)
+claim.consequence_of_occupation(claim15,no)
+claim.location(claim15,contra_office)
+claim.time(claim15,01_01_2024,00_00)
+claim.contraceptive_service(C,other)
+
+claim.policy(claim16,policy1)
+policy.type(policy1,cardinal)
+claim.claimant(claim16,person16)
+policy.insuree(policy1,person16)
+policy.startdate(policy1,person16,01_08_2023)
+policy.enddate(policy1,person16,30_06_2024)
+claim.hosp_start_time(claim16,02_09_2023,00_00)
+claim.hosp_end_time(claim16,02_09_2023,01_13)
+claim.hospital(claim16,stanford_medical_center)
+claim.reason(claim16,female_contraceptives)
+person.dob(person16,01_01_2001)
+person.occupation(person16,other)
+claim.consequence_of_occupation(claim16,no)
+claim.location(claim16,hospital)
+claim.time(claim16,01_01_2024,00_00)
+claim.contraceptive_service(C,iud_with_progestin)
+
 
 %% test cases for hospice,skilled_nursing,emergency_room
 %% expected - covered(claim_a1), covered(claim_a2), covered(claim_a3) - yes
@@ -452,3 +511,79 @@ claim.location(claim_a13,phys_office)
 claim.previous_vaccines_pfizer(claim_a13,0)
 claim.previous_vaccines_moderna(claim_a13,0)
 claim.previous_vaccines_other(claim_a13,1)
+
+
+%% test cases for flu gvaccine
+%% expected - covered(X) - claim_a14,claim_a17
+
+claim.policy(claim_a14,policy1)
+claim.claimant(claim_a14,person_a14)
+policy.insuree(policy1,person_a14)
+policy.startdate(policy1,person_a14,01_08_2023)
+policy.enddate(policy1,person_a14,30_06_2024)
+claim.hosp_start_time(claim_a14,03_09_2023,00_00)
+claim.hosp_end_time(claim_a14,03_09_2023,01_13)
+claim.hospital(claim_a14,stanford_medical_center)
+claim.reason(claim_a14,preventive_care)
+claim.vaccine(claim_a14,flu)
+person.dob(person_a14,04_02_2023)
+person.occupation(person_a14,other)
+person.immunocompromised(person_a14,no)
+claim.consequence_of_occupation(claim_a14,no)
+claim.location(claim_a14,phys_office)
+claim.previous_vaccines_flu_more_than_2(claim_a14,no)
+claim.vaccine_dose_count(claim_a14,2)
+
+claim.policy(claim_a15,policy1)
+claim.claimant(claim_a15,person_a15)
+policy.insuree(policy1,person_a15)
+policy.startdate(policy1,person_a15,01_08_2023)
+policy.enddate(policy1,person_a15,30_06_2024)
+claim.hosp_start_time(claim_a15,03_09_2023,00_00)
+claim.hosp_end_time(claim_a15,03_09_2023,01_13)
+claim.hospital(claim_a15,stanford_medical_center)
+claim.reason(claim_a15,preventive_care)
+claim.vaccine(claim_a15,flu)
+person.dob(person_a15,04_02_2023)
+person.occupation(person_a15,other)
+person.immunocompromised(person_a15,no)
+claim.consequence_of_occupation(claim_a15,no)
+claim.location(claim_a15,phys_office)
+claim.previous_vaccines_flu_more_than_2(claim_a15,yes)
+claim.vaccine_dose_count(claim_a15,2)
+
+claim.policy(claim_a16,policy1)
+claim.claimant(claim_a16,person_a16)
+policy.insuree(policy1,person_a16)
+policy.startdate(policy1,person_a16,01_08_2023)
+policy.enddate(policy1,person_a16,30_06_2024)
+claim.hosp_start_time(claim_a16,03_09_2023,00_00)
+claim.hosp_end_time(claim_a16,03_09_2023,01_13)
+claim.hospital(claim_a16,stanford_medical_center)
+claim.reason(claim_a16,preventive_care)
+claim.vaccine(claim_a16,flu)
+person.dob(person_a16,04_02_2001)
+person.occupation(person_a16,other)
+person.immunocompromised(person_a16,no)
+claim.consequence_of_occupation(claim_a16,no)
+claim.location(claim_a16,phys_office)
+claim.previous_vaccines_flu_more_than_2(claim_a16,yes)
+claim.vaccine_dose_count(claim_a16,2)
+
+claim.policy(claim_a17,policy1)
+claim.claimant(claim_a17,person_a17)
+policy.insuree(policy1,person_a17)
+policy.startdate(policy1,person_a17,01_08_2023)
+policy.enddate(policy1,person_a17,30_06_2024)
+claim.hosp_start_time(claim_a17,03_09_2023,00_00)
+claim.hosp_end_time(claim_a17,03_09_2023,01_13)
+claim.hospital(claim_a17,stanford_medical_center)
+claim.reason(claim_a17,preventive_care)
+claim.vaccine(claim_a17,flu)
+person.dob(person_a17,04_02_2023)
+person.occupation(person_a17,other)
+person.immunocompromised(person_a17,no)
+claim.consequence_of_occupation(claim_a17,no)
+claim.location(claim_a17,phys_office)
+claim.previous_vaccines_flu_more_than_2(claim_a17,yes)
+claim.vaccine_dose_count(claim_a17,1)

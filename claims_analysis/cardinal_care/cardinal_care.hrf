@@ -112,9 +112,26 @@ eligible_service(C,P,preventive_care):-
   claim.vaccine_dose_count(C,D) &
   leq(D,N).
 
+% Not implementing as these are recommendations and not mandatory requirements
+% LAIV4 should not be used during pregnancy but can be used postpartum. 
+% >= 65: recommend inactivated influenza vaccine (HD-IIV4), quadrivalent recombinant influenza vaccine (RIV4), or quadrivalent adjuvanted inactivated influenza vaccine (aIIV4). 
+% LAIV4 should not be used for persons with compromised immunity 
+eligible_service(C,P,preventive_care):-
+  claim.location(C,L) &
+  valid_location(preventive_care,L) &
+  claim.vaccine(C,flu) &
+  claim.claimant(C,Cl) &
+  person.dob(Cl,DOB) &
+  claim.hosp_start_time(C,C_D,C_T) &
+  get_date_diff_in_months(C_D, DOB, M) &
+  claim.previous_vaccines_flu_more_than_2(Prev_Count) & % more than 2 vaccine doses till now (not annual)
+  age_range_limit_flu(C,N,Min_age,Max_age,Prev_Count) &
+  leq(Min_age, M) & leq (M, Max_age) &
+  claim.vaccine_dose_count_annual(C,D) &
+  leq(D,N).
+
 eligible_service(C,P,female_contraceptives):-
   claim.claimant(C,Cl) &
-  person.sex(Cl, female) &
   claim.contraceptive_service(C,Service) &
   fda_approved(Service) &
   claim.location(C,L) &
@@ -255,6 +272,11 @@ eligible_for_revaccination(Cl):-
   person.condition(Cl,hemodialysis_patient).
 
 
+%%% Age limits for flu vaccines
+age_range_limit_flu(C,1,0,20000,PC).
+age_range_limit_flu(C,2,6,96,no).
+age_range_limit_flu(C,2,6,96,unknown).
+
 % Age limit for cancer
 check_age_range_limit(Claim, cancer):- 
   claim.claimant(Claim,Cl) &
@@ -383,12 +405,6 @@ visit_current_year(Service,Claim1,Claim2):-
   lt(C2_TS,C1_TS) 
   % &
   % covered(Claim2)
-  
-contraceptive_location_check(Service,L):-
-  valid_location_contraceptive(Service,L).
-
-contraceptive_location_check(sterilization_surgery_for_women,L).
-contraceptive_location_check(sterilization_surgery_for_men,L).
 
 %%%%%%%%%%%%%%%%%%% Exceptions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -447,12 +463,9 @@ valid_location(outpatient_surgery_facility_charges,surgery_center)
 valid_location(home_health_care,home)
 valid_location(non_surgical_physican_service,hospital)
 
-
-valid_location_contraceptive(counseling,contra_office)
-valid_location_contraceptive(rod,contra_office)
-valid_location_contraceptive(larc,contra_office)
-valid_location_contraceptive(preogestin,contra_office)
-valid_location_contraceptive(oral,contra_office)
+contraceptive_location_check(Service, contra_office).
+contraceptive_location_check(sterilization_surgery_for_women,L).
+contraceptive_location_check(sterilization_surgery_for_men,L).
 
 valid_service_provider(inpatient_surgical_services, operating_surgeon)
 valid_service_provider(inpatient_surgical_services, anesthetist)
@@ -477,11 +490,11 @@ age_range_limit(cancer,breast,0,200,1).
 
 fda_approved(counseling).
 fda_approved(rod).
+fda_approved(larc).
 fda_approved(oral).
+fda_approved(iud_with_preogestin).
 fda_approved(sterilization_surgery_for_women).
 fda_approved(sterilization_surgery_for_men).
-fda_approved(larc).
-fda_approved(iud_with_preogestin).
 fda_approved(implantable_rod).
 fda_approved(progestin_shot_injection).
 fda_approved(the_pill_estrogen_and_progestin).
