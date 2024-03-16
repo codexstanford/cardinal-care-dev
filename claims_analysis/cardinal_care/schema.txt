@@ -81,6 +81,7 @@ Person
 - Occupation
 - Sex
 - Dependent
+- immunocompromised
 
 Policy
 - Type
