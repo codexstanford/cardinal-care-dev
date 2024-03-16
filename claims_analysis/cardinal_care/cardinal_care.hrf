@@ -273,7 +273,7 @@ eligible_for_revaccination(Cl):-
 
 
 %%% Age limits for flu vaccines
-age_range_limit_flu(C,1,0,200,PC).
+age_range_limit_flu(C,1,0,20000,PC).
 age_range_limit_flu(C,2,6,96,no).
 age_range_limit_flu(C,2,6,96,unknown).
 
