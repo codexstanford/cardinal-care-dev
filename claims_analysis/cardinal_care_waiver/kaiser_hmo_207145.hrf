@@ -32,6 +32,7 @@ get_timestamp_from_date(DATE,STAMP) :-
   evaluate(parsedate(DATE),[D,M,Y]) &
   evaluate(maketimestamp(Y,M,D,1,1,1), STAMP)
 
+% Prescriptions
 eligible_service(C, P, prescription):-
   claim.type(C, prescription) &
   claim.item(C, X) &

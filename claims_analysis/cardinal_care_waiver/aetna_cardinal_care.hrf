@@ -145,7 +145,7 @@ gte(X,Y):-
 international(no) % User Input%
 start_date(1672563661000) % Jan 1 2023 %
 end_date(1737450061000) % Jan 21 2025, dummy dates %
-sf_bay_care_in_medical(500) % Might be 100?
+sf_bay_care_in_medical(500) % Might be 100? --> New case
 sf_bay_care_out_medical(0)
 sf_bay_care_in_mental(500)
 sf_bay_care_out_mental(25)

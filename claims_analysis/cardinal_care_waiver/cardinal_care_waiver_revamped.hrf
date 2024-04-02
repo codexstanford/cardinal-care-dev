@@ -6,7 +6,7 @@ covered :-
   evacuation_covered(yes) &
   requirements(yes)
 
-evacuation_covered(yes) :-
+evacuation_covered(yes) :- 
   evac_covered(yes) &
   repatriation_covered(yes) &
   visa_coverage(yes)  &
