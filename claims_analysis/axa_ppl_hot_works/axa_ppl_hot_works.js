@@ -9,6 +9,7 @@ const INPUT_FIELD_IDS_TO_FACT_TEMPLATES = {
   "policy_territory_input" : "policy.policy_territory($POLICY$, $VALUE$)",
   "policy_hot_works_exclusion_endorsement_input" : "policy.hot_work_exclusion_endorsement($POLICY$, $VALUE$)",
   "policy_hot_works_precaution_amendment_endorsement_input" : "policy.hot_work_precautions_amendment_endorsement($POLICY$, $VALUE$)",
+  "claim_filed_date_input": "claim.filed_date($CLAIM$, $VALUE$)",
   "claim_startdate_input": "claim.startdate($CLAIM$, $VALUE$)",
   "claim_enddate_input": "claim.enddate($CLAIM$, $VALUE$)",
   "claim_cleanup_costs_input": "claim.for_clean_up_costs($CLAIM$, $VALUE$)",
@@ -309,6 +310,8 @@ function build_claim_info_section() {
   
   rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "text", "claim1", "Claim ID: ", "claim_id_input")]));
   
+  rows.push(newClaimsFormInputRow([newClaimsFormInputCell(2, "date", "2024-02-03", "Claim Filed Date: ", "claim_filed_date_input")]));
+  
   rows.push(newClaimsFormInputRow([
     newClaimsFormInputCell(1, "date", "2024-02-01", "Start Date of Claim: ", "claim_startdate_input"),
     newClaimsFormInputCell(1, "date", "2024-02-02", "End Date of Claim: ", "claim_enddate_input")
@@ -577,13 +580,13 @@ definition(parsetime(TIME),map(readstring,tail(matches(stringify(TIME),"(..)_(..
 % - Limit of liability is in the schedule
 % - The excess is in the schedule
 
-%  1 Complete (except for checking that claim and accidents occur during the policy period)
+%  1 Complete
 %  2 Complete (implicit)
 %  3 Complete
 %  4 Complete
 %  5 Complete
 %  6 Complete
-%  7 Specific to damages amount, so ignored for now
+%  7 Specific to damages amount, so currently not applicable
 %  8 Complete
 %  9 Complete
 % 10 Complete
@@ -607,7 +610,12 @@ policy_in_effect(P,C) :-
   get_timestamp_from_date(CSD, CSS) &
   get_timestamp_from_date(CED, CES) &
   leq(PSS, CSS) &
-  leq(CES, PES)
+  leq(CES, PES) &
+  leq(CSS, CES) &
+  claim.filed_date(C, FD) &
+  get_timestamp_from_date(FD, FDS) &
+  leq(PSS, FDS) &
+  leq(FDS, PES)
 
 claim.insuree(C, I) :-
   claim.policy(C, P) &
