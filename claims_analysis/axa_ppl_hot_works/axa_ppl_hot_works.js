@@ -453,7 +453,7 @@ function build_hot_work_exclusion_endorsement_section() {
   
   rows.push(newHeadingRow("Hot Work Exclusion Endorsement Information", "hot-work-exclusion-endorsement-info-subheading", ["claims-processing-section-subheading", "exclusion-endorsement-row", "endorsement-info-heading"]));
 
-  rows.push(newClaimsFormInputRow([newClaimsFormSelectCell(2, "", "Location where the hot work took place [Placeholder]: ", "claim_hot_work_location_input", 
+  rows.push(newClaimsFormInputRow([newClaimsFormSelectCell(2, "", "Location where the hot work took place: ", "claim_hot_work_location_input", 
   [
     ["california", "California"],
     ["none", ""],
