@@ -50,12 +50,27 @@ eligible_service(C,P,Service):-
   claim.location(C,L) &
   valid_location(Service,L).
 
+% service provider and location
+eligible_service(C,P,X):-
+  covered_list_with_service_provider_and_location(List) &
+  member(X,List) &
+  claim.service_provider(C,O) &
+  valid_service_provider(X,O) &
+  claim.location(C,L) &
+  valid_location(X,L).
+
 % location
 eligible_service(C,P,X):-
   covered_list_with_location(List) &
   member(X,List) &
   claim.location(C,L) &
   valid_location(X,L).
+
+% yearly limit
+eligible_service(C,P,X):-
+  covered_list_with_yearly_limit(List) &
+  member(X,List) &
+  check_policy_year_limit(C,Service)
 
 % service provider
 eligible_service(C,P,X):-
@@ -138,28 +153,21 @@ eligible_service(C,P,preventive_care):-
   leq(D,N).
 
 eligible_service(C,P,female_contraceptives):-
-  claim.claimant(C,Cl) &
   claim.contraceptive_service(C,Service) &
   fda_approved(Service) &
   claim.location(C,L) &
   contraceptive_location_check(Service,L).
 
-eligible_service(C,P,inpatient_surgical_services):-
-  claim.location(C,L) &
-  valid_location(inpatient_surgical_services,L) &
-  claim.service_provider(C,O) &
-  valid_service_provider(inpatient_surgical_services, O).
-
-eligible_service(C,P,outpatient_surgical_services):-
-  claim.location(C,L) &
-  valid_location(outpatient_surgical_services,L) &
-  claim.service_provider(C,O) &
-  valid_service_provider(outpatient_surgical_services, O).
-
-
-eligible_service(C,P,outpatient_surgery_facility_charges):-
-  claim.location(C,L) &
-  valid_location(outpatient_surgery_facility_charges,L).
+eligible(C,P,transplant_travel_and_lodging):-
+  claim.recipient(C,Recipient) &
+  policy.covered_people(P,Recipient).
+  
+eligible_service(C,P,comprehensive_infertility_services):-
+  claim.infertility_service(C,artificial_insemination) &
+  check_policy_year_limit(C,artificial_insemination).
+% not covered: injectible_infertility_medication, 
+% (Part of ART)thawing_frozen_eggs_sperm, donor_charges, surrogacy_charges, gestational_charges, home_kits, ovulation_induction
+% IVF, ZIFT, GIFT, cryptopreserved_embryos_transfer_or_service
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -444,6 +452,7 @@ yearly_visit_limit(routine_physical,0,22,0).
 yearly_visit_limit(routine_physical,22,200,1)
 yearly_visit_limit(gynecological_exam,0,200,1).
 yearly_visit_limit(home_health_care,0,200,100).
+yearly_visit_limit(artificial_insemination,0,200,6)
 
 valid_location(routine_physical,phys_office).
 valid_location(preventive_care,phys_office).
@@ -471,6 +480,8 @@ valid_location(home_health_care,home)
 valid_location(non_surgical_physican_service,hospital)
 valid_location(well_newborn_nursery_care,hospital)
 valid_location(well_newborn_nursery_care,birthing_center)
+valid_location(inpatient_mental_health,hospital)
+
 
 contraceptive_location_check(Service, contra_office).
 contraceptive_location_check(sterilization_surgery_for_women,L).
@@ -493,9 +504,10 @@ valid_service_provider(voluntary_sterilization_reversal, specialist_surgeon)
 
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care])
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care, inpatient_mental_health, outpatient_surgery_facility_charges])
 covered_list_with_service_provider([abortion,voluntary_sterilization_reversal])
-covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care]). %always covered
+covered_list_with_service_provider_and_location([inpatient_surgical_services, outpatient_surgical_services])
+covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care, outpatient_mental_office_visit, outpatient_mental_other_services, advanced_reproductive_technology_care]). %always covered
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 
 fda_approved(counseling).

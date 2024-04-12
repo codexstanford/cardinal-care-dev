@@ -44,6 +44,15 @@ Claim
 --- outpatient_surgery_facility_charges
 --- home_health_care
 --- non_surgical_physican_service
+--- transplant_travel_and_lodging
+--- comprehensive_infertility_services
+--- inpatient_mental_health
+--- outpatient_mental_office_visit 
+--- outpatient_mental_other_services
+--- advanced_reproductive_technology_care
+- infertility_service
+--- artificial_insemination
+--- injectible_infertility_medication
 - family_member_present (Family Member or Caregiver Present)
 - type_of_care
 --- Emergency
@@ -88,4 +97,5 @@ Policy
 - Insuree
 - Startdate
 - enddate
+- covered_people
 
