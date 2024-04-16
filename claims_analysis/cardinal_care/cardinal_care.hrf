@@ -57,6 +57,13 @@ eligible_service(C,P,X):-
   claim.location(C,L) &
   valid_location(X,L).
 
+% service provider
+eligible_service(C,P,X):-
+  covered_list_with_service_provider(List) &
+  member(X,List) &
+  claim.service_provider(C,O) &
+  valid_service_provider(X,O).
+
 % no restrictions
 eligible_service(C,P,X):-
   covered_list(List) &
@@ -462,6 +469,8 @@ valid_location(outpatient_surgery_facility_charges,outpatient_dept)
 valid_location(outpatient_surgery_facility_charges,surgery_center)
 valid_location(home_health_care,home)
 valid_location(non_surgical_physican_service,hospital)
+valid_location(well_newborn_nursery_care,hospital)
+valid_location(well_newborn_nursery_care,birthing_center)
 
 contraceptive_location_check(Service, contra_office).
 contraceptive_location_check(sterilization_surgery_for_women,L).
@@ -473,20 +482,21 @@ valid_service_provider(inpatient_surgical_services, surgical_assistant)
 valid_service_provider(outpatient_surgical_services, operating_surgeon)
 valid_service_provider(outpatient_surgical_services, anesthetist)
 valid_service_provider(outpatient_surgical_services, surgical_assistant)
+valid_service_provider(abortion, inpatient_physician)
+valid_service_provider(abortion, outpatient_physician)
+valid_service_provider(abortion, specialist_surgeon)
+valid_service_provider(voluntary_sterilization_reversal, inpatient_physician)
+valid_service_provider(voluntary_sterilization_reversal, outpatient_physician)
+valid_service_provider(voluntary_sterilization_reversal, specialist_surgeon)
+
 
 
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services])
-covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing]).
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care])
+covered_list_with_service_provider([abortion,voluntary_sterilization_reversal])
+covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care]). %always covered
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
-age_range_limit(vaccine,covid,0,200,3).
-age_range_limit(vaccine,polio,0,5,5).
-age_range_limit(vaccine,polio,5,100,0).
-age_range_limit(vaccine,tb,0,24,1).
-age_range_limit(vaccine,tb,24,200,0).
-age_range_limit(cancer,prostate,0,200,1). 
-age_range_limit(cancer,breast,0,200,1).
 
 fda_approved(counseling).
 fda_approved(rod).
