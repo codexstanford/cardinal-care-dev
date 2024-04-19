@@ -62,7 +62,8 @@ Claim
 --- maintenance_therapy
 - service_provider
 - Vaccine
-- vaccine_count
+- vaccine_dose_count
+- vaccine_dose_count_annual
 - Contraceptive service 
 - Allegy service
 - Contraceptive service 
@@ -73,12 +74,14 @@ Claim
 - previous_vaccines_pfizer (for covid)
 - previous_vaccines_moderna (for covid)
 - previous_vaccines_other (for covid, covers janssen and novovax only)
+- previous_vaccines_flu_more_than_2
 
 Person
 - DOB
 - Occupation
 - Sex
 - Dependent
+- immunocompromised
 
 Policy
 - Type
