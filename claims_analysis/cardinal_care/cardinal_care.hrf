@@ -82,7 +82,12 @@ eligible_service(C,P,specialized_screening_counseling):-
 
 eligible_service(C,P,specialized_screening_counseling):-
   claim.screening_type(C,cancer) &
+  not_lung_cancer(C) &
   check_age_range_limit(C,cancer).   
+
+not_lung_cancer(C):-
+  claim.screening_type(C,Cancer) &
+  distinct(Cancer,lung).
 
 eligible_service(C,P,preventive_care):-
   claim.location(C,L) &
