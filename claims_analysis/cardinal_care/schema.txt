@@ -12,7 +12,6 @@ Claim
 --- sutter_health
 - Location
 --- phys_office
---- facility
 --- ob_office
 --- gyn_office
 --- ob_gyn_office
