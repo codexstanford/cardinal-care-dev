@@ -84,6 +84,9 @@ Claim
 - previous_vaccines_moderna (for covid)
 - previous_vaccines_other (for covid, covers janssen and novovax only)
 - previous_vaccines_flu_more_than_2
+- is_infertile (a person is considered infertile if unable to conceive or produce conception after 1 year of frequent sexual intercourse when the female attempting conception is under 35 years of age, or after 6 months of frequent sexual intercourse when the female attempting conception is 35 years of age or older. Alternatively, 6 cycles of timed sperm insemination(s) (intrauterine, intracervical, or intravaginal), either with or without ovulation induction medication, when the female attempting conception is under 35 years of age, or 3 cycles of timed sperm insemination(s) when the female attempting conception is 35 years of age or older)
+- had_sterlization
+
 
 Person
 - DOB

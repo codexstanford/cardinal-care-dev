@@ -159,6 +159,11 @@ eligible(C,P,transplant_travel_and_lodging):-
   policy.covered_people(P,Recipient).
   
 eligible_service(C,P,comprehensive_infertility_services):-
+  claim.is_infertile(C,yes) &
+  claim.had_sterlization(C, no) &
+  claim.cause_of_infertility(C, Cause) &
+  valid_infertility_cause_for_artificial_insemination(List) &
+  member(Cause, List) &
   claim.infertility_service(C,artificial_insemination) &
   check_policy_year_limit(C,artificial_insemination).
 % not covered: injectible_infertility_medication, 
@@ -511,6 +516,15 @@ covered_list_with_service_provider([abortion,voluntary_sterilization_reversal]) 
 covered_list_with_service_provider_and_location([inpatient_surgical_services, outpatient_surgical_services]) % list of services that are covered with service provider restrictions and location restrictions
 covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care, outpatient_mental_office_visit, outpatient_mental_other_services, advanced_reproductive_technology_care]). %always covered
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
+
+% 		a. infertile couples with mild male-factor fertility problems; (when 2 or more semen analyses, measured at least two weeks apart, have 1 or more variables below the 5th percentile)
+		% b. unexplained infertility problems;
+		% c. minimal to mild endometriosis;
+		% d. medically refractory erectile dysfunction or vaginismus preventing intercourse;
+		% e. couples where the man is HIV positive and undergoing sperm washing; 
+		% f. couples undergoing menotropin ovarian stimulation; or
+		% g. clomiphene-citrate-stimulated artificial insemination (intra-cervical insemination or IUI) medically necessary for infertile women with WHO Group II ovulation disorders such as polycystic ovarian syndrome who ovulate with clomiphene citrate but have not become pregnant after ovulation induction with clomiphene.
+valid_infertility_cause_for_artificial_insemination([mild_male_problems, unexplained, mild_endometriosis, ed_or_vaginismus_preventing, male_hiv_positive, menotropin_stimulation, group_two_disorders])
 
 fda_approved(counseling).
 fda_approved(rod).
