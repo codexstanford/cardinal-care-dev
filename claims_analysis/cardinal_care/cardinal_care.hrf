@@ -26,7 +26,7 @@ policy_active(C,P):-
   leq(P_START_STAMP,H_START_STAMP) &
   leq(H_END_STAMP,P_END_STAMP)
 
-% check if the hospitali is valid and the service is covered
+% check if the hospital is valid and the service is covered
 valid_hospitalization(C,P):-
   claim.hospital(C,Hosp) &
   valid_hospital(Hosp) &
@@ -158,7 +158,9 @@ eligible_service(C,P,outpatient_surgery_facility_charges):-
   valid_location(outpatient_surgery_facility_charges,L).
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% Age limits for children are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#
+% Age limits for adults are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/adult-schedule-notes.html
+% A parsed version of the limits for covid and hep-b are available at https://office365stanford-my.sharepoint.com/:x:/g/personal/lalwani_stanford_edu/EdHSUrocet5LnlzdEE3r9AAB7VUS0uqNWiqbjEyfr7KHRw?e=8RO5l4
 %%% Age limits for covid vaccines
 age_range_limit_covid(C,2,Y,M,no,moderna,0,0,0):-
   leq(Y,4) &
