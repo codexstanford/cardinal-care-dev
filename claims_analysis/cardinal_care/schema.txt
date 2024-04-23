@@ -15,7 +15,7 @@ Claim
 --- facility
 --- ob_office
 --- gyn_office
---- ob_gyn
+--- ob_gyn_office
 --- telemedicine
 --- sp_office
 --- allergy_specialist
@@ -26,9 +26,9 @@ Claim
 --- home
 --- hospital
 - Reason
---- specialized_screening_counselling
+--- specialized_screening_counseling
 ----- cancer
------ obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum
+----- obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum
 --- preventive_care
 --- female_contraceptives
 --- routine_physical
