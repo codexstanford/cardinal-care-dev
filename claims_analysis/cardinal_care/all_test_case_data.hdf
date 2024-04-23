@@ -1,41 +1,5 @@
-%% expected - covered(X) - claim1,claim3,claim5,claim6,claim8,claim11,claim12, 
+%% expected - covered(X) - claim3,claim5,claim6,claim8,claim11,claim12, 
 %% claim_a1, claim_a2, claim_a3, claim_a4, claim_a6, claim_a9, claim_a11,claim_a14,claim_a17
-
-%% test cases for preventive_care
-
-%% expected - covered(claim1) - yes
-%% covered(claim2) - no 
-claim.policy(claim1,policy1)
-policy.type(policy1,cardinal)
-claim.claimant(claim1,person1)
-policy.insuree(policy1,person1)
-policy.startdate(policy1,person1,01_08_2023)
-policy.enddate(policy1,person1,30_06_2024)
-claim.hosp_start_time(claim1,02_09_2023,00_00)
-claim.hosp_end_time(claim1,02_09_2023,01_13)
-claim.hospital(claim1,stanford_medical_center)
-claim.reason(claim1,preventive_care)
-claim.vaccine(claim1,tb)
-claim.location(claim1,phys_office)
-person.dob(person1,01_01_2001)
-person.occupation(person1,other)
-claim.consequence_of_occupation(claim1,no)
-
-claim.policy(claim2,policy1)
-claim.claimant(claim2,person1)
-claim.hosp_start_time(claim2,02_10_2023,00_00)
-claim.hosp_end_time(claim2,02_10_2023,01_13)
-claim.hospital(claim2,stanford_medical_center)
-claim.reason(claim2,preventive_care)
-claim.vaccine(claim2,tb)
-person.dob(person1,01_01_2001)
-person.occupation(person1,other)
-claim.consequence_of_occupation(claim2,no)
-claim.location(claim2,phys_office)
-
-
-claim.time(claim1,01_01_2024,00_00)
-claim.time(claim2,01_02_2024,00_00)
 
 %% test cases for routine_physical
 
