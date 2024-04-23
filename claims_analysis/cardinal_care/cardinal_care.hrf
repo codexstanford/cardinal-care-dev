@@ -26,7 +26,7 @@ policy_active(C,P):-
   leq(P_START_STAMP,H_START_STAMP) &
   leq(H_END_STAMP,P_END_STAMP)
 
-% check if the hospitali is valid and the service is covered
+% check if the hospital is valid and the service is covered
 valid_hospitalization(C,P):-
   claim.hospital(C,Hosp) &
   valid_hospital(Hosp) &
@@ -41,23 +41,23 @@ valid_hospitalization(C,P):-
   ~exception(C,P).
 
 
-%%% Services that have location restriction and visit limit in the policy year
+
 
 %%%%%%%%%%%%%%%%%%% Eligible Services %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% yearly limit and location
+%%% Services that have location restriction and visit limit in the policy year
 eligible_service(C,P,Service):-
   check_policy_year_limit(C,Service) &
   claim.location(C,L) &
   valid_location(Service,L).
 
-% location
+% services that have only location restriction
 eligible_service(C,P,X):-
   covered_list_with_location(List) &
   member(X,List) &
   claim.location(C,L) &
   valid_location(X,L).
 
-% service provider
+% services that have only service provider restriction
 eligible_service(C,P,X):-
   covered_list_with_service_provider(List) &
   member(X,List) &
@@ -69,24 +69,20 @@ eligible_service(C,P,X):-
   covered_list(List) &
   member(X,List).
 
-eligible_service(C,P,specialized_screening_counselling):-
+
+eligible_service(C,P,specialized_screening_counseling):-
   claim.screening_type(C,Type) &
   valid_screening_list(List) &
   member(Type,List).
 
-eligible_service(C,P,specialized_screening_counselling):-
+eligible_service(C,P,specialized_screening_counseling):-
   claim.screening_type(C,cancer) &
   claim.cancer_type(C,lung) &
   evaluate(countofall(X,lung_cancer_past_twelve_months(C,X)),0). 
 
-eligible_service(C,P,specialized_screening_counselling):-
+eligible_service(C,P,specialized_screening_counseling):-
   claim.screening_type(C,cancer) &
   check_age_range_limit(C,cancer).   
-
-eligible_service(C,P,preventive_care):-
-  claim.location(C,L) &
-  valid_location(preventive_care,L) &
-  check_age_range_limit(C,vaccine).
 
 eligible_service(C,P,preventive_care):-
   claim.location(C,L) &
@@ -162,7 +158,9 @@ eligible_service(C,P,outpatient_surgery_facility_charges):-
   valid_location(outpatient_surgery_facility_charges,L).
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% Age limits for children are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#
+% Age limits for adults are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/adult-schedule-notes.html
+% A parsed version of the limits for covid and hep-b are available at https://office365stanford-my.sharepoint.com/:x:/g/personal/lalwani_stanford_edu/EdHSUrocet5LnlzdEE3r9AAB7VUS0uqNWiqbjEyfr7KHRw?e=8RO5l4
 %%% Age limits for covid vaccines
 age_range_limit_covid(C,2,Y,M,no,moderna,0,0,0):-
   leq(Y,4) &
@@ -329,8 +327,8 @@ age_range_visit_cancer(Claim1,Claim2):-
   claim.claimant(Claim2,Person) &
   claim.policy(Claim1,Policy) &
   claim.policy(Claim2,Policy) &
-  claim.reason(Claim1,specialized_screening_counselling) &
-  claim.reason(Claim2,specialized_screening_counselling) &
+  claim.reason(Claim1,specialized_screening_counseling) &
+  claim.reason(Claim2,specialized_screening_counseling) &
   claim.screening_type(Claim1,cancer) &
   claim.screening_type(Claim2,cancer) &
   claim.cancer_type(Claim1,Cancer) &
@@ -353,6 +351,7 @@ age_range_visit(Claim1,Claim2,MinAge,MaxAge,DOB):-
   lt(C2_TS,C1_TS) &
   covered(Claim2). 
 
+%retrieves the age range limit for a service based on the age of the claimant.
 get_age_range_limit(Type,Case,Age,Limit,MinAge,MaxAge):-
   age_range_limit(Type,Case,MinAge,MaxAge,Limit) &
   evaluate(minus(MaxAge,1),MaxAgeMinus) &
@@ -363,8 +362,8 @@ get_age_range_limit(Type,Case,Age,Limit,MinAge,MaxAge):-
 lung_cancer_past_twelve_months(Claim1,Claim2):-
   claim.claimant(Claim1,Cl) &
   claim.claimant(Claim2,Cl) &
-  claim.reason(Claim1,specialized_screening_counselling) &
-  claim.reason(Claim2,specialized_screening_counselling) &
+  claim.reason(Claim1,specialized_screening_counseling) &
+  claim.reason(Claim2,specialized_screening_counseling) &
   claim.screening_type(Claim1,cancer) &
   claim.screening_type(Claim2,cancer) &
   claim.cancer_type(Claim1,lung) &
@@ -374,7 +373,7 @@ lung_cancer_past_twelve_months(Claim1,Claim2):-
   get_date_diff(C1_D, C2_D, Age) &
   same(Age, 0)
 
-% Visit limit in general
+% Count number of visits for a service in the policy year
 check_policy_year_limit(C,Service):-
   claim.claimant(C,Cl) &
   person.dob(Cl,DOB) &
@@ -384,12 +383,15 @@ check_policy_year_limit(C,Service):-
   evaluate(plus(countofall(X,visit_current_year(Service,C,X)),1),Count) &
   leq(Count,Limit).
 
+%retrieves the yearly visit limit for a service based on the age of the claimant.
+%the limit is defined for a range of ages and we check which range the claimant falls into
 yearly_visit_limit(Service,Age,Limit):-
   yearly_visit_limit(Service,MinAge,MaxAge,Limit) &
   evaluate(minus(MaxAge,1),MaxAgeMinus) &
   leq(Age,MaxAgeMinus) &
   leq(MinAge,Age).
 
+% Count number of visits for a service in the policy year
 visit_current_year(Service,Claim1,Claim2):-
   claim.claimant(Claim1,Person) &
   claim.claimant(Claim2,Person) &
@@ -451,7 +453,7 @@ valid_location(preventive_care,facility).
 valid_location(gynecological_exam,phys_office).
 valid_location(gynecological_exam,ob_office).
 valid_location(gynecological_exam,gyn_office).
-valid_location(gynecological_exam,ob_gyn).
+valid_location(gynecological_exam,ob_gyn_office).
 valid_location(physician_consultation,telemedicine)
 valid_location(physician_consultation,phys_office)
 valid_location(physician_consultation,sp_office)
@@ -491,10 +493,10 @@ valid_service_provider(voluntary_sterilization_reversal, specialist_surgeon)
 
 
 
-valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
-genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum]).
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care])
-covered_list_with_service_provider([abortion,voluntary_sterilization_reversal])
+valid_screening_list([obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,
+genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum]). 
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care]) % list of services that are covered with location restrictions
+covered_list_with_service_provider([abortion,voluntary_sterilization_reversal]) % list of services that are covered with service provider restrictions
 covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care]). %always covered
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 
