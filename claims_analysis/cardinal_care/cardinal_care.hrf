@@ -157,7 +157,8 @@ eligible_service(C,P,female_contraceptives):-
 
 eligible(C,P,transplant_travel_and_lodging):-
   claim.recipient(C,Recipient) &
-  policy.covered_people(P,Recipient).
+  policy.covered_people(P,List) &
+  member(Recipient,List).
   
 eligible_service(C,P,comprehensive_infertility_services):-
   claim.is_infertile(C,yes) &
@@ -513,10 +514,10 @@ valid_service_provider(voluntary_sterilization_reversal, specialist_surgeon)
 
 valid_screening_list([obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum]).
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care, inpatient_mental_health, outpatient_surgery_facility_charges]) % list of services that are covered with location restrictions
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,well_newborn_nursery_care, inpatient_mental_health, outpatient_surgery_facility_charges]) % list of services that are covered with location restrictions
 covered_list_with_service_provider([abortion,voluntary_sterilization_reversal]) % list of services that are covered with service provider restrictions
 covered_list_with_service_provider_and_location([inpatient_surgical_services, outpatient_surgical_services]) % list of services that are covered with service provider restrictions and location restrictions
-covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care, outpatient_mental_office_visit, outpatient_mental_other_services, advanced_reproductive_technology_care]). %always covered
+covered_list([breast_pump_supplies,hospice,skilled_nursing,maternity_care, outpatient_mental_office_visit, outpatient_mental_other_services, advanced_reproductive_technology_care]). %always covered
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 
 % https://www.aetna.com/cpb/medical/data/300_399/0327.html
@@ -598,4 +599,12 @@ minor_or_dependent(C,Cl):-
   claim.time(C,C_D,C_T) &
   get_date_diff(C_D, DOB, Age) &
   leq(Age,17).
+
+person.immunocompromised(Cl,Immuno_Status):-
+  person.condition(Cl,immunocompromised) &
+  eval(yes, Immuno_Status).
+
+person.immunocompromised(Cl,Immuno_Status):-
+  ~person.condition(Cl,immunocompromised) &
+  eval(no, Immuno_Status).
 

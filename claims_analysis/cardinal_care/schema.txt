@@ -1,104 +1,184 @@
-Schema
-
-Claim
-- Policy
-- Date
-- Claimant
-- hosp_start_time
-- hosp_end_time
-- Hospital
---- stanford_medical_center
---- menlo_medical_clinic
---- sutter_health
-- Location
---- phys_office
---- facility
---- ob_office
---- gyn_office
---- ob_gyn_office
---- telemedicine
---- sp_office
---- allergy_specialist
---- contra_office
---- birthing_center
---- outpatient_dept
---- surgery_center
---- home
---- hospital
-- Reason
---- specialized_screening_counseling
------ cancer
------ obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum
---- preventive_care
---- female_contraceptives
---- routine_physical
---- gynecological_exam
---- physician_consultation
---- allergy
---- breast_pump_supplies
---- physician_consultation
---- allergy
---- inpatient_surgical_services
---- outpatient_surgical_services
---- inpatient_care
---- outpatient_surgery_facility_charges
---- home_health_care
---- non_surgical_physican_service
---- transplant_travel_and_lodging
---- comprehensive_infertility_services
---- inpatient_mental_health
---- outpatient_mental_office_visit 
---- outpatient_mental_other_services
---- advanced_reproductive_technology_care
-- infertility_service
---- artificial_insemination
---- injectible_infertility_medication
-- family_member_present (Family Member or Caregiver Present)
-- type_of_care
---- Emergency
---- Non emergency
-- mother_hbsag (Mother's HBsAg status for hep_b vaccines)
---- Negative
---- Positive
---- Unknown
-- vaccine_brand
-- anti_hbs_count (count of anti-HBs in mlU/mL for hep_b vaccines )
--birth_weight (birth weight in grams)
-- home_service
---- transportation
---- homemaker_service
---- home_delivery
---- maintenance_therapy
-- service_provider
-- Vaccine
-- vaccine_dose_count
-- vaccine_dose_count_annual
-- Contraceptive service 
-- Allegy service
-- Contraceptive service 
-- Allegy service
-- Consequence_of_occupation
-- screening_type
-- cancer_type
-- previous_vaccines_pfizer (for covid)
-- previous_vaccines_moderna (for covid)
-- previous_vaccines_other (for covid, covers janssen and novovax only)
-- previous_vaccines_flu_more_than_2
-- is_infertile (a person is considered infertile if unable to conceive or produce conception after 1 year of frequent sexual intercourse when the female attempting conception is under 35 years of age, or after 6 months of frequent sexual intercourse when the female attempting conception is 35 years of age or older. Alternatively, 6 cycles of timed sperm insemination(s) (intrauterine, intracervical, or intravaginal), either with or without ovulation induction medication, when the female attempting conception is under 35 years of age, or 3 cycles of timed sperm insemination(s) when the female attempting conception is 35 years of age or older)
-- had_sterlization
-
 
 Person
-- DOB
-- Occupation
-- Sex
-- Dependent
-- immunocompromised
+- dob: Date of birth (DD_MM_YYYY)
+- occupation
+	- healthcare_worker
+	- armed_forces
+- dependent
+	- yes
+	- no
+- condition: Pre-existing medical conditions
+	- immunocompromised
+	- hemodialysis_patient
+
+
 
 Policy
-- Type
-- Insuree
-- Startdate
-- enddate
-- covered_people
+- type: The type of policy (in this case cardinal)
+- insuree: The person who bought the policy
+- startdate: Start date of the policy
+- enddate: End date of the policy
+- covered_people: List of all the people who are covered
+
+
+
+Claim
+- anti_hbs_count: count of anti-HBs in mlU/mL for hep_b vaccines
+- birth_weight: birth weight in grams
+- cancer_type: Possible types of cancer
+	- lung
+- cause_of_infertility: Possible causes of infertility (used in comprehensive_infertility_services to determine whether cause is valid for such service or not)
+	- mild_male_problems
+	- unexplained
+	- mild_endometriosis
+	- ed_or_vaginismus_preventing
+	- male_hiv_positive
+	- menotropin_stimulation
+	- group_two_disorders
+- claimant: The claimant. May or may not be same as policy holder
+- consequence_of_occupation: Whether the hospitalization was because of work done while performing your occupation duty
+	- yes
+	- no
+- contraceptive_service: The type of contraceptive_service usedd
+	- counseling
+	- rod
+	- larc
+	- oral
+	- iud_with_preogestin
+	- sterilization_surgery_for_women
+	- sterilization_surgery_for_men
+	- implantable_rod
+	- progestin_shot_injection
+	- the_pill_estrogen_and_progestin
+	- the_mini_pill_progestin
+	- patch
+	- vaginal_contraceptive_ring
+	- diaphragm_with_spermicide
+	- sponge_with_spermicide
+	- cervical_cap_with_spermicide
+	- male_condom
+	- female_condom
+	- spermicide
+	- levonorgestrel_15_mg
+	- ulipristal_acetate
+- family_member_present: Family Member or Caregiver Present
+- had_sterlization: Whether the person is sterlized or not. If sterlized, infertility services are not covered
+	- yes
+	- no
+- home_service: Services provided at home
+	- transportation
+	- homemaker_service
+	- home_delivery
+	- maintenance_therapy
+- hosp_end_time: Hospitalization Start Time
+- hosp_start_time: Hospitalization Start Time
+- hospital: The hospital where the treatment was done (only have tier 1 for now)
+	- stanford_medical_center
+	- menlo_medical_clinic
+	- sutter_health
+- infertility_service: Type of service for infertility (in particular for now only when reason=comprehensive_infertility_services)
+	- artificial_insemination
+	- injectible_infertility_medication
+- is_infertile: a person is considered infertile if unable to conceive or produce conception after 1 year of frequent sexual intercourse when the female attempting conception is under 35 years of age, or after 6 months of frequent sexual intercourse when the female attempting conception is 35 years of age or older. Alternatively, 6 cycles of timed sperm insemination(s) (intrauterine, intracervical, or intravaginal), either with or without ovulation induction medication, when the female attempting conception is under 35 years of age, or 3 cycles of timed sperm insemination(s) when the female attempting conception is 35 years of age or older
+	- yes
+	- no
+- location: The office or facility where the treatment was done
+	- phys_office
+	- facility
+	- ob_office
+	- gyn_office
+	- ob_gyn_office
+	- telemedicine
+	- sp_office
+	- allergy_specialist
+	- contra_office
+	- birthing_center
+	- outpatient_dept
+	- surgery_center
+	- home
+	- hospital
+- mother_hbsag: Mother's HBsAg status for hep_b vaccines. Possible Values: 
+	- negative
+	- positive
+	- unknown
+- policy: policy to which the claim is related to
+- previous_vaccines_flu_more_than_equal_2: If atleast 2 flu vaccine shots have been taken
+	- yes
+	- no
+- previous_vaccines_moderna: Number of moderna vaccines taken (for covid)
+- previous_vaccines_other: Number of other vaccines taken (for covid, covers janssen and novovax only)
+- previous_vaccines_pfizer: Number of pfizer vaccine taken (for covid)
+- reason: Broad category of the type of service received. This in most cases, map directly to service mentioned in the policy document
+	- specialized_screening_counseling
+	- preventive_care
+	- female_contraceptives
+	- routine_physical
+	- gynecological_exam
+	- physician_consultation
+	- allergy
+	- breast_pump_supplies
+	- physician_consultation
+	- abortion
+	- inpatient_surgical_services
+	- outpatient_surgical_services
+	- inpatient_care
+	- outpatient_surgery_facility_charges
+	- home_health_care
+	- non_surgical_physican_service
+	- transplant_travel_and_lodging
+	- comprehensive_infertility_services
+	- inpatient_mental_health
+	- outpatient_mental_office_visit 
+	- outpatient_mental_other_services
+	- comprehensive_infertility_services
+	- advanced_reproductive_technology_care
+	- well_newborn_nursery_care
+	- voluntary_sterilization_reversal
+	- hospice
+	- skilled_nursing
+	- maternity_care
+- recipient: In transplant, the person who is receiving the organ
+- screening_type: The type of disease screening
+	- cancer
+	- obesity
+	- healthy_diet
+	- alcohol_drug_misuse
+	- tobacco_missuse
+	- depression
+	- sti
+	- genetic_risk_cancer_breast_ovarian
+	- stress_management
+	- chronic_condition
+	- lactation
+	- prenatal_postpartum
+- service_provider: The possible doctor/specialist/practitioner for the service (used for surgical processes, abortion and sterlization)
+	- operating_surgeon
+	- anesthetist
+	- surgical_assistant
+	- operating_surgeon
+	- anesthetist
+	- surgical_assistant
+	- inpatient_physician
+	- outpatient_physician
+	- specialist_surgeon
+	- inpatient_physician
+	- outpatient_physician
+	- specialist_surgeon
+- time: The date and time at which claim is filed
+- type_of_care: Whether it is an emergency or not
+	- emergency
+	- non_emergency
+- vaccine: which vaccine was given
+	- hep_b
+	- covid
+	- flu
+- vaccine_brand: The brand of vaccine taken for covid vaccines
+	- twinrix
+	- pfizer
+	- moderna
+	- janssen
+	- novavax
+- vaccine_dose_count: Total Vaccine doses taken by the person (for covid and hep_b)
+- vaccine_dose_count_annual: Vaccine doses taken by the person in the last year (for flu)
+
 
