@@ -61,6 +61,43 @@ Claim
 	- spermicide
 	- levonorgestrel_15_mg
 	- ulipristal_acetate
+- dme_provider: The provider for the equipments
+	- byram_healthcare
+	- advanced_diabetes_supply
+	- edgepark_medical
+	- apria
+- equipment_type: Type of dme bought
+	- ambulatory_aids
+	- bipap_supplies
+	- blood_pressure_monitors
+	- breast_pumps_and_supplies
+	- communication_aids
+	- continuous_glucose_monitors
+	- cpap_supplies
+	- diabetic_testing_supplies
+	- elevators
+	- glucose_meters
+	- hospital_beds
+	- incontinence
+	- inpen
+	- insulin
+	- insulin_pumps_and_supplies
+	- knee_walker
+	- massage_devices
+	- ostomy_supplies
+	- over_bed_tables
+	- oxygen_concentrators
+	- personal_hygiene_and_convenience_items
+	- pleurx_kits
+	- portable_whirlpool_pumps
+	- sad_light_boxes
+	- sauna_baths
+	- telephone_alert_systems
+	- urological_supplies
+	- ventilators
+	- vision_aids
+	- whirlpools
+	- wound_care
 - family_member_present: Family Member or Caregiver Present
 - had_sterlization: Whether the person is sterlized or not. If sterlized, infertility services are not covered
 	- yes
@@ -137,6 +174,7 @@ Claim
 	- hospice
 	- skilled_nursing
 	- maternity_care
+	- durable_medical_and_surgical_equipment
 - recipient: In transplant, the person who is receiving the organ
 - screening_type: The type of disease screening
 	- cancer

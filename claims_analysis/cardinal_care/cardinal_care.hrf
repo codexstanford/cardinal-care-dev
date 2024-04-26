@@ -173,6 +173,18 @@ eligible_service(C,P,comprehensive_infertility_services):-
 % IVF, ZIFT, GIFT, cryptopreserved_embryos_transfer_or_service
 % https://www.aetna.com/cpb/medical/data/300_399/0327.html
 
+
+eligible_service(C,P,durable_medical_and_surgical_equipment):-
+  claim.dme_provider(C,Provider) &
+  tier_one_dme_providers(List) &
+  member(Provider,List) &
+  claim.equipment_type(C,Type) &
+  dme_products(Provider,Products) &
+  member(Type,Products) & 
+  dme_excluded_list(Excluded) &
+  ~member(Type, Excluded).
+
+
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Age limits for children are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#
 % Age limits for adults are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/adult-schedule-notes.html
@@ -553,6 +565,22 @@ fda_approved(female_condom).
 fda_approved(spermicide).
 fda_approved(levonorgestrel_15_mg).
 fda_approved(ulipristal_acetate).
+
+
+% vendors for dme. Taken from https://vaden.stanford.edu/news/durable-medical-equipment-dme-and-laboratory-benefits-under-cardinal-care
+tier_one_dme_providers([byram_healthcare,advanced_diabetes_supply,edgepark_medical,apria])
+
+% products by each provider
+% https://www.aetna.com/dsepublicContent/assets/pdf/en/DME_National_Provider_Listing.pdf
+% https://www.northcoastmed.com/browse-our-products/
+
+dme_products(byram_healthcare, [diabetic_testing_supplies, ostomy_supplies, urological_supplies, wound_care, breast_pumps_and_supplies, continuous_glucose_monitors, blood_pressure_monitors ])
+dme_products(advanced_diabetes_supply, [diabetic_testing_supplies, continuous_glucose_monitors, insulin_pumps_and_supplies, insulin, inpen, glucose_meters])
+dme_products(edgepark_medical, [diabetic_testing_supplies, ostomy_supplies, urological_supplies, wound_care, incontinence, insulin_pumps_and_supplies, continuous_glucose_monitors, breast_pumps_and_supplies, pleurx_kits ])
+dme_products(apria, [oxygen_concentrators, ventilators, cpap_supplies, bipap_supplies, ambulatory_aids, hospital_beds, sad_light_boxes, knee_walker ])
+
+
+dme_excluded_list([whirlpools,portable_whirlpool_pumps,sauna_baths,massage_devices,over_bed_tables,elevators,communication_aids,vision_aids,telephone_alert_systems,personal_hygiene_and_convenience_items])
 
 %%%%%%%%%%%%%%%%%%% Helper Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
