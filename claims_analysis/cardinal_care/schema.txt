@@ -54,14 +54,20 @@ Claim
 - vaccine_brand
 - anti_hbs_count (count of anti-HBs in mlU/mL for hep_b vaccines )
 -birth_weight (birth weight in grams)
-- home_service
+- home_service (Type of service received within home_health_care)
 --- transportation
 --- homemaker_service
 --- home_delivery
 --- maintenance_therapy
 - service_provider
-- Vaccine
-- vaccine_dose_count
+--- operating_surgeon
+--- anesthetist
+--- surgical_assistant
+--- inpatient_physician
+--- outpatient_physician
+--- specialist_surgeon
+- Vaccine (Type of Vaccine)
+- vaccine_dose_count (How many doses of this vaccine have you received, including the current vaccine)
 - vaccine_dose_count_annual
 - Contraceptive service 
 - Allegy service
