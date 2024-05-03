@@ -501,7 +501,7 @@ valid_service_provider(voluntary_sterilization_reversal, specialist_surgeon)
 
 valid_screening_list([obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,
 genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum]). 
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care]) % list of services that are covered with location restrictions
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care,home_health_care]) % list of services that are covered with location restrictions
 covered_list_with_service_provider([abortion,voluntary_sterilization_reversal]) % list of services that are covered with service provider restrictions
 covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care]). %always covered
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
