@@ -1,5 +1,5 @@
 %% expected - covered(X) - claim3,claim5,claim6,claim8,claim11,claim12, 
-%% claim_a1, claim_a2, claim_a3, claim_a4, claim_a6, claim_a9, claim_a11,claim_a14,claim_a17
+%% claim_a1, claim_a2, claim_a3, claim_a4, claim_a6, claim_a9, claim_a11,claim_a14,claim_a17,claim_a18, claim_a21
 
 %% test cases for routine_physical
 
@@ -551,3 +551,118 @@ claim.consequence_of_occupation(claim_a17,no)
 claim.location(claim_a17,phys_office)
 claim.previous_vaccines_flu_more_than_2(claim_a17,yes)
 claim.vaccine_dose_count(claim_a17,1)
+
+
+%% test cases for comprehensive_infertility_services
+
+%% expected - covered(claim_a18) - yes
+%% covered(claim_a19) - no. incorrect cause
+%% covered(claim_a20) - no. not covered service
+claim.policy(claim_a18,policy_a18)
+claim.claimant(claim_a18,person_a18)
+policy.insuree(policy_a18,person_a18)
+policy.startdate(policy_a18,person_a18,01_08_2023)
+policy.enddate(policy_a18,person_a18,30_06_2024)
+claim.hosp_start_time(claim_a18,03_09_2023,00_00)
+claim.hosp_end_time(claim_a18,03_09_2023,01_13)
+claim.hospital(claim_a18,stanford_medical_center)
+claim.reason(claim_a18,comprehensive_infertility_services)
+person.dob(person_a18,04_02_2023)
+person.occupation(person_a18,other)
+person.immunocompromised(person_a18,no)
+claim.consequence_of_occupation(claim_a18,no)
+claim.is_infertile(claim_a18, yes)
+claim.had_sterlization(claim_a18, no)
+claim.infertility_service(claim_a18, artificial_insemination)
+claim.cause_of_infertility(claim_a18, mild_endometriosis)
+
+
+claim.policy(claim_a19,policy_a19)
+claim.claimant(claim_a19,person_a19)
+policy.insuree(policy_a19,person_a19)
+policy.startdate(policy_a19,person_a19,01_08_2023)
+policy.enddate(policy_a19,person_a19,30_06_2024)
+claim.hosp_start_time(claim_a19,03_09_2023,00_00)
+claim.hosp_end_time(claim_a19,03_09_2023,01_13)
+claim.hospital(claim_a19,stanford_medical_center)
+claim.reason(claim_a19,comprehensive_infertility_services)
+person.dob(person_a19,04_02_2023)
+person.occupation(person_a19,other)
+person.immunocompromised(person_a19,no)
+claim.consequence_of_occupation(claim_a19,no)
+claim.is_infertile(claim_a19, yes)
+claim.had_sterlization(claim_a19, no)
+claim.infertility_service(claim_a19, artificial_insemination)
+claim.cause_of_infertility(claim_a19, other)
+
+claim.policy(claim_a20,policy_a20)
+claim.claimant(claim_a20,person_a20)
+policy.insuree(policy_a20,person_a20)
+policy.startdate(policy_a20,person_a20,01_08_2023)
+policy.enddate(policy_a20,person_a20,30_06_2024)
+claim.hosp_start_time(claim_a20,03_09_2023,00_00)
+claim.hosp_end_time(claim_a20,03_09_2023,01_13)
+claim.hospital(claim_a20,stanford_medical_center)
+claim.reason(claim_a20,comprehensive_infertility_services)
+person.dob(person_a20,04_02_2023)
+person.occupation(person_a20,other)
+person.immunocompromised(person_a20,no)
+claim.consequence_of_occupation(claim_a20,no)
+claim.is_infertile(claim_a20, yes)
+claim.had_sterlization(claim_a20, no)
+claim.infertility_service(claim_a20, ivf)
+claim.cause_of_infertility(claim_a20, mild_endometriosis)
+
+
+%% test cases for durable_medical_and_surgical_equipment
+
+%% expected - covered(claim_a21) - yes
+%% covered(claim_a22) - no. equipment type not supported by corresponding provider
+%% covered(claim_a20) - no. provider not in tier 1
+claim.policy(claim_a21,policy_a21)
+claim.claimant(claim_a21,person_a21)
+policy.insuree(policy_a21,person_a21)
+policy.startdate(policy_a21,person_a21,01_08_2023)
+policy.enddate(policy_a21,person_a21,30_06_2024)
+claim.hosp_start_time(claim_a21,03_09_2023,00_00)
+claim.hosp_end_time(claim_a21,03_09_2023,01_13)
+claim.hospital(claim_a21,stanford_medical_center)
+claim.reason(claim_a21,comprehensive_infertility_services)
+person.dob(person_a21,04_02_2023)
+person.occupation(person_a21,other)
+person.immunocompromised(person_a21,no)
+claim.consequence_of_occupation(claim_a21,no)
+claim.dme_provider(claim_a21, byram_healthcare) 
+claim.equipment_type(claim_a21, diabetic_testing_supplies)
+
+claim.policy(claim_a22,policy_a22)
+claim.claimant(claim_a22,person_a22)
+policy.insuree(policy_a22,person_a22)
+policy.startdate(policy_a22,person_a22,01_08_2023)
+policy.enddate(policy_a22,person_a22,30_06_2024)
+claim.hosp_start_time(claim_a22,03_09_2023,00_00)
+claim.hosp_end_time(claim_a22,03_09_2023,01_13)
+claim.hospital(claim_a22,stanford_medical_center)
+claim.reason(claim_a22,comprehensive_infertility_services)
+person.dob(person_a22,04_02_2023)
+person.occupation(person_a22,other)
+person.immunocompromised(person_a22,no)
+claim.consequence_of_occupation(claim_a22,no)
+claim.dme_provider(claim_a22, byram_healthcare) 
+claim.equipment_type(claim_a22, bipap_supplies)
+
+claim.policy(claim_a23,policy_a23)
+claim.claimant(claim_a23,person_a23)
+policy.insuree(policy_a23,person_a23)
+policy.startdate(policy_a23,person_a23,01_08_2023)
+policy.enddate(policy_a23,person_a23,30_06_2024)
+claim.hosp_start_time(claim_a23,03_09_2023,00_00)
+claim.hosp_end_time(claim_a23,03_09_2023,01_13)
+claim.hospital(claim_a23,stanford_medical_center)
+claim.reason(claim_a23,comprehensive_infertility_services)
+person.dob(person_a23,04_02_2023)
+person.occupation(person_a23,other)
+person.immunocompromised(person_a23,no)
+claim.consequence_of_occupation(claim_a23,no)
+claim.dme_provider(claim_a23, after_the_fall) 
+claim.equipment_type(claim_a23, bipap_supplies)
