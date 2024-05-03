@@ -1,5 +1,3 @@
-Schema
-
 Person
 - dob: Date of birth (DD_MM_YYYY)
 - occupation
