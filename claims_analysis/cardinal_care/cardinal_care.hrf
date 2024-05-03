@@ -97,7 +97,12 @@ eligible_service(C,P,specialized_screening_counseling):-
 
 eligible_service(C,P,specialized_screening_counseling):-
   claim.screening_type(C,cancer) &
+  not_lung_cancer(C) &
   check_age_range_limit(C,cancer).   
+
+not_lung_cancer(C):-
+  claim.screening_type(C,Cancer) &
+  distinct(Cancer,lung).
 
 eligible_service(C,P,preventive_care):-
   claim.location(C,L) &
@@ -478,7 +483,8 @@ yearly_visit_limit(artificial_insemination,0,200,6)
 
 valid_location(routine_physical,phys_office).
 valid_location(preventive_care,phys_office).
-valid_location(preventive_care,facility).
+valid_location(preventive_care,hospital).
+valid_location(preventive_care,outpatient_dept).
 valid_location(gynecological_exam,phys_office).
 valid_location(gynecological_exam,ob_office).
 valid_location(gynecological_exam,gyn_office).

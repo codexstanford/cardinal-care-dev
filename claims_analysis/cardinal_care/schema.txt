@@ -1,3 +1,79 @@
+Schema
+
+Claim
+- Policy
+- Date
+- Claimant
+- hosp_start_time
+- hosp_end_time
+- Hospital
+--- stanford_medical_center
+--- menlo_medical_clinic
+--- sutter_health
+- Location
+--- phys_office
+--- ob_office
+--- gyn_office
+--- ob_gyn_office
+--- telemedicine
+--- sp_office
+--- allergy_specialist
+--- contra_office
+--- birthing_center
+--- outpatient_dept
+--- surgery_center
+--- home
+--- hospital
+- Reason
+--- specialized_screening_counseling
+----- cancer
+----- obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum
+--- preventive_care
+--- female_contraceptives
+--- routine_physical
+--- gynecological_exam
+--- physician_consultation
+--- allergy
+--- breast_pump_supplies
+--- physician_consultation
+--- allergy
+--- inpatient_surgical_services
+--- outpatient_surgical_services
+--- inpatient_care
+--- outpatient_surgery_facility_charges
+--- home_health_care
+--- non_surgical_physican_service
+- family_member_present (Family Member or Caregiver Present)
+- type_of_care
+--- Emergency
+--- Non emergency
+- mother_hbsag (Mother's HBsAg status for hep_b vaccines)
+--- Negative
+--- Positive
+--- Unknown
+- vaccine_brand
+- anti_hbs_count (count of anti-HBs in mlU/mL for hep_b vaccines )
+-birth_weight (birth weight in grams)
+- home_service
+--- transportation
+--- homemaker_service
+--- home_delivery
+--- maintenance_therapy
+- service_provider
+- Vaccine
+- vaccine_dose_count
+- vaccine_dose_count_annual
+- Contraceptive service 
+- Allegy service
+- Contraceptive service 
+- Allegy service
+- Consequence_of_occupation
+- screening_type
+- cancer_type
+- previous_vaccines_pfizer (for covid)
+- previous_vaccines_moderna (for covid)
+- previous_vaccines_other (for covid, covers janssen and novovax only)
+- previous_vaccines_flu_more_than_2
 
 Person
 - dob: Date of birth (DD_MM_YYYY)

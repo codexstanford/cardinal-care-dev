@@ -367,7 +367,7 @@ person.occupation(person_a8,other)
 claim.consequence_of_occupation(claim_a8,no)
 claim.location(claim_a8,phys_office)
 
-%% test cases for covid gvaccine
+%% test cases for covid vaccine
 %% expected - covered(X) - claim_a9,claim_a11
 
 
