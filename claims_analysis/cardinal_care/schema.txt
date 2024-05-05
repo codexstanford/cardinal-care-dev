@@ -209,7 +209,7 @@ Claim
 	- hep_b
 	- covid
 	- flu
-- vaccine_brand: The brand of vaccine taken for covid vaccines
+- vaccine_brand: The brand of vaccine taken 
 	- twinrix
 	- pfizer
 	- moderna

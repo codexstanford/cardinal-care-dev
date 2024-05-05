@@ -160,7 +160,7 @@ eligible_service(C,P,female_contraceptives):-
   claim.location(C,L) &
   contraceptive_location_check(Service,L).
 
-eligible(C,P,transplant_travel_and_lodging):-
+eligible_service(C,P,transplant_travel_and_lodging):-
   claim.recipient(C,Recipient) &
   policy.covered_people(P,List) &
   member(Recipient,List).
