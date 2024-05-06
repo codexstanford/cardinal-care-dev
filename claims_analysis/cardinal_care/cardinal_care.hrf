@@ -50,12 +50,27 @@ eligible_service(C,P,Service):-
   claim.location(C,L) &
   valid_location(Service,L).
 
+% service provider and location
+eligible_service(C,P,X):-
+  covered_list_with_service_provider_and_location(List) &
+  member(X,List) &
+  claim.service_provider(C,O) &
+  valid_service_provider(X,O) &
+  claim.location(C,L) &
+  valid_location(X,L).
+
 % services that have only location restriction
 eligible_service(C,P,X):-
   covered_list_with_location(List) &
   member(X,List) &
   claim.location(C,L) &
   valid_location(X,L).
+
+% yearly limit
+eligible_service(C,P,X):-
+  covered_list_with_yearly_limit(List) &
+  member(X,List) &
+  check_policy_year_limit(C,Service)
 
 % services that have only service provider restriction
 eligible_service(C,P,X):-
@@ -120,6 +135,7 @@ eligible_service(C,P,preventive_care):-
   claim.vaccine_dose_count(C,D) &
   leq(D,N).
 
+% https://www.cdc.gov/mmwr/volumes/72/rr/rr7202a1.htm
 % Not implementing as these are recommendations and not mandatory requirements
 % LAIV4 should not be used during pregnancy but can be used postpartum. 
 % >= 65: recommend inactivated influenza vaccine (HD-IIV4), quadrivalent recombinant influenza vaccine (RIV4), or quadrivalent adjuvanted inactivated influenza vaccine (aIIV4). 
@@ -139,28 +155,40 @@ eligible_service(C,P,preventive_care):-
   leq(D,N).
 
 eligible_service(C,P,female_contraceptives):-
-  claim.claimant(C,Cl) &
   claim.contraceptive_service(C,Service) &
   fda_approved(Service) &
   claim.location(C,L) &
   contraceptive_location_check(Service,L).
 
-eligible_service(C,P,inpatient_surgical_services):-
-  claim.location(C,L) &
-  valid_location(inpatient_surgical_services,L) &
-  claim.service_provider(C,O) &
-  valid_service_provider(inpatient_surgical_services, O).
+eligible_service(C,P,transplant_travel_and_lodging):-
+  claim.recipient(C,Recipient) &
+  policy.covered_people(P,List) &
+  member(Recipient,List).
+  
+eligible_service(C,P,comprehensive_infertility_services):-
+  claim.is_infertile(C,yes) &
+  claim.had_sterlization(C, no) &
+  claim.cause_of_infertility(C, Cause) &
+  valid_infertility_cause_for_artificial_insemination(List) &
+  member(Cause, List) &
+  claim.infertility_service(C,artificial_insemination) &
+  check_policy_year_limit(C,artificial_insemination).
+% not covered: injectible_infertility_medication, 
+% (Part of ART)thawing_frozen_eggs_sperm, donor_charges, surrogacy_charges, gestational_charges, home_kits, ovulation_induction
+% IVF, ZIFT, GIFT, cryptopreserved_embryos_transfer_or_service
+% https://www.aetna.com/cpb/medical/data/300_399/0327.html
 
-eligible_service(C,P,outpatient_surgical_services):-
-  claim.location(C,L) &
-  valid_location(outpatient_surgical_services,L) &
-  claim.service_provider(C,O) &
-  valid_service_provider(outpatient_surgical_services, O).
 
+eligible_service(C,P,durable_medical_and_surgical_equipment):-
+  claim.dme_provider(C,Provider) &
+  tier_one_dme_providers(List) &
+  member(Provider,List) &
+  claim.equipment_type(C,Type) &
+  dme_products(Provider,Products) &
+  member(Type,Products) & 
+  dme_excluded_list(Excluded) &
+  ~member(Type, Excluded).
 
-eligible_service(C,P,outpatient_surgery_facility_charges):-
-  claim.location(C,L) &
-  valid_location(outpatient_surgery_facility_charges,L).
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Age limits for children are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#
@@ -460,6 +488,7 @@ yearly_visit_limit(routine_physical,0,22,0).
 yearly_visit_limit(routine_physical,22,200,1)
 yearly_visit_limit(gynecological_exam,0,200,1).
 yearly_visit_limit(home_health_care,0,200,100).
+yearly_visit_limit(artificial_insemination,0,200,6)
 
 valid_location(routine_physical,phys_office).
 valid_location(preventive_care,phys_office).
@@ -488,6 +517,8 @@ valid_location(home_health_care,home)
 valid_location(non_surgical_physican_service,hospital)
 valid_location(well_newborn_nursery_care,hospital)
 valid_location(well_newborn_nursery_care,birthing_center)
+valid_location(inpatient_mental_health,hospital)
+
 
 contraceptive_location_check(Service, contra_office).
 contraceptive_location_check(sterilization_surgery_for_women,L).
@@ -509,12 +540,27 @@ valid_service_provider(voluntary_sterilization_reversal, specialist_surgeon)
 
 
 valid_screening_list([obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,
-genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum]). 
-covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care,home_health_care]) % list of services that are covered with location restrictions
+
+genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum]).
+covered_list_with_location([physician_consultation,allergy,inpatient_care,non_surgical_physican_service,inpatient_surgical_services,well_newborn_nursery_care,home_health_care,inpatient_mental_health,outpatient_surgery_facility_charges]) % list of services that are covered with location restrictions
+
 covered_list_with_service_provider([abortion,voluntary_sterilization_reversal]) % list of services that are covered with service provider restrictions
-covered_list([breast_pump_supplies,hospice,skilled_nursing,skilled_nursing,maternity_care]). %always covered
+covered_list_with_service_provider_and_location([inpatient_surgical_services, outpatient_surgical_services]) % list of services that are covered with service provider restrictions and location restrictions
+covered_list([breast_pump_supplies,hospice,skilled_nursing,maternity_care, outpatient_mental_office_visit, outpatient_mental_other_services, advanced_reproductive_technology_care]). %always covered
 home_not_covered_list([transportation,homemaker_service,home_delivery,maintenance_therapy]).
 
+% https://www.aetna.com/cpb/medical/data/300_399/0327.html
+% a. infertile couples with mild male-factor fertility problems; (when 2 or more semen analyses, measured at least two weeks apart, have 1 or more variables below the 5th percentile)
+% b. unexplained infertility problems;
+% c. minimal to mild endometriosis;
+% d. medically refractory erectile dysfunction or vaginismus preventing intercourse;
+% e. couples where the man is HIV positive and undergoing sperm washing; 
+% f. couples undergoing menotropin ovarian stimulation; or
+% g. clomiphene-citrate-stimulated artificial insemination (intra-cervical insemination or IUI) medically necessary for infertile women with WHO Group II ovulation disorders such as polycystic ovarian syndrome who ovulate with clomiphene citrate but have not become pregnant after ovulation induction with clomiphene.
+valid_infertility_cause_for_artificial_insemination([mild_male_problems, unexplained, mild_endometriosis, ed_or_vaginismus_preventing, male_hiv_positive, menotropin_stimulation, group_two_disorders])
+
+
+% From https://www.fda.gov/consumers/free-publications-women/birth-control
 fda_approved(counseling).
 fda_approved(rod).
 fda_approved(larc).
@@ -536,6 +582,22 @@ fda_approved(female_condom).
 fda_approved(spermicide).
 fda_approved(levonorgestrel_15_mg).
 fda_approved(ulipristal_acetate).
+
+
+% vendors for dme. Taken from https://vaden.stanford.edu/news/durable-medical-equipment-dme-and-laboratory-benefits-under-cardinal-care
+tier_one_dme_providers([byram_healthcare,advanced_diabetes_supply,edgepark_medical,apria])
+
+% products by each provider
+% https://www.aetna.com/dsepublicContent/assets/pdf/en/DME_National_Provider_Listing.pdf
+% https://www.northcoastmed.com/browse-our-products/
+
+dme_products(byram_healthcare, [diabetic_testing_supplies, ostomy_supplies, urological_supplies, wound_care, breast_pumps_and_supplies, continuous_glucose_monitors, blood_pressure_monitors ])
+dme_products(advanced_diabetes_supply, [diabetic_testing_supplies, continuous_glucose_monitors, insulin_pumps_and_supplies, insulin, inpen, glucose_meters])
+dme_products(edgepark_medical, [diabetic_testing_supplies, ostomy_supplies, urological_supplies, wound_care, incontinence, insulin_pumps_and_supplies, continuous_glucose_monitors, breast_pumps_and_supplies, pleurx_kits ])
+dme_products(apria, [oxygen_concentrators, ventilators, cpap_supplies, bipap_supplies, ambulatory_aids, hospital_beds, sad_light_boxes, knee_walker ])
+
+
+dme_excluded_list([whirlpools,portable_whirlpool_pumps,sauna_baths,massage_devices,over_bed_tables,elevators,communication_aids,vision_aids,telephone_alert_systems,personal_hygiene_and_convenience_items])
 
 %%%%%%%%%%%%%%%%%%% Helper Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -582,4 +644,12 @@ minor_or_dependent(C,Cl):-
   claim.time(C,C_D,C_T) &
   get_date_diff(C_D, DOB, Age) &
   leq(Age,17).
+
+person.immunocompromised(Cl,Immuno_Status):-
+  person.condition(Cl,immunocompromised) &
+  eval(yes, Immuno_Status).
+
+person.immunocompromised(Cl,Immuno_Status):-
+  ~person.condition(Cl,immunocompromised) &
+  eval(no, Immuno_Status).
 
