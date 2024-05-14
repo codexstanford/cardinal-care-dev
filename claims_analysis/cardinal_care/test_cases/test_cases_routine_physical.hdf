@@ -1,3 +1,4 @@
+% expected result - [claim3]
 claim.policy(claim3,policy1)
 policy.type(policy1,cardinal)
 claim.claimant(claim3,person2)

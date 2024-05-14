@@ -13,6 +13,17 @@ function readFileToStringSync(filePath) {
     }
 }
 
+// Function to extract the expected result list from the comment
+function extractExpectedResult(fileContent) {
+    const commentLine = fileContent.split('\n')[0]; // Get the first line
+    const match = commentLine.match(/%\s*expected result\s*-\s*\[(.*)\]/i); // Match the expected result comment
+    if (match && match[1]) {
+        return match[1].split(',').map(item => item.trim()); // Split and trim the list items
+    } else {
+        return null;
+    }
+}
+
 function main() {
     let accumulated_test_results = [];
 
@@ -26,24 +37,27 @@ function main() {
         return;
     }
 
-    let test_path = 'test_cases/test_case3.hdf';
-    const test_file_contents = readFileToStringSync(test_path);
-    if (!test_file_contents) {
-        console.error('Failed to read test file.');
-        return;
-    }
-
-    // Assuming definemorerules and readdata are defined elsewhere in your code
     let ruleset = definemorerules([], readdata(rule_file_contents));
-    let dataset = definemorefacts([], readdata(test_file_contents));
 
-    // ================ Example test 1 ================
-    let test_name = "Example Test 1";
-    accumulated_test_results.push([test_name, run_unit_test(test_name, 'X', 'covered(X)', ['claim3'], dataset, ruleset, true)]); // Prints the verbose output
+    const test_folder = 'test_cases';
+    const test_files = fs.readdirSync(test_folder);
     
-    // ================ Example test 2 ================
-    // test_name = "Example Test 2";
-    // accumulated_test_results.push([test_name, run_unit_test(test_name, 'X', 'q(X)', ['b'], 'p(a) p(b)', ruleset, true)]); // Prints the verbose output
+    for (let test_file of test_files) {
+        let test_path = `${test_folder}/${test_file}`;
+        const test_file_contents = readFileToStringSync(test_path);
+        if (!test_file_contents) {
+            console.error('Failed to read test file:', test_file);
+            continue;
+        }
+        
+        
+        let expected_result = extractExpectedResult(test_file_contents);
+        console.log("Expected Result: ", expected_result);
+        let dataset = definemorefacts([], readdata(test_file_contents));
+        
+        let test_name = `Test ${test_file}`;
+        accumulated_test_results.push([test_name, run_unit_test(test_name, 'X', 'covered(X)', expected_result, dataset, ruleset, 2)]); // Prints the verbose output
+    }
 
     // ==================== Aggregate results ====================
     let num_succeeded_tests = accumulated_test_results.filter(function(result_pair) {return result_pair[1]}).length;
