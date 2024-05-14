@@ -1,4 +1,5 @@
 // Depends on epilog.js
+const { definemorefacts, read, compfinds, readdata, grindem} = require('./epilog.js');
 
 // Returns true if the query run on the dataset (induced by dataset_str) and ruleset produces exactly the results in expected_result_list (ignoring order)
     // and false otherwise
@@ -39,3 +40,7 @@ function run_unit_test(test_name, variable_expr, query_str, expected_result_list
 
     console.log(run_unit_test("Example Test", 'X', 'q(X)', ['b', 'a'], 'p(a) p(b)', ruleset, true)); // Prints 'true', in addition to the verbose output
 */
+// Export the functions
+module.exports = {
+    run_unit_test
+};
