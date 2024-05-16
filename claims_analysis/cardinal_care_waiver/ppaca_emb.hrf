@@ -1,3 +1,4 @@
+% Side note, ppaca aligns with ACA for medicare. Notes on medicare here: https://docs.google.com/document/d/1qimCd-hvrCgm8cXluwJEcmb0ObUW6-5Rzi8txOAEhf0/edit?usp=sharing
 emb_covered(C) :-
   claim.policy(C, P) &
   policy.type(P,T) &

@@ -6,7 +6,7 @@ covered(C) :-
 covered(C, P, kaiser_hmo) :-
   valid_insuree(C,P) &
   policy_active(C,P) &
-  claim.type(C, T) &
+  claim.reason(C, T) &
   eligible_service(C,P,T)
 
 valid_insuree(C,P) :-
@@ -32,9 +32,96 @@ get_timestamp_from_date(DATE,STAMP) :-
   evaluate(parsedate(DATE),[D,M,Y]) &
   evaluate(maketimestamp(Y,M,D,1,1,1), STAMP)
 
+% Preventive Care START
+
+% Page 15
+eligible_service(C, P, rehabilitative_habilitative):-
+  claim.reason(C, rehabilitative_habilitative) &
+  claim.item(C, X) &
+  elligible_rehabilitative_habilitative_service(C, P, X)
+
+elligible_rehabilitative_habilitative_service(C, P, X) :-      % Quantity Limit and other exceptions
+  rehabilitative_habilitative_list(List) &
+  member(X, List) &
+  ~rehabilitative_habilitative_exception(C, P, X) &
+  rehabilitative_habilitative_cost(X, N) %&
+  % cost_to_add(C, P, N)
+  
+
+rehabilitative_habilitative_exception(C, P, X) :- % Theoretically this should be covered by line 43's relation
+  rehabilitative_habilitative_exclusions_list(List) &
+  member(X, List)
+
+rehabilitative_habilitative_exception(C, P, X) :- % Need another exception for pg. 58 "not health care item or service" --> schema thing
+  Item.type(X, T) &
+  rehabilitative_habilitative_inclusions_list(List) &
+  ~member(T, List)
+
+rehabilitative_habilitative_inclusions_list([healthcare_items, healthcare_services])
+rehabilitative_habilitative_exclusions_list([respite_care, day_care, recreational_care, residential_treatment, social_services, custodial_care, education_services, vocational_training])
+
+rehabilitative_habilitative_list([individual, group, organized_day_program]).
+rehabilitative_habilitative_cost(individual, 30) % per visit
+rehabilitative_habilitative_cost(group, 15) % per visit
+rehabilitative_habilitative_cost(organized, 30) % per day
+
+% Reproductive Health Services START
+
+% Family Planning
+eligible_service(C, P, family_planning):-
+  claim.reason(C, family_planning) &
+  claim.item(C, X) &
+  elligible_family_planning_service(C, P, X)
+
+elligible_family_planning_service(C, P, X) :-
+  elligible_family_planning_service_list(List) &
+  member(X, List) &
+  ~family_planning_exception(C, P, X) &
+  family_planning_cost(C, P, X)
+
+family_planning_cost(C, P, X) :-
+  elligible_family_planning_cost(X, N) % &
+  %cost_to_add(C, P, N)
+
+% Page 15
+elligible_family_planning_service_list([counseling, injectible_insertable_internal, female_sterilization_operation, female_sterilization_other, male_sterlization_operation, male_sterilization_other])
+% For larger pools, start separating into lists of cost types (none vs some) and check membership (less hardcoding). 
+elligible_family_planning_cost(counseling, 0)
+elligible_family_planning_cost(injectible_insertable_internal, 0)
+elligible_family_planning_cost(female_sterilization_operation, 0)
+elligible_family_planning_cost(female_sterilization_other, 0)
+elligible_family_planning_cost(male_sterilization_operation, 150)
+elligible_family_planning_cost(male_sterilization_other, 50)
+
+% Family Planning
+eligible_service(C, P, abortion_related):-
+  claim.reason(C, abortion_related) &
+  claim.item(C, X) &
+  elligible_abortion_service(C, P, X)
+
+elligible_abortion_related_service(C, P, X) :-
+  elligible_abortion_related_service_list(List) &
+  member(X, List) &
+  ~abortion_related_exception(C, P, X)
+
+abortion_related_exception(C, P, X) :-
+  claim.item(X, prescription_drugs) &
+  ~obeys_formulary_guidelines(X)      % Pg. 15 "prescription drugs, in accord with our drug formulary guidelines" --> This relation may not be worth/necessitate adding schema for/
+
+elligible_abortion_related_service_list([surgical_abortion, prescription_drugs, other_abortion_services])
+
+% Skilled Nursing Facility Care (Pg. 16)
+eligible_service(C, P, skilled_nursing_facility_care):-   % Schema for this: admit date, leave date, benefit period (has it been 60 days since prior admit date)
+  claim.reason(C, skilled_nursing_facility_care) &
+  claim.item(C, X) %&
+  % item.admit_date(C, ADate) &
+  % item.release_date(C, RDate) & % Assumes days, not date, actually.
+  % leq(minus(RDate, ADate), 100) &
+  % valid_benefit_period(C, P, X)       % Valid benefit period is 6- days without inpatient in a hospital or skilled nursing facility, receivin a skilled level of care.
+
 % Prescriptions
 eligible_service(C, P, prescription):-
-  claim.type(C, prescription) &
+  claim.reason(C, prescription) &
   claim.item(C, X) &
   elligible_prescription(C, P, X)
 
@@ -42,7 +129,7 @@ elligible_prescription(C, P, X) :-      % QWuantity Limit and other exceptions
   prescriptions_list(List) &
   member(X, List) &
   ~prescription_exception(C, P, X) &
-  prescription_cost(C, P, X)
+  prescription_cost(C, P, X) % &
 
 prescription_cost(C, P, X) :-
   prescription.tier(X, T) &
@@ -71,6 +158,7 @@ prescription_cost(C, P, X) :-
 
 ~international(kaiser_hmo)
 
+% From Formulary
 prescriptions_list([ibuprofen, diphenhydramine_hcl, oxycodone_hcl, tracleer, cayston]).
 prescription.tier(ibuprofen, 1)
 prescription.tier(diphenhydramine_hcl, 1)
