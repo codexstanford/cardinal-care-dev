@@ -53,10 +53,9 @@ function main() {
         
         let expected_result = extractExpectedResult(test_file_contents);
         console.log("Expected Result: ", expected_result);
-        let dataset = definemorefacts([], readdata(test_file_contents));
         
         let test_name = `Test ${test_file}`;
-        accumulated_test_results.push([test_name, run_unit_test(test_name, 'X', 'covered(X)', expected_result, dataset, ruleset, 2)]); // Prints the verbose output
+        accumulated_test_results.push([test_name, run_unit_test(test_name, 'X', 'covered(X)', expected_result, test_file_contents, ruleset, 2)]); // Prints the verbose output
     }
 
     // ==================== Aggregate results ====================
