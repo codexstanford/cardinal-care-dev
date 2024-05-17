@@ -32,6 +32,8 @@ while len(drug_list) > 0:
         brand_name = tds[0].find('span', 'brandName')
         if brand_name:
             brand_name = brand_name.text
+        if not brand_name:
+            brand_name = 'error_not_found'
         generic_name = tds[0].find('span', 'genericName')
         if not generic_name:
             generic_name = tds[0].find('span', 'tableSubItem')
@@ -63,7 +65,9 @@ df.to_csv('../external_data/aetna_drugs.csv', index=False, mode='w', header=Fals
 with open('../external_data/aetna_drugs.hdf', 'w') as f:
     for i, values in df.iterrows():
         for col in cols[:-1]:
-            f.write(f'aetna_drugs.{col}(prescription_drug_{i}, {str(values[col]).replace(" ", "_").lower()})\n')
+            value = str(values[col]).replace(" ", "_").lower()
+            value = re.sub('[^0-9a-zA-Z]+', '_', value)
+            f.write(f'aetna_drugs.{col}(prescription_drug_{i}, {value})\n')
         for note in values['notes']:
             if notes == '':
                 continue

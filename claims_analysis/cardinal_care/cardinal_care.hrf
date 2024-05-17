@@ -190,6 +190,11 @@ eligible_service(C,P,durable_medical_and_surgical_equipment):-
   ~member(Type, Excluded).
 
 
+eligible_service(C,P,outpatient_prescription_drugs):-
+  claim.drug_name(C, Drug_Name) &
+  fda_drug_name(Drug_id, Drug_Name) &
+  ~prescription_exception(C,P,Drug_id).
+
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Age limits for children are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#
 % Age limits for adults are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/adult-schedule-notes.html
@@ -475,6 +480,29 @@ exception(C,P):-
   claim.claimant(C,Cl) &
   minor_or_dependent(C,Cl) &
   claim.family_member_present(C,no).
+
+
+%%%%%%%%% Prescription Drugs %%%%%%%%%%
+
+% not Biological sera 
+prescription_exception(C,P,Drug_id):-
+  aetna_drugs.generic_name(Drug_id, Drug_name) &
+  equal(Drug_name, biological_sera)
+
+% dietary supplyments or 
+% drugs to treat increase sexual desire, including drugs, implants, devices or preparations to correct or enhance erectile function, enhance sensitivity, or alter the shape or appearance of a sex organ 
+prescription_exception(C,P,Drug_id):-
+  aetna_drugs.subtherapeutic_class(Drug_id,nutritional_supplements___vitamins_and_supplements) |
+  aetna_drugs.subtherapeutic_class(Drug_id,erectile_dysfunction)
+
+
+
+exception(C,P):-
+  claim.reason(C, outpatient_prescription_drugs) &
+  claim.drug_name(C,Drug_Name) &
+  fda_approved(Drug_id, Drug_Name) &
+
+
 
 
 %%%%%%%%%%%%%%%%%%% Example Data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
