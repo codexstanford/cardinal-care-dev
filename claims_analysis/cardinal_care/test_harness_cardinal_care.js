@@ -55,7 +55,9 @@ function main() {
         console.log("Expected Result: ", expected_result);
         
         let test_name = `Test ${test_file}`;
-        accumulated_test_results.push([test_name, run_unit_test(test_name, 'X', 'covered(X)', expected_result, test_file_contents, ruleset, 2)]); // Prints the verbose output
+        // create save file path as traces/test_file_name.trace
+        let save_file_path = `traces/${test_file}.txt`;
+        accumulated_test_results.push([test_name, run_unit_test(test_name, 'X', 'covered(X)', expected_result, test_file_contents, ruleset, 1, false)]); // Prints the verbose output
     }
 
     // ==================== Aggregate results ====================
