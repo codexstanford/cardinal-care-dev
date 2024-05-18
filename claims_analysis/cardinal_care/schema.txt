@@ -12,10 +12,9 @@ Claim
 --- sutter_health
 - Location
 --- phys_office
---- facility
 --- ob_office
 --- gyn_office
---- ob_gyn
+--- ob_gyn_office
 --- telemedicine
 --- sp_office
 --- allergy_specialist
@@ -26,15 +25,17 @@ Claim
 --- home
 --- hospital
 - Reason
---- specialized_screening_counselling
+--- specialized_screening_counseling
 ----- cancer
------ obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer,stress_management,chronic_condition,lactation,prenatal_postpartum
+----- obesity,healthy_diet,alcohol_drug_misuse,tobacco_missuse,depression,sti,genetic_risk_cancer_breast_ovarian,stress_management,chronic_condition,lactation,prenatal_postpartum
 --- preventive_care
+----- flu
+----- covid
+----- hep_b
 --- female_contraceptives
 --- routine_physical
 --- gynecological_exam
 --- physician_consultation
---- allergy
 --- breast_pump_supplies
 --- physician_consultation
 --- allergy
@@ -44,6 +45,12 @@ Claim
 --- outpatient_surgery_facility_charges
 --- home_health_care
 --- non_surgical_physican_service
+--- well_newborn_nursery_care
+--- abortion
+--- voluntary sterilization reversal
+--- hospice
+--- skilled nursing
+--- maternity care
 - family_member_present (Family Member or Caregiver Present)
 - type_of_care
 --- Emergency
@@ -55,14 +62,20 @@ Claim
 - vaccine_brand
 - anti_hbs_count (count of anti-HBs in mlU/mL for hep_b vaccines )
 -birth_weight (birth weight in grams)
-- home_service
+- home_service (Type of service received within home_health_care)
 --- transportation
 --- homemaker_service
 --- home_delivery
 --- maintenance_therapy
 - service_provider
-- Vaccine
-- vaccine_dose_count
+--- operating_surgeon
+--- anesthetist
+--- surgical_assistant
+--- inpatient_physician
+--- outpatient_physician
+--- specialist_surgeon
+- Vaccine (Type of Vaccine)
+- vaccine_dose_count (How many doses of this vaccine have you received, including the current vaccine)
 - vaccine_dose_count_annual
 - Contraceptive service 
 - Allegy service
