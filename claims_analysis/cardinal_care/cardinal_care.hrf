@@ -425,11 +425,11 @@ yearly_visit_limit(Service,Age,Limit):-
   leq(MinAge,Age).
 
 time_lesser_with_tiebreak(C1,TS1,C2,TS2):-
-  leq(TS1,TS2).
+  lt(TS1,TS2).
 
 time_lesser_with_tiebreak(C1,TS1,C2,TS2):-
   same(TS1,TS2) &
-  leq(C1,C2).
+  lt(C1,C2).
 
 % Count number of visits for a service in the policy year
 visit_current_year(Service,Claim1,Claim2):-
@@ -451,7 +451,7 @@ visit_current_year(Service,Claim1,Claim2):-
   claim.time(Claim2,C2_D,C2_T) &
   get_timestamp_from_datetime(C1_D,C1_T,C1_TS) &
   get_timestamp_from_datetime(C2_D,C2_T,C2_TS) &
-  time_lesser_with_tiebreak(Claim1,C1_TS,Claim2,C2_TS) &
+  time_lesser_with_tiebreak(Claim2,C2_TS,Claim1,C1_TS).
 
  
   % &

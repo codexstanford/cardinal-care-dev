@@ -1,0 +1,56 @@
+This is a guide for collecting data on age limits for vaccines covered by a policy.
+
+1. Observe the policy wording, cardinal care says the following:
+Subject to any age limits provided for in the comprehensive
+guidelines supported by Advisory Committee on
+Immunization Practices of the Centers for Disease Control and
+Prevention. 
+This gives us two pieces of information
+ - a) the names of the organizations we need to use to find data and
+ b) The policy only cares about "age limits" - this means we can ignore other sources
+ of limits such as number of days between doses.
+ 2. Refer to the organizations mentioned in the policy doc to get detailed information
+ on age limits. For hep_b these are at: 
+ https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#note-hepb - for children
+ and 
+ https://www.cdc.gov/vaccines/schedules/hcp/imz/adult-schedule-notes.html#note-hepb - for adults
+ and
+ http://www.cdc.gov/vaccines/hcp/acip-recs/vacc-specific/hepb.html for more details
+ I recommend creating a spreadsheet to track limits - for hep_b I used:
+https://office365stanford-my.sharepoint.com/:x:/r/personal/lalwani_stanford_edu/Documents/vaccine%20schedules.xlsx?d=wba52d2d17a1c4bde9e5cdd104debf400&csf=1&web=1&e=B91e0K&nav=MTVfezAwMDAwMDAwLTAwMDEtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMH0
+3. Now, I describe how I derived the rules for the hep-b case.
+The child schedule mentions: 
+Administration of 4 doses is permitted when a combination vaccine containing HepB is used after the birth dose.
+Final (3rd or 4th) dose: age 6–18 months (minimum age 24 weeks)
+This implies you can have a limit of 2 doses up to the age of 6 months, which increases to 3 a combination vaccine containing HepB is used after the birth dose.
+After the age of 6 months, you can take the final dose which implies the above limit increases by one.
+For adults the policy states: Age 19 through 59 years: complete a 2- or 3- or 4-dose series
+Hence, the limit for doses becomes 4 unconditionally after the age of 18 (there is a similar rule for 18 year olds)
+
+
+Post-vaccination serology testing and revaccination (if anti-HBs<10mlU/mL) is recommended for certain populations, including:
+Infants born to HBsAg-positive mothers
+Persons who are predialysis or on maintenance dialysis
+Other immunocompromised persons
+For detailed revaccination recommendations, see http://www.cdc.gov/vaccines/hcp/acip-recs/vacc-specific/hepb.html.
+
+Usually, the detailed recommendations website contains links to both CURRENT and ARCHIVED recommended practices. Please refer to only the CURRENT recommendations.
+The documents are usually complex, so it's best to look for something specific. In this case, I specifically searched for the word "revaccination" which helped me find 
+more detailed eligibility criteria for revaccinations.
+
+After combing through the documents at the above link, I found the following details:
+- single-dose revaccination for infants born to HBsAg-positive women not responding to the initial vaccine series;
+- postvaccination serologic testing 1–2 months after the final dose of vaccine is recommended for certain persons following vaccination 
+(e.g., hemodialysis patients, HIV-infected and other immunocompromised persons, health care personnel, and sex partners of HBsAg-positive persons)
+- Revaccination may consist of administration of a second complete HepB vaccine series
+- Administration of more than two complete HepB vaccine series is generally not recommended, except for hemodialysis patients
+
+Thus, (if anti-HBs<10mlU/mL), the limit for infants born to HBsAg-positive women increases to 5.
+For other cases eligible for revaccination (HIV-infected and other immunocompromised persons, health care personnel, and sex partners of HBsAg-positive persons) the limit increases by 4
+For hemodialysis patients there is no limit
+
+How to encode in policy: 
+
+encode the above rules in the age_range_limit_<YOUR_VACCINE> clause.
+
+add a new eligible service rule for your vaccine that calls age_range_limit_<YOUR_VACCINE>, refer to eligible service rules for other vaccines to understand how to implement.
