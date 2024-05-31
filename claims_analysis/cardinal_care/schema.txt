@@ -21,6 +21,18 @@ Policy
 
 
 
+Prescription
+- patient: Person for whom the prescription is given
+- drug_id: Drugs recommended in this Prescription (use aetna formulary for drug_id)
+- use_case: purpose of the prescription
+	- cosmetics
+	- infertility
+	- increase_sexual_desire
+	- weight_gain_or_loss
+- date: Date of prescription
+- related_to_travel_or_work: yes/no whether the prescription is immunizations related to work or travel
+
+
 Claim
 - anti_hbs_count: count of anti-HBs in mlU/mL for hep_b vaccines
 - birth_weight: birth weight in grams
@@ -166,7 +178,6 @@ Claim
 	- inpatient_mental_health
 	- outpatient_mental_office_visit 
 	- outpatient_mental_other_services
-	- comprehensive_infertility_services
 	- advanced_reproductive_technology_care
 	- well_newborn_nursery_care
 	- voluntary_sterilization_reversal

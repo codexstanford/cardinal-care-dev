@@ -192,11 +192,17 @@ eligible_service(C,P,durable_medical_and_surgical_equipment):-
 % The Drug_id refers to the drug variable in aetna_drugs.hdf
 eligible_service(C,P,outpatient_prescription_drugs):-
   claim.prescription(C, Prescription) &
-  prescription.drug_id(Prescription, Drug_id) &
+  claim.claimant(C, Claimant) &
+  prescription.patient(Prescription, Claimant) &  % Claimant should be same as User
+  prescription.drug_id(Prescription, Drug_id) & 
   prescription.use_case(Prescription, Use_case) &
+  prescription.related_to_travel_or_work(Prescription, no) &
   disallowed_prescription_use_case(List) &
   ~member(Use_case, List) &
-  ~prescription_exception(C,P,Drug_id).
+  ~prescription_exception(C,P,Drug_id) &
+  evaluate(countofall(X,duplicative_claim_for_prescription(C,X)),1)
+
+
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Age limits for children are taken from https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#
@@ -379,6 +385,19 @@ age_range_visit_cancer(Claim1,Claim2):-
   get_date_diff(C1_D, DOB, Age) &
   get_age_range_limit(cancer,Cancer,Age,Limit,MinAge,MaxAge) &
   age_range_visit(Claim1,Claim2,MinAge,MaxAge,DOB).
+
+% check if the two claims are for the same prescription
+duplicative_claim_for_prescription(Claim1,Claim2):-
+  claim.claimant(Claim1,Person) &
+  claim.claimant(Claim2,Person) &
+  claim.policy(Claim1,Policy) &
+  claim.policy(Claim2,Policy) &
+  claim.reason(Claim1,outpatient_prescription_drugs) &
+  claim.reason(Claim2,outpatient_prescription_drugs) &
+  claim.prescription(Claim1, Prescription1) &
+  prescription.drug_id(Prescription1, Drug_id) &
+  claim.prescription(Claim2, Prescription2) &
+  prescription.drug_id(Prescription2, Drug_id)
 
 % check if the claim is within the age range
 age_range_visit(Claim1,Claim2,MinAge,MaxAge,DOB):-
@@ -625,7 +644,7 @@ dme_products(apria, [oxygen_concentrators, ventilators, cpap_supplies, bipap_sup
 
 dme_excluded_list([whirlpools,portable_whirlpool_pumps,sauna_baths,massage_devices,over_bed_tables,elevators,communication_aids,vision_aids,telephone_alert_systems,personal_hygiene_and_convenience_items])
 
-disallowed_prescription_use_case([cosmetics, infertility])
+disallowed_prescription_use_case([cosmetics, infertility, increase_sexual_desire, weight_gain_or_loss])
 
 
 %%%%%%%%%%%%%%%%%%% Helper Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
