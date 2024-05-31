@@ -19,7 +19,7 @@ function run_unit_test(test_name, variable_expr, query_str, expected_result_list
     let dataset = definemorefacts([], readdata(dataset_str));
 
     let results = compfinds(variable_expr, query, dataset, ruleset);
-    if(debug) {
+    if(verbose) {
         debugfinds(variable_expr, query, dataset, ruleset);
     }
     let expected_result_set = new Set(expected_result_list);
