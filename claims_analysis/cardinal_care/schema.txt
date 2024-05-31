@@ -27,8 +27,9 @@ Prescription
 - use_case: purpose of the prescription
 	- cosmetics
 	- infertility
-	- increase_sexual_desire
 	- weight_gain_or_loss
+	- tobaccco_cessation
+
 - date: Date of prescription
 - related_to_travel_or_work: yes/no whether the prescription is immunizations related to work or travel
 

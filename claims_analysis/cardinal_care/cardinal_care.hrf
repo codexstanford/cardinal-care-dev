@@ -644,7 +644,7 @@ dme_products(apria, [oxygen_concentrators, ventilators, cpap_supplies, bipap_sup
 
 dme_excluded_list([whirlpools,portable_whirlpool_pumps,sauna_baths,massage_devices,over_bed_tables,elevators,communication_aids,vision_aids,telephone_alert_systems,personal_hygiene_and_convenience_items])
 
-disallowed_prescription_use_case([cosmetics, infertility, increase_sexual_desire, weight_gain_or_loss])
+disallowed_prescription_use_case([cosmetics, infertility, weight_gain_or_loss])
 
 
 %%%%%%%%%%%%%%%%%%% Helper Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
