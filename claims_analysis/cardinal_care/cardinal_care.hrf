@@ -156,7 +156,7 @@ eligible_service(C,P,preventive_care):-
 
 eligible_service(C,P,female_contraceptives):-
   claim.contraceptive_service(C,Service) &
-  fda_approved(Service) &
+  fda_approved_contraceptive(Service) &
   claim.location(C,L) &
   contraceptive_location_check(Service,L).
 
@@ -189,10 +189,13 @@ eligible_service(C,P,durable_medical_and_surgical_equipment):-
   dme_excluded_list(Excluded) &
   ~member(Type, Excluded).
 
-
+% The Drug_id refers to the drug variable in aetna_drugs.hdf
 eligible_service(C,P,outpatient_prescription_drugs):-
-  claim.drug_name(C, Drug_Name) &
-  fda_drug_name(Drug_id, Drug_Name) &
+  claim.prescription(C, Prescription) &
+  prescription.drug_id(Prescription, Drug_id) &
+  prescription.use_case(Prescription, Use_case) &
+  disallowed_prescription_use_case(List) &
+  ~member(Use_case, List) &
   ~prescription_exception(C,P,Drug_id).
 
 %%%%%%%%%%%%%%%%%%% Range Limit Checks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -491,19 +494,14 @@ prescription_exception(C,P,Drug_id):-
 
 % dietary supplyments or 
 % drugs to treat increase sexual desire, including drugs, implants, devices or preparations to correct or enhance erectile function, enhance sensitivity, or alter the shape or appearance of a sex organ 
+% That are used for the purpose of weight gain or reduction, including but not limited to stimulants, preparations, foods or diet supplements, dietary regimens and supplements, food or food supplements, appetite suppressants or other medications 
 prescription_exception(C,P,Drug_id):-
   aetna_drugs.subtherapeutic_class(Drug_id,nutritional_supplements___vitamins_and_supplements) |
   aetna_drugs.subtherapeutic_class(Drug_id,erectile_dysfunction)
 
-
-
-exception(C,P):-
-  claim.reason(C, outpatient_prescription_drugs) &
-  claim.drug_name(C,Drug_Name) &
-  fda_approved(Drug_id, Drug_Name) &
-
-
-
+% For which the cost is covered by a federal, state, or government agency (for example: Medicaid or Veterans Administration) 
+prescription_exception(C,P,Drug_id):-
+  claim.cost_covered(C, yes)
 
 %%%%%%%%%%%%%%%%%%% Example Data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -589,27 +587,27 @@ valid_infertility_cause_for_artificial_insemination([mild_male_problems, unexpla
 
 
 % From https://www.fda.gov/consumers/free-publications-women/birth-control
-fda_approved(counseling).
-fda_approved(rod).
-fda_approved(larc).
-fda_approved(oral).
-fda_approved(iud_with_preogestin).
-fda_approved(sterilization_surgery_for_women).
-fda_approved(sterilization_surgery_for_men).
-fda_approved(implantable_rod).
-fda_approved(progestin_shot_injection).
-fda_approved(the_pill_estrogen_and_progestin).
-fda_approved(the_mini_pill_progestin).
-fda_approved(patch).
-fda_approved(vaginal_contraceptive_ring).
-fda_approved(diaphragm_with_spermicide).
-fda_approved(sponge_with_spermicide).
-fda_approved(cervical_cap_with_spermicide).
-fda_approved(male_condom).
-fda_approved(female_condom).
-fda_approved(spermicide).
-fda_approved(levonorgestrel_15_mg).
-fda_approved(ulipristal_acetate).
+fda_approved_contraceptive(counseling).
+fda_approved_contraceptive(rod).
+fda_approved_contraceptive(larc).
+fda_approved_contraceptive(oral).
+fda_approved_contraceptive(iud_with_preogestin).
+fda_approved_contraceptive(sterilization_surgery_for_women).
+fda_approved_contraceptive(sterilization_surgery_for_men).
+fda_approved_contraceptive(implantable_rod).
+fda_approved_contraceptive(progestin_shot_injection).
+fda_approved_contraceptive(the_pill_estrogen_and_progestin).
+fda_approved_contraceptive(the_mini_pill_progestin).
+fda_approved_contraceptive(patch).
+fda_approved_contraceptive(vaginal_contraceptive_ring).
+fda_approved_contraceptive(diaphragm_with_spermicide).
+fda_approved_contraceptive(sponge_with_spermicide).
+fda_approved_contraceptive(cervical_cap_with_spermicide).
+fda_approved_contraceptive(male_condom).
+fda_approved_contraceptive(female_condom).
+fda_approved_contraceptive(spermicide).
+fda_approved_contraceptive(levonorgestrel_15_mg).
+fda_approved_contraceptive(ulipristal_acetate).
 
 
 % vendors for dme. Taken from https://vaden.stanford.edu/news/durable-medical-equipment-dme-and-laboratory-benefits-under-cardinal-care
@@ -626,6 +624,9 @@ dme_products(apria, [oxygen_concentrators, ventilators, cpap_supplies, bipap_sup
 
 
 dme_excluded_list([whirlpools,portable_whirlpool_pumps,sauna_baths,massage_devices,over_bed_tables,elevators,communication_aids,vision_aids,telephone_alert_systems,personal_hygiene_and_convenience_items])
+
+disallowed_prescription_use_case([cosmetics, infertility])
+
 
 %%%%%%%%%%%%%%%%%%% Helper Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
