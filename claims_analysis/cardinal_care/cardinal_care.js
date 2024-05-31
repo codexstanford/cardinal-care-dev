@@ -611,7 +611,7 @@ valid_location(allergy,allergy_specialist)
 valid_location_contraceptive(counseling,contra_office)
 valid_location_contraceptive(rod,contra_office)
 valid_location_contraceptive(larc,contra_office)
-valid_location_contraceptive(preogestin,contra_office)
+valid_location_contraceptive(progestin,contra_office)
 valid_location_contraceptive(oral,contra_office)
 
 valid_screening_list([obesity,healthy_diet,alcohol_misuse,tobacco_missuse,depression,sti,
@@ -630,7 +630,7 @@ age_range_limit(cancer,breast,0,200,1).
 fda_approved(counseling).
 fda_approved(rod).
 fda_approved(larc).
-fda_approved(preogestin).
+fda_approved(progestin).
 fda_approved(oral).
 fda_approved(sterilization).
 `;

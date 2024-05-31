@@ -40,9 +40,6 @@ valid_hospitalization(C,P):-
   claim.type_of_care(C,emergency) &
   ~exception(C,P).
 
-
-
-
 %%%%%%%%%%%%%%%%%%% Eligible Services %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Services that have location restriction and visit limit in the policy year
 eligible_service(C,P,Service):-
@@ -610,7 +607,7 @@ fda_approved_contraceptive(counseling).
 fda_approved_contraceptive(rod).
 fda_approved_contraceptive(larc).
 fda_approved_contraceptive(oral).
-fda_approved_contraceptive(iud_with_preogestin).
+fda_approved_contraceptive(iud_with_progestin).
 fda_approved_contraceptive(sterilization_surgery_for_women).
 fda_approved_contraceptive(sterilization_surgery_for_men).
 fda_approved_contraceptive(implantable_rod).

@@ -56,7 +56,7 @@ Claim
 	- rod
 	- larc
 	- oral
-	- iud_with_preogestin
+	- iud_with_progestin
 	- sterilization_surgery_for_women
 	- sterilization_surgery_for_men
 	- implantable_rod
