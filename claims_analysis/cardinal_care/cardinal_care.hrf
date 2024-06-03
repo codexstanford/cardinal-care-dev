@@ -78,7 +78,7 @@ eligible_service(C,P,specialized_screening_counseling):-
 eligible_service(C,P,specialized_screening_counseling):-
   claim.screening_type(C,cancer) &
   claim.cancer_type(C,lung) &
-  evaluate(countofall(X,lung_cancer_past_twelve_months(C,X)),0). 
+  evaluate(countofall(X,lung_cancer_past_twelve_months(C,X)),1). 
 
 eligible_service(C,P,specialized_screening_counseling):-
   claim.screening_type(C,cancer) &
@@ -373,10 +373,13 @@ lung_cancer_past_twelve_months(Claim1,Claim2):-
   claim.screening_type(Claim2,cancer) &
   claim.cancer_type(Claim1,lung) &
   claim.cancer_type(Claim2,lung) &
+  claim.time(Claim1,C1_D,C1_T) &
+  claim.time(Claim2,C2_D,C2_T) &
   evaluate(parsedate(C1_D),[D,M,Y]) &
   evaluate(parsedate(C2_D),[D2,M2,Y2]) &
-  get_date_diff(C1_D, C2_D, Age) &
-  same(Age, 0)
+  get_date_diff_in_months(C1_D, C2_D, Months) &
+  leq(Months,12) &
+  leq(0, Months).
 
 % Count number of visits for a service in the policy year
 check_policy_year_limit(C,Service):-
