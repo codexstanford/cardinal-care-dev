@@ -13,13 +13,15 @@ const fs = require('fs');
     // dataset_str (string): a string specifying the Epilog dataset that will be queried
     // ruleset (epilog ruleset): the ruleset that will be queried
     // verbose (boolean): if true, prints additional debug information to the console. If false, only prints whether the test failed or succeeded.
-
-function run_unit_test(test_name, variable_expr, query_str, expected_result_list, dataset_str, ruleset, verbose = false) {
+    // trace (boolean): if true, prints the trace of the query to the console
+    // Returns: true if the test succeeded, false otherwise
+    
+function run_unit_test(test_name, variable_expr, query_str, expected_result_list, dataset_str, ruleset, verbose = false, trace = false) {
     let query = read(query_str);
     let dataset = definemorefacts([], readdata(dataset_str));
 
     let results = compfinds(variable_expr, query, dataset, ruleset);
-    if(verbose) {
+    if(trace) {
         debugfinds(variable_expr, query, dataset, ruleset);
     }
     let expected_result_set = new Set(expected_result_list);
