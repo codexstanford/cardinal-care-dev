@@ -40,6 +40,23 @@ valid_hospitalization(C,P):-
   claim.type_of_care(C,emergency) &
   ~exception(C,P).
 
+% separate rule for prescription as it is not linked to any hospital
+% The Drug_id refers to the drug variable in aetna_drugs.hdf
+valid_hospital(C,P):-
+  claim.reason(C, outpatient_prescription_drugs) &
+  claim.prescription(C, Prescription) &
+  claim.claimant(C, Claimant) &
+  prescription.patient(Prescription, Claimant) &  % Claimant should be same as User
+  prescription.drug_id(Prescription, Drug_id) & 
+  prescription.use_case(Prescription, Use_case) &
+  prescription.related_to_travel_or_work(Prescription, no) &
+  disallowed_prescription_use_case(List) &
+  ~member(Use_case, List) &
+  ~prescription_exception(C,P,Drug_id) &
+  evaluate(countofall(X,duplicative_claim_for_prescription(C,X)),1) &
+  ~exception(C,P).
+
+
 %%%%%%%%%%%%%%%%%%% Eligible Services %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Services that have location restriction and visit limit in the policy year
 eligible_service(C,P,Service):-
@@ -186,18 +203,6 @@ eligible_service(C,P,durable_medical_and_surgical_equipment):-
   dme_excluded_list(Excluded) &
   ~member(Type, Excluded).
 
-% The Drug_id refers to the drug variable in aetna_drugs.hdf
-eligible_service(C,P,outpatient_prescription_drugs):-
-  claim.prescription(C, Prescription) &
-  claim.claimant(C, Claimant) &
-  prescription.patient(Prescription, Claimant) &  % Claimant should be same as User
-  prescription.drug_id(Prescription, Drug_id) & 
-  prescription.use_case(Prescription, Use_case) &
-  prescription.related_to_travel_or_work(Prescription, no) &
-  disallowed_prescription_use_case(List) &
-  ~member(Use_case, List) &
-  ~prescription_exception(C,P,Drug_id) &
-  evaluate(countofall(X,duplicative_claim_for_prescription(C,X)),1)
 
 
 
