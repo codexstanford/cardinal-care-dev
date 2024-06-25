@@ -493,7 +493,7 @@ function build_precautions_taken_info_section() {
     newClaimsFormInputCell(1, "checkbox", false, "Were combustible materials removed from the area on the other side of partitions or walls?", "claim_conduction_ignition_removed_combustible_materials_input")
   ]));
 
-  rows.push(newClaimsFormSubElementTable("period-of-work-subelement-table", "Periods of Work", "Period of Work", "work_period", "claim.period_of_work", [
+  rows.push(newClaimsFormSubElementTable("period-of-work-subelement-table", "Periods of Work", "Period of Work", "work_period", "claim.period_of_work", false, [
     [{colSpan: 2, inputType: "number", defaultInput: 29, fieldSpecificIDSubstring: "claim_safety_check_minutes_input", factTemplate: "work_period.num_minutes_thorough_safety_check_for_signs_of_fire_or_combustion_around_above_or_below_the_work_area_made_at_regular_intervals_after_completion_of_work_period($SUB_ELEM_ID$, $VALUE$)", cellText: "For how many minutes after the completion of the period of work was a thorough safety check conducted at regular intervals above, around, and below for signs of fire or combustion?"}]
   ], update_coverage_indicator));
 
@@ -519,7 +519,7 @@ function build_subcontractor_info_section() {
 
   rows.push(newHeadingRow("Subcontractor Information", "subcontractor-info-subheading", ["claims-processing-section-subheading"]));
 
-  rows.push(newClaimsFormSubElementTable("subcontractors-subelement-table", "Subcontractors", "Subcontractor", "subcontractor", "claim.subcontractor_appointed_to_carry_out_services_at_premises_or_site_of_customer", [
+  rows.push(newClaimsFormSubElementTable("subcontractors-subelement-table", "Subcontractors", "Subcontractor", "subcontractor", "claim.subcontractor_appointed_to_carry_out_services_at_premises_or_site_of_customer", false, [
     [{colSpan: 2, inputType: "checkbox", defaultInput: true, fieldSpecificIDSubstring: "claim_took_reasonable_steps_to_obtain_subcontractor_ppl_info_boolean_input", factTemplate: "claim.insuree_took_reasonable_steps_to_obtain_information_from_subcontractor_prior_to_starting_work_that_they_have_ppl_insurance_in_force_during_their_period_of_involvement($CLAIM$, $SUB_ELEM_ID$, $VALUE$)", cellText: "Did the insuree take reasonable steps to obtain information from the subcontractor, prior to starting work, that the subcontractor has Public liability insurance in force throughout the period of involvement? "}]
   ], update_coverage_indicator));
 

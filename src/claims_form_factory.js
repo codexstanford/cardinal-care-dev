@@ -122,7 +122,7 @@ function _newInputElem(inputType, defaultInput, inputID, selectOptions = null) {
 
 // A collapsible table that allows the user to create and enter information about multiple objects of the same type (e.g. periods of work, vaccinations)
 // Returns a row containing a single cell, which contains the table
-function newClaimsFormSubElementTable(subElementTableID, subElementTableTitle, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
+function newClaimsFormSubElementTable(subElementTableID, subElementTableTitle, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, allowEditingSubElementID, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
 
     let subElementTable = document.createElement("table");
 
@@ -136,7 +136,7 @@ function newClaimsFormSubElementTable(subElementTableID, subElementTableTitle, s
     // Create the collapse, expand, "add another subelement" and "remove this subelement" buttons
         // Creates and adds the event listeners for each button
         // "removeThisSubElemButtonPrototype" is only used in the event listener for the "add another subelement" button, but currently returned anyway
-    let [collapseSubElemTableButton, expandSubElemTableButton, addAnotherSubElemButton, removeThisSubElemButtonPrototype] = _createSubElemTableButtons(subElementTable, subElementTableID, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback);
+    let [collapseSubElemTableButton, expandSubElemTableButton, addAnotherSubElemButton, removeThisSubElemButtonPrototype] = _createSubElemTableButtons(subElementTable, subElementTableID, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, allowEditingSubElementID, subElementSpecificRowSpecs, update_coverage_indicator_callback);
     
 
     // -- Build the heading row, with an "add another subelement" button
@@ -171,7 +171,7 @@ function newClaimsFormSubElementTable(subElementTableID, subElementTableTitle, s
 /********* Private helper functions for the creation of subelement tables *********/
 
 // Creates the collapse, expand, "add another subelement", and "remove this subelement" buttons
-function _createSubElemTableButtons(subElementTable, subElementTableID, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
+function _createSubElemTableButtons(subElementTable, subElementTableID, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, allowEditingSubElementID, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
     // -- Collapse Button
     let collapseSubElemTableButton = document.createElement("button");
     collapseSubElemTableButton.innerHTML = "v";
@@ -228,12 +228,12 @@ function _createSubElemTableButtons(subElementTable, subElementTableID, SUB_ELEM
     let addAnotherSubElemButtonClass = subElementTableID + "-add-another-subelement-button";
     addAnotherSubElemButton.classList.add(addAnotherSubElemButtonClass, "add-another-subelement-button");
     
-    _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElemButton, removeThisSubElemButtonPrototype, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, expandSubElemTableCallback, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback);
+    _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElemButton, removeThisSubElemButtonPrototype, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, expandSubElemTableCallback, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, allowEditingSubElementID, subElementSpecificRowSpecs, update_coverage_indicator_callback);
     
     return [collapseSubElemTableButton, expandSubElemTableButton, addAnotherSubElemButton, removeThisSubElemButtonPrototype];
 }
 
-function _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElemButton, removeThisSubElemButtonPrototype, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, expandSubElemTableCallback, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
+function _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElemButton, removeThisSubElemButtonPrototype, SUB_ELEM_ID_AND_CLASS_PREFIX, SUB_ELEM_ROW_CLASS, expandSubElemTableCallback, subElementEnglishName, subElementEpilogType, subElementAttributeRelationPredicate, allowEditingSubElementID, subElementSpecificRowSpecs, update_coverage_indicator_callback) {
     // For a given subelement table, this class is given to all cells that contain an input element for the object constant of a subelement.
         // For now, used to get all the object constants for subelements of a given type.
     const SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS = SUB_ELEM_ID_AND_CLASS_PREFIX + "-subelem-id-input-cell";
@@ -261,7 +261,7 @@ function _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElem
         // -- Create the row that displays the object constant of the subelement
         const SUB_ELEM_OBJ_CONST = subElementEpilogType + "_obj_" + subElemIndex;
         let subElemObjConstInputFieldID = SUB_ELEM_ID_AND_CLASS_PREFIX + "-subelem-id-input-field-" + subElemIndex;
-        let newSubElemObjConstCell = newClaimsFormInputCell(2, "text", SUB_ELEM_OBJ_CONST, " "+ subElementEnglishName + " ID: ", subElemObjConstInputFieldID, true);
+        let newSubElemObjConstCell = newClaimsFormInputCell(2, "text", SUB_ELEM_OBJ_CONST, " "+ subElementEnglishName + " ID: ", subElemObjConstInputFieldID, !allowEditingSubElementID);
         newSubElemObjConstCell.id = SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS + "-" + subElemIndex;
         newSubElemObjConstCell.classList.add(SUB_ELEM_OBJ_CONST_INPUT_CELL_CLASS, "subelem-obj-const-input-cell");
         // Set the data needed for linking the subelement to the claim
