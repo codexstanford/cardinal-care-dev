@@ -523,6 +523,12 @@ function build_subcontractor_info_section() {
     [{colSpan: 2, inputType: "checkbox", defaultInput: true, fieldSpecificIDSubstring: "claim_took_reasonable_steps_to_obtain_subcontractor_ppl_info_boolean_input", factTemplate: "claim.insuree_took_reasonable_steps_to_obtain_information_from_subcontractor_prior_to_starting_work_that_they_have_ppl_insurance_in_force_during_their_period_of_involvement($CLAIM$, $SUB_ELEM_ID$, $VALUE$)", cellText: "Did the insuree take reasonable steps to obtain information from the subcontractor, prior to starting work, that the subcontractor has Public liability insurance in force throughout the period of involvement? "}]
   ], update_coverage_indicator));
 
+
+  rows.push(newClaimsFormSubElementTable("covid19-vaccine-subelement-table", "Covid Vaccines", "Vaccine", "covid19_vaccination_event", "claim.covid19_vaccination", false, [
+    [{colSpan: 2, inputType: "select", defaultInput: "moderna", fieldSpecificIDSubstring: "claim_covid19_vaccine_brand", factTemplate: "claim.vaccine_brand($CLAIM$, covid19_vaccination_event($SUB_ELEM_ID$, $VALUE$))", cellText: "Brand: "}],
+    [{colSpan: 2, inputType: "date", defaultInput: "2024-09-05", fieldSpecificIDSubstring: "claim_covid19_vaccine_date", factTemplate: "claim.vaccine_date($CLAIM$, covid19_vaccination_event($SUB_ELEM_ID$, $VALUE$))", cellText: "Date: "}]
+  ], update_coverage_indicator));
+
   return rows;
 }
 

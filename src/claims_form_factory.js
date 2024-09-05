@@ -285,9 +285,11 @@ function _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElem
 
         // Prepend in order to put the button to the left of the object constant text and input field
         newSubElemObjConstCell.prepend(newRemoveThisSubElemButton);
+        newSubElemObjConstCell.style.display = 'none';
         // Package the cell into a row
         let newSubElemObjConstRow = newClaimsFormInputRow([newSubElemObjConstCell], [SUB_ELEM_ROW_CLASS, THIS_SUB_ELEM_ROW_CLASS]);
         
+        newSubElemObjConstRow.prepend(newRemoveThisSubElemButton);
 
         // -- Build the rows specific to this type of subelement
         let subElementSpecificRows = [];
@@ -324,7 +326,7 @@ function _addEventListenerForAddAnotherButton(subElementTable, addAnotherSubElem
 
 // Distinct from newClaimsFormInputCell, since additional data is required to build input cells in subelement tables
 function _newSubElemInputCell(colSpan, inputType, defaultInput, cellText, inputID, factTemplate, SUB_ELEM_OBJ_CONST, update_coverage_indicator_callback) {
-    let inputElem = _newInputElem(inputType, defaultInput, inputID);
+    let inputElem = _newInputElem(inputType, defaultInput, inputID, [["moderna", "Moderna"]]);
     
     // Class for all subelement input cells, regardless of their specific table
     inputElem.classList.add("subelem-non-obj-const-input-field");
