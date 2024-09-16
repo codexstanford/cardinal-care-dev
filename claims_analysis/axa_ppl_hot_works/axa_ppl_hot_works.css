@@ -30,6 +30,8 @@ nav a {
 #coverage-indicator {
   font-weight: bold;
   font-size: 20px;
+  position: sticky;
+  top: -1px;
 }
 
 #coverage-indicator td {
