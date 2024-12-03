@@ -4889,4 +4889,5 @@ module.exports = {
   read,
   compfinds,
   grindem,
+  debugfinds
 };

@@ -14,6 +14,8 @@ This gives us two pieces of information
  https://www.cdc.gov/vaccines/schedules/hcp/imz/child-schedule-notes.html#note-hepb - for children
  and 
  https://www.cdc.gov/vaccines/schedules/hcp/imz/adult-schedule-notes.html#note-hepb - for adults
+ and
+ http://www.cdc.gov/vaccines/hcp/acip-recs/vacc-specific/hepb.html for more details
  I recommend creating a spreadsheet to track limits - for hep_b I used:
 https://office365stanford-my.sharepoint.com/:x:/r/personal/lalwani_stanford_edu/Documents/vaccine%20schedules.xlsx?d=wba52d2d17a1c4bde9e5cdd104debf400&csf=1&web=1&e=B91e0K&nav=MTVfezAwMDAwMDAwLTAwMDEtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMH0
 3. Now, I describe how I derived the rules for the hep-b case.
@@ -31,6 +33,10 @@ Infants born to HBsAg-positive mothers
 Persons who are predialysis or on maintenance dialysis
 Other immunocompromised persons
 For detailed revaccination recommendations, see http://www.cdc.gov/vaccines/hcp/acip-recs/vacc-specific/hepb.html.
+
+Usually, the detailed recommendations website contains links to both CURRENT and ARCHIVED recommended practices. Please refer to only the CURRENT recommendations.
+The documents are usually complex, so it's best to look for something specific. In this case, I specifically searched for the word "revaccination" which helped me find 
+more detailed eligibility criteria for revaccinations.
 
 After combing through the documents at the above link, I found the following details:
 - single-dose revaccination for infants born to HBsAg-positive women not responding to the initial vaccine series;
